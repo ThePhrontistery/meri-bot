@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CORS Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        pre {
+            background: #f4f4f4;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        button {
+            padding: 10px 15px;
+            background: #2c3e50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px 0;
+        }
+        button:hover {
+            background: #1a252f;
+        }
+    </style>
+</head>
+<body>
+    <h1>CORS Test Page</h1>
+    <p>Click the button below to test the API endpoint with CORS.</p>
+    
+    <button id="testButton">Test API Endpoint</button>
+    
+    <h2>Response:</h2>
+    <pre id="response">Click the button to test the API</pre>
+    
+    <script>
+        document.getElementById('testButton').addEventListener('click', async () => {
+            const responseElement = document.getElementById('response');
+            responseElement.textContent = 'Sending request...';
+            
+            try {
+                const response = await fetch('http://localhost:8000/chatbot/query', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        question: 'Test CORS request',
+                        conversation_id: 'cors-test-123'
+                    })
+                });
+                
+                const data = await response.json();
+                responseElement.textContent = `Status: ${response.status}
+
+Headers:
+${JSON.stringify(Object.fromEntries(response.headers.entries()), null, 2)}
+
+Response:
+${JSON.stringify(data, null, 2)}`;
+            } catch (error) {
+                responseElement.textContent = `Error: ${error.message}\n${error.stack}`;
+            }
+        });
+    </script>
+</body>
+</html>

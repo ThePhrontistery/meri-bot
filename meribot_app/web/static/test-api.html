@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Test</title>
+    <script>
+        async function testAPI() {
+            const response = await fetch('http://localhost:8000/chatbot/query', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    question: 'Hello, can you hear me?',
+                    conversation_id: 'test-conversation-123'
+                })
+            });
+            
+            const data = await response.json();
+            console.log('API Response:', data);
+            document.getElementById('result').textContent = JSON.stringify(data, null, 2);
+        }
+    </script>
+</head>
+<body>
+    <h1>API Test Page</h1>
+    <button onclick="testAPI()">Test API</button>
+    <pre id="result">Click the button to test the API</pre>
+</body>
+</html>

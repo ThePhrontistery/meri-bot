@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MeriBot - Asistente Virtual C&CA</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+        }
+        .container {
+            margin-top: 30px;
+        }
+        pre {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        code {
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .widget-demo {
+            margin: 40px 0;
+            padding: 20px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <!-- MeriBot Widget Container -->
+    <div id="meribot-widget-container"></div>
+    
+    <!-- Load the MeriBot widget with error handling -->
+    <script>
+        console.log('Loading MeriBot widget...');
+        
+        // Create script element
+        const widgetScript = document.createElement('script');
+        widgetScript.src = '/static/js/meribot-loader.js';
+        
+        // Set widget configuration
+        widgetScript.setAttribute('data-autoload', 'true');
+        widgetScript.setAttribute('data-api-url', 'http://localhost:8000/chatbot/query');
+        widgetScript.setAttribute('data-button-text', 'Chat with MeriBot');
+        widgetScript.setAttribute('data-button-color', '#2c3e50');
+        widgetScript.setAttribute('data-title', 'MeriBot Assistant');
+        widgetScript.setAttribute('data-subtitle', '¿En qué puedo ayudarte hoy?');
+        widgetScript.setAttribute('data-position', 'bottom-right');
+        widgetScript.setAttribute('data-auto-open', 'true');
+        widgetScript.setAttribute('data-debug', 'true');
+        
+        // Add error handling
+        widgetScript.onerror = function() {
+            console.error('Failed to load MeriBot widget');
+            const container = document.getElementById('meribot-widget-container');
+            if (container) {
+                container.innerHTML = '<p style="color:red">Error loading MeriBot widget. Please check the console for details.</p>';
+            }
+        };
+        
+        // Add load handler
+        widgetScript.onload = function() {
+            console.log('MeriBot widget loaded successfully');
+            if (window.MeriBot) {
+                console.log('MeriBot API is available');
+                // Initialize the widget
+                window.MeriBot.init();
+            }
+        };
+        
+        // Add to document
+        document.body.appendChild(widgetScript);
+    </script>
+<body>
+    <h1>MeriBot - Asistente Virtual C&CA</h1>
+    
+    <div class="container">
+        <p>Bienvenido a la demostración del widget de MeriBot. El botón de chat debería aparecer en la esquina inferior derecha.</p>
+        
+        <div class="widget-demo">
+            <h2>Ejemplo de integración</h2>
+            <p>Para integrar este widget en tu página, añade el siguiente código:</p>
+            
+            <pre><code>&lt;script src="http://localhost:3000/static/js/meribot-loader.js" 
+    data-autoload
+    data-api-url="http://localhost:3000/chatbot/query"
+    data-button-text="Chat con MeriBot"
+    data-button-color="#2c3e50"
+    data-title="MeriBot"
+    data-subtitle="¿En qué puedo ayudarte?"
+    data-position="bottom-right"
+    data-auto-open="false"&gt;
+&lt;/script&gt;</code></pre>
+        </div>
+        
+        <div class="widget-demo">
+            <h2>Control programático</h2>
+            <p>Puedes controlar el widget con JavaScript:</p>
+            <pre><code>// Mostrar el chat
+window.MeriBot.show();
+
+// Ocultar el chat
+window.MeriBot.hide();
+
+// Enviar un mensaje programáticamente
+window.MeriBot.sendMessage('Hola, MeriBot');</code></pre>
+            
+            <div style="margin-top: 20px;">
+                <button onclick="window.MeriBot && window.MeriBot.show()" style="padding: 8px 16px; margin-right: 10px;">Mostrar chat</button>
+                <button onclick="window.MeriBot && window.MeriBot.hide()" style="padding: 8px 16px; margin-right: 10px;">Ocultar chat</button>
+                <button onclick="window.MeriBot && window.MeriBot.sendMessage('¿Cómo estás?')" style="padding: 8px 16px;">Enviar saludo</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

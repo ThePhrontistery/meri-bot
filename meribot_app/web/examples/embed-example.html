@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MeriBot Embed Example</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .container {
+            margin-top: 40px;
+        }
+        pre {
+            background: #f4f4f4;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        code {
+            font-family: 'Courier New', Courier, monospace;
+        }
+    </style>
+</head>
+<body>
+    <h1>MeriBot Widget Embed Example</h1>
+    
+    <div class="container">
+        <div style="margin-top: 20px;">
+            <button id="show-chat" style="padding: 8px 16px; margin-right: 10px;">Mostrar chat</button>
+            <button id="hide-chat" style="padding: 8px 16px; margin-right: 10px;">Ocultar chat</button>
+            <button id="send-greeting" style="padding: 8px 16px;">Enviar saludo</button>
+        </div>
+        <script>
+        // Initialize MeriBot when the page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if MeriBot is already loaded
+            if (window.MeriBot) {
+                initMeriBot();
+            } else {
+                // If not, wait for the loader script to be loaded
+                const checkMeriBot = setInterval(function() {
+                    if (window.MeriBot) {
+                        clearInterval(checkMeriBot);
+                        initMeriBot();
+                    }
+                }, 100);
+            }
+
+            function initMeriBot() {
+                console.log('MeriBot is available, initializing...');
+                
+                // Set up control buttons
+                document.getElementById('show-chat').addEventListener('click', function() {
+                    console.log('Show chat button clicked');
+                    if (window.MeriBot && window.MeriBot.show) {
+                        window.MeriBot.show();
+                    }
+                });
+                
+                document.getElementById('hide-chat').addEventListener('click', function() {
+                    console.log('Hide chat button clicked');
+                    if (window.MeriBot && window.MeriBot.hide) {
+                        window.MeriBot.hide();
+                    }
+                });
+                
+                document.getElementById('send-greeting').addEventListener('click', function() {
+                    console.log('Send greeting button clicked');
+                    if (window.MeriBot && window.MeriBot.sendMessage) {
+                        window.MeriBot.sendMessage('¿Cómo estás?');
+                    }
+                });
+                
+                console.log('MeriBot controls initialized');
+            }
+        });
+    </script>
+        <h2>1. Basic Embed</h2>
+        <p>Add this script to your page to include the MeriBot widget:</p>
+        <pre><code>&lt;script src="/static/js/meribot-loader.js" data-autoload&gt;&lt;/script&gt;</code></pre>
+        
+        <h2>2. With Custom Configuration</h2>
+        <p>Customize the widget appearance and behavior:</p>
+        <pre><code>&lt;script src="/static/js/meribot-loader.js" 
+        data-autoload
+        data-api-url="http://localhost:3000/chatbot/query"
+        data-button-text="Ask MeriBot"
+        data-button-color="#3f51b5"
+        data-title="MeriBot Assistant"
+        data-subtitle="How can I help you today?"
+        data-position="bottom-right"
+        data-auto-open="false"
+        data-debug="false"&gt;
+&lt;/script&gt;</code></pre>
+
+        <h2>3. Programmatic Initialization</h2>
+        <p>Initialize the widget with JavaScript:</p>
+        <pre><code>&lt;script src="/static/js/meribot-loader.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+    // Initialize with custom config
+    const meriBot = initMeriBot({
+        apiUrl: 'http://localhost/chatbot/query',
+        buttonText: 'Chat Now',
+        buttonColor: '#e91e63',
+        title: 'MeriBot',
+        subtitle: 'How can I assist you today?',
+        position: 'bottom-right',
+        autoOpen: false,
+        debug: false
+    });
+    
+    // You can also control the widget programmatically
+    // meriBot.show();
+    // meriBot.hide();
+    // meriBot.sendMessage('Hello, MeriBot!');
+&lt;/script&gt;</code></pre>
+    </div>
+    
+    <!-- Load the MeriBot widget -->
+    <script src="/static/js/meribot-loader.js" 
+            data-api-url="http://localhost:8000/chatbot/query"
+            data-button-text="Chat with MeriBot"
+            data-button-color="#2c3e50"
+            data-title="MeriBot Assistant"
+            data-subtitle="How can I help you today?"
+            data-position="bottom-right"
+            data-auto-open="false"
+            data-debug="true">
+    </script>
+</body>
+</html>
