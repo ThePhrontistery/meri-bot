@@ -1,0 +1,42 @@
+# Stack Tecnológico- Paquetes Requeridos
+- Se indica en el setupo.md cómo instalarlo
+   Para instalarlos se dispone del /meribot_app/requirements.txt
+   Cómo instalar estas dependencias de Python:
+   ```bash
+     pip install -r requirements.txt
+   ```
+
+## Core
+fastapi>=0.95.0
+uvicorn>=0.21.0
+python-dotenv>=1.0.0
+pydantic>=1.10.7
+
+## Web scraping
+beautifulsoup4>=4.12.0
+requests>=2.28.2
+lxml>=4.9.2
+
+## Vector database
+chromadb>=0.4.0
+
+## NLP and ML
+transformers>=4.28.0
+sentence-transformers>=2.2.2
+langchain>=0.0.200
+
+## CLI
+click>=8.1.3
+rich>=13.3.5
+
+## Development
+alembic>=1.10.3
+
+## Estilo de Código
+black>=23.3.0
+isort>=5.12.0
+mypy>=1.2.0
+
+## Tests + cobertura
+pytest>=7.3.1
+pytest-cov>=4.0.0
