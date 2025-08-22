@@ -10,7 +10,7 @@ meribot/
 │   ├── __init__.py
 │   └── app.py              # Aplicación principal de FastAPI
 │
-├── cli/                    # Herramientas de línea de comandos
+├── meri-cli/               # Herramientas de línea de comandos
 │   ├── __init__.py
 │   └── main.py             # Comandos CLI principales
 │
