@@ -4,29 +4,40 @@ Carga configuración desde YAML, INI y variables de entorno.
 Valida campos requeridos y tipos.
 Provee acceso centralizado a la configuración.
 """
+
 import os
 import yaml
-from typing import Any, Dict
+from typing import Any, Dict, List, Optional
+from pydantic import BaseModel, Field, ValidationError
 
 CONFIG_PATH_YAML = os.environ.get("CRAWLER_CONFIG_YAML", os.path.join(os.path.dirname(__file__), "crawler_config.yaml"))
 
-REQUIRED_FIELDS = [
-    "seeds",
-    "allowed_domains",
-    "user_agent",
-    "delay",
-    "output_dir",
-    "log_level",
-    "chroma_path",
-    "embedding_model"
-]
+
+# Esquema formal de configuración usando Pydantic
+class CrawlerConfig(BaseModel):
+    seeds: List[str] = Field(..., description="Lista de URLs semilla")
+    allowed_domains: List[str] = Field(..., description="Dominios permitidos para el crawler")
+    user_agent: str = Field(..., description="Agente de usuario HTTP")
+    delay: float = Field(..., description="Segundos entre peticiones")
+    output_dir: str = Field(..., description="Directorio de salida para los datos extraídos")
+    log_level: str = Field(..., description="Nivel de logging (INFO, DEBUG, etc.)")
+    chroma_path: str = Field(..., description="Ruta para ChromaDB")
+    embedding_model: str = Field(..., description="Modelo de embeddings a usar")
+    max_depth: Optional[int] = Field(3, description="Profundidad máxima de crawling")
+    file_types: Optional[List[str]] = Field(default_factory=lambda: ["html", "pdf", "docx", "xlsx"], description="Tipos de archivo soportados")
+
+    class Config:
+        extra = "forbid"
+
 
 class ConfigError(Exception):
     pass
 
+
 def load_yaml_config(path: str) -> Dict[str, Any]:
     with open(path, "r", encoding="utf-8") as f:
         return yaml.safe_load(f)
+
 
 def override_with_env(config: Dict[str, Any]) -> Dict[str, Any]:
     # Permite override de campos por variables de entorno
@@ -44,25 +55,16 @@ def override_with_env(config: Dict[str, Any]) -> Dict[str, Any]:
             config[key] = value
     return config
 
+
 def validate_config(config: Dict[str, Any]) -> None:
-    missing = [f for f in REQUIRED_FIELDS if f not in config or config[f] is None]
-    if missing:
-        raise ConfigError(f"Faltan campos requeridos en la configuración: {missing}")
-    # Validaciones básicas de tipo
-    if not isinstance(config["seeds"], list):
-        raise ConfigError("El campo 'seeds' debe ser una lista de URLs")
-    if not isinstance(config["allowed_domains"], list):
-        raise ConfigError("El campo 'allowed_domains' debe ser una lista")
-    if not isinstance(config["delay"], (float, int)):
-        raise ConfigError("El campo 'delay' debe ser numérico (float o int)")
-    if not isinstance(config["output_dir"], str):
-        raise ConfigError("El campo 'output_dir' debe ser string")
-    if not isinstance(config["log_level"], str):
-        raise ConfigError("El campo 'log_level' debe ser string")
-    if not isinstance(config["chroma_path"], str):
-        raise ConfigError("El campo 'chroma_path' debe ser string")
-    if not isinstance(config["embedding_model"], str):
-        raise ConfigError("El campo 'embedding_model' debe ser string")
+    """
+    Valida la configuración usando el esquema formal CrawlerConfig (Pydantic).
+    Lanza ConfigError si la validación falla.
+    """
+    try:
+        CrawlerConfig(**config)
+    except ValidationError as e:
+        raise ConfigError(f"Error de validación en la configuración: {e}")
 
 def get_config() -> Dict[str, Any]:
     """Carga y valida la configuración global del crawler."""

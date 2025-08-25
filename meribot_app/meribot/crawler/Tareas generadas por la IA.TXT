@@ -1,0 +1,66 @@
+
+# Fases y Tareas Detalladas
+## Fase 1: Configuración y Setup
+1.1 [x] * Definir esquema de configuración
+1.2 [x] * Crear un archivo de configuración (YAML/JSON) para seeds, dominios, límites, tipos de archivo, etc.
+1.3 [x] * Validar la configuración al inicio.
+1.4 [x] * Inicializar logging estructurado
+1.5 [x] * Configurar logs en formato legible y exportable.
+
+## Fase 2: Descubrimiento y Extracción
+2.1 [x] * Implementar el módulo de descubrimiento
+2.2 [x] * Recorrer URLs semilla, respetando límites de dominio y profundidad.
+2.3 [x] * Detectar enlaces a HTML, .docx, .xlsx, .pdf.
+2.4 [ ] * Desarrollar parsers para cada tipo de fuente (HTML: BeautifulSoup/lxml - Word: python-docx - Excel: openpyxl - PDF: PyMuPDF o pdfminer)
+2.5 [ ] * Manejar errores y formatos no soportados.
+
+## Fase 3: Procesamiento y Filtrado
+3.1 [ ] * Extraer texto principal y metadatos
+3.2 [ ] * Título, fecha, autor, versión, URL, dominio, tipo de documento.
+3.3 [ ] * Normalizar y fragmentar el contenido
+3.4 [ ] * Chunking configurable, preservando límites semánticos.
+3.5 [ ] * Detección de duplicados y cambios
+3.6 [ ] * Calcular hash de contenido y comparar con versiones previas.
+
+## Fase 4: Almacenamiento
+4.1 [ ] * Integrar con ChromaDB
+4.2 [ ] * Adaptar los datos extraídos al formato vectorial requerido.
+4.3 [ ] * Upsert de fragmentos con claves determinísticas y metadatos.
+
+## Fase 5: Orquestación y Automatización
+5.1 [ ] * Programar ejecución automática semanal
+5.2 [ ] * Usar un scheduler (ej: APScheduler) o integración con cron.
+5.3 [ ] * Implementar disparador manual desde Meri-Cli
+5.4 [ ] * Comando CLI para lanzar el crawler bajo demanda.
+
+## Fase 6: Reportes y Monitoreo
+6.1 [ ] * Generar reportes claros de resultados
+6.2 [ ] * Nuevos, actualizados, no cambiados, errores.
+6.3 [ ] * Exportar en tabla y JSON.
+6.4 [ ] * Exponer métricas y logs en CLI
+6.5 [ ] * Comandos para consultar estado, logs y métricas básicas.
+
+## Fase 7: Gestión de Errores y Edge Cases
+7.1 [ ] * Manejo robusto de errores
+7.2 [ ] * Continuar ante fallos parciales, registrar y reportar todos los errores.
+7.3 [ ] * Mensajes estándar para "no answer found" y "acceso restringido".
+
+LISTA DE TAREAS DETALLADA
+- Definir y validar archivo de configuración del crawler.
+- Configurar logging estructurado y exportable.
+- Implementar módulo de descubrimiento de URLs y documentos.
+- Desarrollar parser para HTML.
+- Desarrollar parser para Word (.docx).
+- Desarrollar parser para Excel (.xlsx).
+- Desarrollar parser para PDF.
+- Extraer y normalizar metadatos relevantes.
+- Implementar chunking configurable del contenido.
+- Detectar duplicados y cambios por hash y metadatos.
+- Adaptar y almacenar datos en ChromaDB.
+- Programar ejecución automática semanal.
+- Implementar disparador manual desde Meri-Cli.
+- Generar reportes de resultados y errores.
+- Exponer métricas y logs en CLI.
+- Manejar errores y edge cases con mensajes estándar.
+- Documentar todos los módulos y funciones.
+- Crear pruebas unitarias y de integración.
