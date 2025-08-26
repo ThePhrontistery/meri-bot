@@ -11,13 +11,13 @@
 2.1 [x] * Implementar el módulo de descubrimiento
 2.2 [x] * Recorrer URLs semilla, respetando límites de dominio y profundidad.
 2.3 [x] * Detectar enlaces a HTML, .docx, .xlsx, .pdf.
-2.4 [ ] * Desarrollar parsers para cada tipo de fuente (HTML: BeautifulSoup/lxml - Word: python-docx - Excel: openpyxl - PDF: PyMuPDF o pdfminer)
-2.5 [ ] * Manejar errores y formatos no soportados.
+2.4 [x] * Desarrollar parsers para cada tipo de fuente (HTML: BeautifulSoup/lxml - Word: python-docx - Excel: openpyxl - PDF: PyMuPDF o pdfminer)
+2.5 [x] * Manejar errores y formatos no soportados.
 
 ## Fase 3: Procesamiento y Filtrado
-3.1 [ ] * Extraer texto principal y metadatos
-3.2 [ ] * Título, fecha, autor, versión, URL, dominio, tipo de documento.
-3.3 [ ] * Normalizar y fragmentar el contenido
+3.1 [x] * Extraer texto principal y metadatos
+3.2 [x] * Título, fecha, autor, versión, URL, dominio, tipo de documento.
+3.3 [x] * Normalizar y fragmentar el contenido
 3.4 [ ] * Chunking configurable, preservando límites semánticos.
 3.5 [ ] * Detección de duplicados y cambios
 3.6 [ ] * Calcular hash de contenido y comparar con versiones previas.
