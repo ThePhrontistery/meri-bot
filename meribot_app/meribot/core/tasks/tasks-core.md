@@ -24,20 +24,19 @@
   - [X] 1.3 Mantener el historial de mensajes durante la sesión activa.
   - [X] 1.4 Eliminar el historial al cerrar el panel de conversación.
   - [X] 1.5 Añadir identificadores únicos para cada conversación.
-  - [ ] 1.6 Realizar pruebas unitarias de la gestión de conversaciones y contexto.
+  - [x] 1.6 Realizar pruebas unitarias de la gestión de conversaciones y contexto.
 - [x] 2.0 Desarrollar el sistema de plugins y su integración con el CORE.
   - [x] 2.1 Diseñar la clase base para plugins.
   - [x] 2.2 Implementar el registro y activación/desactivación de plugins.
   - [x] 2.3 Permitir que los plugins accedan al contexto y metadatos de la consulta.
   - [x] 2.4 Documentar el proceso de creación de nuevos plugins.
   - [x] 2.5 Realizar pruebas unitarias del sistema de plugins.
-- [ ] 3.0 Integrar la base vectorial para búsquedas semánticas y citación de fuentes.
-  - [ ] 3.1 Implementar la conexión con ChromaDB.
-  - [ ] 3.2 Desarrollar la función de búsqueda semántica de fragmentos relevantes.
-  - [ ] 3.3 Incluir metadatos (dominio, fecha, fuente) en los fragmentos almacenados.
-  - [ ] 3.4 Permitir filtrar resultados por dominio y otros metadatos.
-  - [ ] 3.5 Citar las fuentes utilizadas en las respuestas.
-  - [ ] 3.6 Realizar pruebas unitarias de la integración de la base vectorial.
+- [x] 3.0 Integrar la base vectorial para búsquedas semánticas y citación de fuentes.
+  - [x] 3.1 Implementar la conexión con ChromaDB.
+  - [x] 3.2 Desarrollar la función de búsqueda semántica de fragmentos relevantes.
+  - [x] 3.3 Permitir filtrar resultados por dominio y otros metadatos.
+  - [x] 3.4 Citar las fuentes utilizadas en las respuestas.
+  - [x] 3.5 Realizar pruebas unitarias de la integración de la base vectorial.
 - [ ] 4.0 Implementar la gestión de caché de respuestas frecuentes.
   - [ ] 4.1 Diseñar la estructura de la caché y su integración con el CORE.
   - [ ] 4.2 Configurar el tiempo de vida de la caché.
