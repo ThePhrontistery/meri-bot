@@ -75,6 +75,20 @@ class BasePlugin(ABC):
 
 class PluginManager:
 
+    async def run_pre_llm_plugins(self, message, context, metadata):
+        """
+        Hook para plugins pre-LLM. Devuelve la primera respuesta no vacía de los plugins activos, o None.
+        """
+        # Por defecto, no hay plugins activos que intercepten
+        return None
+
+    async def run_post_llm_plugins(self, response, context, metadata):
+        """
+        Hook para plugins post-LLM. Permite modificar la respuesta antes de devolverla.
+        """
+        # Por defecto, no modifica la respuesta
+        return response
+
     def process_with_active_plugins(self, query: str, context: dict) -> dict:
         """
         Procesa una consulta con todos los plugins activos, pasando contexto y metadatos.

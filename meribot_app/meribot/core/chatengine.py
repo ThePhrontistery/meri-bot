@@ -43,9 +43,9 @@ class ChatEngine:
         Flujo: caché -> plugins -> vector search -> LLM.
         """
         session = self.conversation_manager.get_or_create_session(user_id)
-        context = session.history
+        context = session.get_history()
         # 1. Buscar en caché
-        cached = self.cache.get(message, domain=domain)
+        cached = self.cache.get(message)
         if cached:
             return {"type": "cache", "response": cached, "citations": [], "source": "cache"}
         # 2. Plugins (pre-LLM)
@@ -71,9 +71,9 @@ class ChatEngine:
         # 5. Plugins (post-LLM)
         response = await self.plugin_manager.run_post_llm_plugins(response, context, metadata)
         # 6. Actualizar historial y caché
-        session.add_message({"role": "user", "content": message})
-        session.add_message({"role": "assistant", "content": response})
-        self.cache.set(message, response, domain=domain)
+        session.add_message("user", message)
+        session.add_message("assistant", response)
+        self.cache.set(message, response)
         return {
             "type": "llm",
             "response": response,
@@ -92,7 +92,7 @@ class ChatEngine:
         Genera respuesta en streaming, orquestando el flujo completo.
         """
         session = self.conversation_manager.get_or_create_session(user_id)
-        context = session.history
+        context = session.get_history()
         # Plugins y caché no soportan streaming, así que solo LLM
         try:
             async for token in self.llm_engine.stream_response(
@@ -110,7 +110,7 @@ class ChatEngine:
     def get_context(self, user_id: str) -> List[Dict[str, Any]]:
         """Devuelve el historial de mensajes de la sesión activa."""
         session = self.conversation_manager.get_or_create_session(user_id)
-        return session.history
+        return session.get_history()
 
     # Métodos de filtrado avanzado
     def filter_chunks(self, chunks, domain=None, metadata=None):

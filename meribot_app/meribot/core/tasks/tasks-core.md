@@ -74,15 +74,10 @@
   - [x] 8.5 Implementar la citación automática de fuentes en las respuestas.
   - [x] 8.6 Manejar errores de conectividad y fallos del modelo de IA.
   - [x] 8.7 Realizar pruebas unitarias del conjunto de la tarea.
-- [ ] 9.0 Desarrollar el ChatEngine como interfaz de coordinación del CORE.
-  - [ ] 9.1 Diseñar la clase ChatEngine como punto de entrada principal del CORE.
-  - [ ] 9.2 Coordinar la interacción entre plugins, vector search, caché y LLM.
-  - [ ] 9.3 Implementar la lógica de flujo conversacional completa.
-  - [ ] 9.4 Gestionar el filtrado por dominio y metadatos de consultas.
-  - [ ] 9.5 Proporcionar una interfaz programática asíncrona limpia para el módulo API.
-  - [ ] 9.6 Realizar pruebas unitarias del conjunto de la tarea.
-- [ ] 10.0 Crear pruebas unitarias y de cobertura para las funciones principales.
-  - [ ] 10.1 Escribir tests unitarios para cada módulo del CORE.
-  - [ ] 10.2 Cubrir casos de error y edge cases.
-  - [ ] 10.3 Configurar la ejecución automática de tests y generación de informes de cobertura.
-  - [ ] 10.4 Revisar y mantener la cobertura superior al 80%.
+- [x] 9.0 Desarrollar el ChatEngine como interfaz de coordinación del CORE.
+  - [x] 9.1 Diseñar la clase ChatEngine como punto de entrada principal del CORE.
+  - [x] 9.2 Coordinar la interacción entre plugins, vector search, caché y LLM.
+  - [x] 9.3 Implementar la lógica de flujo conversacional completa.
+  - [x] 9.4 Gestionar el filtrado por dominio y metadatos de consultas.
+  - [x] 9.5 Proporcionar una interfaz programática asíncrona limpia para el módulo API.
+  - [x] 9.6 Realizar pruebas unitarias del conjunto de la tarea.

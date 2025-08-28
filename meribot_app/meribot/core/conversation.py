@@ -55,6 +55,17 @@ class ConversationContext:
 
 
 class ConversationManager:
+    def get_or_create_session(self, user_id: str) -> 'ConversationContext':
+        """
+        Devuelve la sesión activa para el usuario o la crea si no existe.
+        El ID de usuario se usa como clave de sesión.
+        """
+        # Buscar sesión por user_id (si existe)
+        for ctx in self.sessions.values():
+            if getattr(ctx, 'user_id', None) == user_id:
+                return ctx
+        # Si no existe, crear nueva sesión
+        return self.create_session(user_id=user_id)
     """
     Gestiona la creación y cierre de sesiones de conversación.
     Permite registrar, recuperar y cerrar sesiones activas.
