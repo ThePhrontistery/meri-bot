@@ -54,26 +54,26 @@
   - [x] 5.3 Configurar el system prompt y parámetros como temperatura y tokens.
   - [x] 5.4 Documentar las opciones de configuración disponibles.
   - [x] 5.5 Realizar pruebas unitarias del conjunto de la tarea.
-  - [x] 6.0 Implementar logging y auditoría de eventos y errores.
+- [x] 6.0 Implementar logging y auditoría de eventos y errores.
   - [x] 6.1 Registrar errores y eventos críticos.
   - [x] 6.2 Registrar inputs rechazados por guardrails y fallos de generación.
   - [x] 6.3 Garantizar que los logs permitan auditoría técnica sin exponer datos sensibles.
   - [x] 6.4 Configurar niveles de logging y rotación de logs.
   - [x] 6.5 Realizar pruebas unitarias del conjunto de la tarea.
-  - [x] 7.0 Desarrollar validaciones, sanitización y guardrails de seguridad.
+- [x] 7.0 Desarrollar validaciones, sanitización y guardrails de seguridad.
   - [x] 7.1 Implementar validación y sanitización de entradas del usuario.
   - [x] 7.2 Añadir guardrails para evitar respuestas inadecuadas o peligrosas.
   - [x] 7.3 Garantizar cumplimiento de estándares de seguridad y accesibilidad.
   - [x] 7.4 Probar casos extremos y edge cases de seguridad.
   - [x] 7.5 Realizar pruebas unitarias del conjunto de la tarea.
-- [ ] 8.0 Implementar el motor de generación de respuestas con LLM.
-  - [ ] 8.1 Integrar Langchain para la comunicación con modelos de IA.
-  - [ ] 8.2 Implementar la lógica de generación de respuestas en modo streaming.
-  - [ ] 8.3 Configurar el system prompt persistente y parámetros del modelo.
-  - [ ] 8.4 Gestionar el contexto conversacional en las llamadas al LLM.
-  - [ ] 8.5 Implementar la citación automática de fuentes en las respuestas.
-  - [ ] 8.6 Manejar errores de conectividad y fallos del modelo de IA.
-  - [ ] 8.7 Realizar pruebas unitarias del conjunto de la tarea.
+- [x] 8.0 Implementar el motor de generación de respuestas con LLM.
+  - [x] 8.1 Integrar Langchain para la comunicación con modelos de IA.
+  - [x] 8.2 Implementar la lógica de generación de respuestas en modo streaming.
+  - [x] 8.3 Configurar el system prompt persistente y parámetros del modelo.
+  - [x] 8.4 Gestionar el contexto conversacional en las llamadas al LLM.
+  - [x] 8.5 Implementar la citación automática de fuentes en las respuestas.
+  - [x] 8.6 Manejar errores de conectividad y fallos del modelo de IA.
+  - [x] 8.7 Realizar pruebas unitarias del conjunto de la tarea.
 - [ ] 9.0 Desarrollar el ChatEngine como interfaz de coordinación del CORE.
   - [ ] 9.1 Diseñar la clase ChatEngine como punto de entrada principal del CORE.
   - [ ] 9.2 Coordinar la interacción entre plugins, vector search, caché y LLM.
