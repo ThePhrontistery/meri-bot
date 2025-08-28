@@ -23,9 +23,9 @@
 3.6 [x] * Calcular hash de contenido y comparar con versiones previas.
 
 ## Fase 4: Almacenamiento
-4.1 [ ] * Integrar con ChromaDB
-4.2 [ ] * Adaptar los datos extraídos al formato vectorial requerido.
-4.3 [ ] * Upsert de fragmentos con claves determinísticas y metadatos.
+4.1 [x] * Integrar con ChromaDB
+4.2 [x] * Adaptar los datos extraídos al formato vectorial requerido.
+4.3 [x] * Upsert de fragmentos con claves determinísticas y metadatos.
 
 ## Fase 5: Orquestación y Automatización
 5.1 [ ] * Programar ejecución automática semanal
