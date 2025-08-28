@@ -1,3 +1,9 @@
+# --- Stub para integración con ChatEngine/tests ---
+class VectorSearch:
+    """Stub de VectorSearch para integración básica y evitar errores de importación."""
+    def search(self, message, domain=None, metadata=None):
+        # Retorna una lista vacía por defecto (mock minimalista)
+        return []
 
 from typing import Optional
 
