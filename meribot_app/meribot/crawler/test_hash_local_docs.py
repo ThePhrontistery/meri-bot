@@ -49,8 +49,8 @@ def main():
             print(f"  Ejemplo {i+1}: id={ids[i]}, texto={chunks[i][:60]}... metadatos={metadata_list[i]}")
         upsert_chunks_to_chroma(chunks, embeddings.tolist(), metadata_list, ids, persist_dir="chroma_data")
         # Consulta directa tras el upsert
-        from meribot.services.storage.chroma_integration import get_chroma_collection
-        collection = get_chroma_collection("meri_chunks", persist_dir="chroma_data")
+        from meribot.services.storage.chroma_integration import get_chroma_collection_and_client
+        collection, _ = get_chroma_collection_and_client("meri_chunks", persist_dir="chroma_data")
         results = collection.get(limit=5)
         print(f"[POST-UPSERT] Recuperados tras upsert: {len(results.get('ids', []))}")
         for i, (id_, doc, meta) in enumerate(zip(results.get('ids', []), results.get('documents', []), results.get('metadatas', []))):

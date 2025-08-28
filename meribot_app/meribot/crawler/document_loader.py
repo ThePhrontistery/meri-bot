@@ -79,7 +79,7 @@ def get_azure_openai_embeddings(sentences: list[str]) -> np.ndarray:
 
 def semantic_chunk_text(
     text: str,
-    max_chunk_size: int = 500,
+    max_chunk_size: int = 2000,
     min_chunk_size: int = 200,
     stride: int = 50,
     split_on_newline: bool = True,
