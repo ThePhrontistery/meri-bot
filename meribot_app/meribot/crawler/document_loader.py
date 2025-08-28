@@ -1,16 +1,39 @@
-########################################
-# Chunking semántico configurable
-from typing import List, Optional
+from dotenv import load_dotenv
+load_dotenv()
+
 import numpy as np
-try:
-    from sentence_transformers import SentenceTransformer, util
-except ImportError:
-    SentenceTransformer = None
-    util = None
+from typing import List, Optional
+import requests
+import os
+import json
+
+def get_azure_openai_embeddings(sentences: list[str]) -> np.ndarray:
+    """
+    Obtiene embeddings de Azure OpenAI para una lista de frases.
+    Requiere las variables de entorno:
+        AZURE_OPENAI_ENDPOINT, AZURE_OPENAI_KEY, AZURE_OPENAI_DEPLOYMENT
+    """
+    endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
+    api_key = os.getenv("AZURE_OPENAI_KEY")
+    deployment = os.getenv("AZURE_OPENAI_EMBEDDINGS_DEPLOYMENT")
+    if not endpoint or not api_key or not deployment:
+        raise RuntimeError("Faltan variables de entorno para Azure OpenAI embeddings.")
+    url = f"{endpoint}/openai/deployments/{deployment}/embeddings?api-version=2023-05-15"
+    headers = {
+        "Content-Type": "application/json",
+        "api-key": api_key
+    }
+    data = {"input": sentences}
+    response = requests.post(url, headers=headers, data=json.dumps(data))
+    if response.status_code != 200:
+        raise RuntimeError(f"Error Azure OpenAI: {response.status_code} {response.text}")
+    result = response.json()
+    # El resultado es una lista de dicts con 'embedding' en el mismo orden
+    embeddings = [item["embedding"] for item in result["data"]]
+    return np.array(embeddings)
 
 def semantic_chunk_text(
     text: str,
-    model_name: str = "all-MiniLM-L6-v2",
     max_chunk_size: int = 500,
     min_chunk_size: int = 200,
     stride: int = 50,
@@ -19,12 +42,11 @@ def semantic_chunk_text(
     return_embeddings: bool = False
 ) -> List[str]:
     """
-    Divide el texto en fragmentos semánticamente coherentes usando embeddings.
-    Usa SentenceTransformer para calcular similitud entre frases y agruparlas en chunks.
+    Divide el texto en fragmentos semánticamente coherentes usando embeddings de Azure OpenAI.
+    Obtiene los embeddings vía API y agrupa frases en chunks según similitud.
 
     Args:
         text (str): Texto a fragmentar.
-        model_name (str): Nombre del modelo de embeddings.
         max_chunk_size (int): Máximo de caracteres por chunk.
         min_chunk_size (int): Mínimo de caracteres por chunk.
         stride (int): Superposición de caracteres entre chunks.
@@ -35,52 +57,50 @@ def semantic_chunk_text(
     Returns:
         List[str] o List[Tuple[str, np.ndarray]]: Lista de chunks (y opcionalmente embeddings).
     """
-    if SentenceTransformer is None or util is None:
-        raise ImportError("sentence-transformers no está instalado. Instala con 'pip install sentence-transformers'.")
-
+    # --- División en frases ---
     if split_on_newline:
         sentences = [s.strip() for s in text.split("\n") if s.strip()]
     else:
-        # Simple sentence split (could be improved)
         import re
         sentences = re.split(r'(?<=[.!?]) +', text)
         sentences = [s.strip() for s in sentences if s.strip()]
 
-    model = SentenceTransformer(model_name)
-    embeddings = model.encode(sentences, convert_to_tensor=True)
+    # --- Obtener embeddings desde Azure OpenAI ---
+    embeddings = get_azure_openai_embeddings(sentences)
 
+    # --- Chunking semántico configurable ---
     chunks = []
     current_chunk = []
     current_len = 0
+    last_emb = None
     for i, (sent, emb) in enumerate(zip(sentences, embeddings)):
         if not current_chunk:
             current_chunk.append(sent)
             current_len = len(sent)
             last_emb = emb
             continue
-        sim = float(util.cos_sim(emb, last_emb))
+        # Calcular similitud coseno con el último embedding del chunk usando NumPy
+        sim = float(np.dot(emb, last_emb) / (np.linalg.norm(emb) * np.linalg.norm(last_emb)))
         if (current_len + len(sent) <= max_chunk_size and sim >= similarity_threshold) or current_len < min_chunk_size:
             current_chunk.append(sent)
             current_len += len(sent)
             last_emb = emb
         else:
-            chunk_text = " ".join(current_chunk)
-            chunks.append(chunk_text)
-            # Start new chunk, with stride overlap if needed
+            chunks.append(" ".join(current_chunk))
+            # Solapamiento opcional
             if stride > 0 and len(current_chunk) > 1:
                 overlap = current_chunk[-stride:] if stride < len(current_chunk) else current_chunk
                 current_chunk = list(overlap)
                 current_len = sum(len(s) for s in current_chunk)
+                last_emb = get_azure_openai_embeddings([current_chunk[-1]])[0]
             else:
                 current_chunk = [sent]
                 current_len = len(sent)
-            last_emb = emb
+                last_emb = emb
     if current_chunk:
-        chunk_text = " ".join(current_chunk)
-        chunks.append(chunk_text)
-
+        chunks.append(" ".join(current_chunk))
     if return_embeddings:
-        chunk_embs = model.encode(chunks, convert_to_tensor=True)
+        chunk_embs = get_azure_openai_embeddings(chunks)
         return list(zip(chunks, chunk_embs))
     return chunks
 # Fragmentación de texto

@@ -77,7 +77,7 @@ Los errores se registran en `logs/crawler.log` con diferentes niveles de severid
 - BeautifulSoup4
 - Requests
 - ChromaDB
-- Sentence-Transformers
+- Azure OpenAI Embeddings
 - Python-dotenv
 
 ## Notas de Implementación
