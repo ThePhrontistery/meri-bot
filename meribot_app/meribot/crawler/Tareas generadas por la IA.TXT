@@ -19,8 +19,8 @@
 3.2 [x] * Título, fecha, autor, versión, URL, dominio, tipo de documento.
 3.3 [x] * Normalizar y fragmentar el contenido
 3.4 [x] * Chunking configurable, preservando límites semánticos.
-3.5 [ ] * Detección de duplicados y cambios
-3.6 [ ] * Calcular hash de contenido y comparar con versiones previas.
+3.5 [x] * Detección de duplicados y cambios
+3.6 [x] * Calcular hash de contenido y comparar con versiones previas.
 
 ## Fase 4: Almacenamiento
 4.1 [ ] * Integrar con ChromaDB

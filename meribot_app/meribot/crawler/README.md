@@ -49,7 +49,7 @@ SCRAPER_DELAY=1.0  # segundos entre peticiones
 
 # Configuración de ChromaDB
 CHROMA_PATH=./chroma_data
-EMBEDDING_MODEL=all-MiniLM-L6-v2
+EMBEDDING_MODEL=text-embedding-3-large
 ```
 
 ## Tareas Programadas

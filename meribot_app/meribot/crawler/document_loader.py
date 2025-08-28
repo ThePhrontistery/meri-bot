@@ -1,11 +1,56 @@
+# ================= Ejemplo de integración tras el chunking =================
+# Supón que tienes un documento procesado y quieres fragmentarlo y clasificar los chunks:
+#
+# from meribot.crawler.document_loader import semantic_chunk_text, process_and_classify_chunks
+#
+# text = "...texto extraído del documento..."
+# metadata = {"id": "doc1", "url": "http://ejemplo.com/doc1"}  # Ajusta según tus metadatos
+# chunks = semantic_chunk_text(text)
+# metadata_list = [{**metadata, "chunk_idx": i} for i in range(len(chunks))]
+# resultados = process_and_classify_chunks(chunks, metadata_list)
+# for chunk, meta, estado in resultados:
+#     print(f"Chunk {meta['chunk_idx']} ({meta.get('id') or meta.get('url')}): {estado}")
+# ===========================================================================
 from dotenv import load_dotenv
 load_dotenv()
+
 
 import numpy as np
 from typing import List, Optional
 import requests
 import os
 import json
+
+# --- Utilidades de hash y persistencia ---
+from meribot.utils.hash_utils import calculate_sha256, load_hash_db, save_hash_db
+
+# Ruta por defecto para la base de datos de hashes (puedes cambiarla)
+HASH_DB_PATH = os.getenv('HASH_DB_PATH', 'hash_db.json')
+# Ejemplo de función para procesar y clasificar chunks según hash
+def process_and_classify_chunks(chunks: list, metadata_list: list, hash_db_path: str = HASH_DB_PATH):
+    """
+    Procesa una lista de chunks y los clasifica como 'nuevo', 'modificado' o 'sin cambios' usando hashes persistentes.
+    :param chunks: Lista de textos (chunks)
+    :param metadata_list: Lista de metadatos asociados a cada chunk (debe tener un campo 'id' o similar)
+    :param hash_db_path: Ruta al archivo JSON de hashes
+    :return: Lista de tuplas (chunk, metadata, estado)
+    """
+    hash_db = load_hash_db(hash_db_path)
+    resultados = []
+    for chunk, meta in zip(chunks, metadata_list):
+        chunk_id = meta.get('id') or meta.get('url') or meta.get('title') or str(hash(chunk))
+        chunk_hash = calculate_sha256(chunk)
+        prev_hash = hash_db.get(chunk_id)
+        if prev_hash is None:
+            estado = 'nuevo'
+        elif prev_hash == chunk_hash:
+            estado = 'sin cambios'
+        else:
+            estado = 'modificado'
+        hash_db[chunk_id] = chunk_hash
+        resultados.append((chunk, meta, estado))
+    save_hash_db(hash_db, hash_db_path)
+    return resultados
 
 def get_azure_openai_embeddings(sentences: list[str]) -> np.ndarray:
     """
@@ -57,6 +102,7 @@ def semantic_chunk_text(
     Returns:
         List[str] o List[Tuple[str, np.ndarray]]: Lista de chunks (y opcionalmente embeddings).
     """
+
     # --- División en frases ---
     if split_on_newline:
         sentences = [s.strip() for s in text.split("\n") if s.strip()]
@@ -65,8 +111,27 @@ def semantic_chunk_text(
         sentences = re.split(r'(?<=[.!?]) +', text)
         sentences = [s.strip() for s in sentences if s.strip()]
 
-    # --- Obtener embeddings desde Azure OpenAI ---
-    embeddings = get_azure_openai_embeddings(sentences)
+
+    # Filtrar frases vacías o muy cortas y limitar a las primeras 50 para pruebas rápidas
+    sentences = [s for s in sentences if len(s) > 10][:50]
+    print(f"[DEBUG] Frases para embeddings (total: {len(sentences)}):")
+    for i, s in enumerate(sentences[:10]):
+        print(f"  {i+1}: {s[:80]}{'...' if len(s) > 80 else ''}")
+    if len(sentences) > 10:
+        print(f"  ... ({len(sentences)-10} frases más)")
+    if not sentences:
+        print("[ADVERTENCIA] No hay frases válidas para embeddings. Se omite el chunking.")
+        return []
+
+
+    # --- Obtener embeddings desde Azure OpenAI en lotes ---
+    MAX_EMBEDDINGS_BATCH = 1000
+    embeddings = []
+    for i in range(0, len(sentences), MAX_EMBEDDINGS_BATCH):
+        batch = sentences[i:i+MAX_EMBEDDINGS_BATCH]
+        print(f"[DEBUG] Solicitando embeddings para frases {i+1}-{i+len(batch)}")
+        batch_embs = get_azure_openai_embeddings(batch)
+        embeddings.extend(batch_embs)
 
     # --- Chunking semántico configurable ---
     chunks = []
