@@ -1,11 +1,11 @@
 # ================= Ejemplo de integración tras el chunking =================
 # Supón que tienes un documento procesado y quieres fragmentarlo y clasificar los chunks:
 #
-# from meribot.crawler.document_loader import semantic_chunk_text, process_and_classify_chunks
+# from meribot.crawler.document_loader import chunk_text_with_langchain, process_and_classify_chunks
 #
 # text = "...texto extraído del documento..."
 # metadata = {"id": "doc1", "url": "http://ejemplo.com/doc1"}  # Ajusta según tus metadatos
-# chunks = semantic_chunk_text(text)
+# chunks = chunk_text_with_langchain(text)  # Usa RecursiveCharacterTextSplitter
 # metadata_list = [{**metadata, "chunk_idx": i} for i in range(len(chunks))]
 # resultados = process_and_classify_chunks(chunks, metadata_list)
 # for chunk, meta, estado in resultados:
@@ -21,8 +21,15 @@ import requests
 import os
 import json
 
+# --- LangChain Text Splitter ---
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+
 # --- Utilidades de hash y persistencia ---
 from meribot.utils.hash_utils import calculate_sha256, load_hash_db, save_hash_db
+
+# --- Configuración del splitter ---
+SPLITTER_CHUNK_SIZE_DOC = 2000
+SPLITTER_CHUNK_OVERLAP_DOC = 50
 
 # Ruta por defecto para la base de datos de hashes (puedes cambiarla)
 HASH_DB_PATH = os.getenv('HASH_DB_PATH', 'hash_db.json')
@@ -77,6 +84,50 @@ def get_azure_openai_embeddings(sentences: list[str]) -> np.ndarray:
     embeddings = [item["embedding"] for item in result["data"]]
     return np.array(embeddings)
 
+def chunk_text_with_langchain(
+    text: str,
+    chunk_size: int = SPLITTER_CHUNK_SIZE_DOC,
+    chunk_overlap: int = SPLITTER_CHUNK_OVERLAP_DOC
+) -> List[str]:
+    """
+    Divide el texto en chunks usando RecursiveCharacterTextSplitter de LangChain.
+    
+    Args:
+        text (str): Texto a fragmentar.
+        chunk_size (int): Tamaño máximo de cada chunk en caracteres.
+        chunk_overlap (int): Superposición entre chunks en caracteres.
+        
+    Returns:
+        List[str]: Lista de chunks de texto.
+    """
+    if not text or not text.strip():
+        print("[ADVERTENCIA] Texto vacío, no se pueden crear chunks.")
+        return []
+    
+    # Crear el splitter con los parámetros especificados
+    text_splitter = RecursiveCharacterTextSplitter(
+        chunk_size=chunk_size,
+        chunk_overlap=chunk_overlap,
+        length_function=len,
+        is_separator_regex=False,
+    )
+    
+    # Dividir el texto en chunks
+    chunks = text_splitter.split_text(text)
+    
+    print(f"[DEBUG] Texto dividido en {len(chunks)} chunks usando RecursiveCharacterTextSplitter")
+    print(f"[DEBUG] Configuración: chunk_size={chunk_size}, chunk_overlap={chunk_overlap}")
+    
+    # Mostrar información de los primeros chunks para debug
+    for i, chunk in enumerate(chunks[:3]):
+        print(f"  Chunk {i}: {len(chunk)} chars | {chunk[:80]}{'...' if len(chunk) > 80 else ''}")
+    
+    if len(chunks) > 3:
+        print(f"  ... y {len(chunks)-3} chunks más")
+    
+    return chunks
+
+# Mantener la función original para compatibilidad hacia atrás
 def semantic_chunk_text(
     text: str,
     max_chunk_size: int = 2000,
@@ -87,87 +138,24 @@ def semantic_chunk_text(
     return_embeddings: bool = False
 ) -> List[str]:
     """
-    Divide el texto en fragmentos semánticamente coherentes usando embeddings de Azure OpenAI.
-    Obtiene los embeddings vía API y agrupa frases en chunks según similitud.
+    DEPRECATED: Usa chunk_text_with_langchain() para mejor rendimiento.
+    
+    Divide el texto usando RecursiveCharacterTextSplitter en lugar del chunking semántico original.
+    Mantenida para compatibilidad, pero redirige a la nueva implementación.
 
     Args:
         text (str): Texto a fragmentar.
-        max_chunk_size (int): Máximo de caracteres por chunk.
-        min_chunk_size (int): Mínimo de caracteres por chunk.
-        stride (int): Superposición de caracteres entre chunks.
-        split_on_newline (bool): Si True, divide primero por saltos de línea.
-        similarity_threshold (float): Umbral de similitud para unir frases.
-        return_embeddings (bool): Si True, retorna tuplas (chunk, embedding).
+        max_chunk_size (int): Máximo de caracteres por chunk (usado como chunk_size).
+        stride (int): Superposición de caracteres entre chunks (usado como chunk_overlap).
+        Otros parámetros se ignoran para simplificar.
 
     Returns:
-        List[str] o List[Tuple[str, np.ndarray]]: Lista de chunks (y opcionalmente embeddings).
+        List[str]: Lista de chunks de texto.
     """
-
-    # --- División en frases ---
-    if split_on_newline:
-        sentences = [s.strip() for s in text.split("\n") if s.strip()]
-    else:
-        import re
-        sentences = re.split(r'(?<=[.!?]) +', text)
-        sentences = [s.strip() for s in sentences if s.strip()]
-
-
-    # Filtrar frases vacías o muy cortas (sin límite de cantidad)
-    sentences = [s for s in sentences if len(s) > 10]
-    print(f"[DEBUG] Frases para embeddings (total: {len(sentences)}):")
-    for i, s in enumerate(sentences[:10]):
-        print(f"  {i+1}: {s[:80]}{'...' if len(s) > 80 else ''}")
-    if len(sentences) > 10:
-        print(f"  ... ({len(sentences)-10} frases más)")
-    if not sentences:
-        print("[ADVERTENCIA] No hay frases válidas para embeddings. Se omite el chunking.")
-        return []
-
-
-    # --- Obtener embeddings desde Azure OpenAI en lotes ---
-    MAX_EMBEDDINGS_BATCH = 1000
-    embeddings = []
-    for i in range(0, len(sentences), MAX_EMBEDDINGS_BATCH):
-        batch = sentences[i:i+MAX_EMBEDDINGS_BATCH]
-        print(f"[DEBUG] Solicitando embeddings para frases {i+1}-{i+len(batch)}")
-        batch_embs = get_azure_openai_embeddings(batch)
-        embeddings.extend(batch_embs)
-
-    # --- Chunking semántico configurable ---
-    chunks = []
-    current_chunk = []
-    current_len = 0
-    last_emb = None
-    for i, (sent, emb) in enumerate(zip(sentences, embeddings)):
-        if not current_chunk:
-            current_chunk.append(sent)
-            current_len = len(sent)
-            last_emb = emb
-            continue
-        # Calcular similitud coseno con el último embedding del chunk usando NumPy
-        sim = float(np.dot(emb, last_emb) / (np.linalg.norm(emb) * np.linalg.norm(last_emb)))
-        if (current_len + len(sent) <= max_chunk_size and sim >= similarity_threshold) or current_len < min_chunk_size:
-            current_chunk.append(sent)
-            current_len += len(sent)
-            last_emb = emb
-        else:
-            chunks.append(" ".join(current_chunk))
-            # Solapamiento opcional
-            if stride > 0 and len(current_chunk) > 1:
-                overlap = current_chunk[-stride:] if stride < len(current_chunk) else current_chunk
-                current_chunk = list(overlap)
-                current_len = sum(len(s) for s in current_chunk)
-                last_emb = get_azure_openai_embeddings([current_chunk[-1]])[0]
-            else:
-                current_chunk = [sent]
-                current_len = len(sent)
-                last_emb = emb
-    if current_chunk:
-        chunks.append(" ".join(current_chunk))
-    if return_embeddings:
-        chunk_embs = get_azure_openai_embeddings(chunks)
-        return list(zip(chunks, chunk_embs))
-    return chunks
+    print("[WARNING] semantic_chunk_text() está deprecada. Usa chunk_text_with_langchain() en su lugar.")
+    print(f"[DEBUG] Redirigiendo a RecursiveCharacterTextSplitter con chunk_size={max_chunk_size}, overlap={stride}")
+    
+    return chunk_text_with_langchain(text, chunk_size=max_chunk_size, chunk_overlap=stride)
 # Fragmentación de texto
 def split_text(text: str, max_length: int = 1000) -> list:
     """

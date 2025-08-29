@@ -16,6 +16,8 @@ chromadb>=0.4.0
 transformers>=4.28.0
 sentence-transformers>=2.2.2
 langchain>=0.0.200
+langchain_community>=0.0.200
+langchain-text-splitters>=0.3.0
 
 # CLI
 click>=8.1.3
