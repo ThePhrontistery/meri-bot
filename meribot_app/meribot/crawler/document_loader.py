@@ -112,8 +112,8 @@ def semantic_chunk_text(
         sentences = [s.strip() for s in sentences if s.strip()]
 
 
-    # Filtrar frases vacías o muy cortas y limitar a las primeras 50 para pruebas rápidas
-    sentences = [s for s in sentences if len(s) > 10][:50]
+    # Filtrar frases vacías o muy cortas (sin límite de cantidad)
+    sentences = [s for s in sentences if len(s) > 10]
     print(f"[DEBUG] Frases para embeddings (total: {len(sentences)}):")
     for i, s in enumerate(sentences[:10]):
         print(f"  {i+1}: {s[:80]}{'...' if len(s) > 80 else ''}")
