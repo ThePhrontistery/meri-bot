@@ -33,32 +33,40 @@ class ChatEngine:
 
     async def process_message(
         self,
-        user_id: str,
+        conversation_id: str,
         message: str,
-        domain: Optional[str] = None,
-        metadata: Optional[Dict[str, Any]] = None,
+        domains: Optional[List[str]] = None,
     ) -> Dict[str, Any]:
         """
         Procesa un mensaje de usuario y retorna la respuesta generada, citaciones y metadatos.
         Flujo: caché -> plugins -> vector search -> LLM.
         """
-        session = self.conversation_manager.get_or_create_session(user_id)
+        session = self.conversation_manager.get_or_create_session(conversation_id)
         context = session.get_history()
         # 1. Buscar en caché
         cached = self.cache.get(message)
         if cached:
             return {"type": "cache", "response": cached, "citations": [], "source": "cache"}
         # 2. Plugins (pre-LLM)
-        plugin_response = await self.plugin_manager.run_pre_llm_plugins(message, context, metadata)
+        plugin_response = await self.plugin_manager.run_pre_llm_plugins(message, context)
         if plugin_response:
             return {"type": "plugin", "response": plugin_response, "citations": [], "source": "plugin"}
-        # 3. Vector search (con filtrado por dominio/metadatos)
-        relevant_chunks = self.vector_search.search(message, domain=domain, metadata=metadata)
+        # 3. Vector search (con filtrado por dominios)
+        # Convertir la lista de dominios en un dominio único para la búsqueda (usar el primero si existe)
+        domain = domains[0] if domains and len(domains) > 0 else None
+        relevant_chunks = self.vector_search.search(message, domain=domain)
         citations = [chunk["source"] for chunk in relevant_chunks] if relevant_chunks else []
+        
         # 4. LLM (con contexto y citación)
-        llm_metadata = dict(metadata or {})
+        # Los metadatos se construyen internamente a partir de la búsqueda vectorial
+        llm_metadata = {}
         if citations:
             llm_metadata["citar_fuentes"] = True
+        # Agregar metadatos recuperados de los chunks si existen
+        if relevant_chunks:
+            for chunk in relevant_chunks:
+                if "metadata" in chunk:
+                    llm_metadata.update(chunk["metadata"])
         try:
             response = await self.llm_engine.generate_response(
                 message,
@@ -66,10 +74,10 @@ class ChatEngine:
                 metadata=llm_metadata
             )
         except Exception as e:
-            log_generation_failure(user_id, message, str(e))
+            log_generation_failure(conversation_id, message, str(e))
             response = "[Error al generar respuesta]"
         # 5. Plugins (post-LLM)
-        response = await self.plugin_manager.run_post_llm_plugins(response, context, metadata)
+        response = await self.plugin_manager.run_post_llm_plugins(response, context)
         # 6. Actualizar historial y caché
         session.add_message("user", message)
         session.add_message("assistant", response)
@@ -83,33 +91,32 @@ class ChatEngine:
 
     async def stream_response(
         self,
-        user_id: str,
+        conversation_id: str,
         message: str,
-        domain: Optional[str] = None,
-        metadata: Optional[Dict[str, Any]] = None,
+        domains: Optional[List[str]] = None,
     ) -> AsyncGenerator[str, None]:
         """
         Genera respuesta en streaming, orquestando el flujo completo.
         """
-        session = self.conversation_manager.get_or_create_session(user_id)
+        session = self.conversation_manager.get_or_create_session(conversation_id)
         context = session.get_history()
         # Plugins y caché no soportan streaming, así que solo LLM
         try:
             async for token in self.llm_engine.stream_response(
-                message, context=context, metadata=metadata
+                message, context=context
             ):
                 yield token
         except Exception as e:
-            log_generation_failure(user_id, message, str(e))
+            log_generation_failure(conversation_id, message, str(e))
             yield "[Error al generar respuesta]"
 
-    def close_session(self, user_id: str):
-        """Cierra la sesión y limpia el historial para el usuario dado."""
-        self.conversation_manager.close_session(user_id)
+    def close_session(self, conversation_id: str):
+        """Cierra la sesión y limpia el historial para la conversación dada."""
+        self.conversation_manager.close_session(conversation_id)
 
-    def get_context(self, user_id: str) -> List[Dict[str, Any]]:
+    def get_context(self, conversation_id: str) -> List[Dict[str, Any]]:
         """Devuelve el historial de mensajes de la sesión activa."""
-        session = self.conversation_manager.get_or_create_session(user_id)
+        session = self.conversation_manager.get_or_create_session(conversation_id)
         return session.get_history()
 
     # Métodos de filtrado avanzado

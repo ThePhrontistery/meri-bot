@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List
 import os
 import sys
 
@@ -10,8 +10,7 @@ import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
-# Import the question processor y el core
-from meribot.nlp.processor import QuestionProcessor
+# Import el core
 from meribot.core.chatengine import ChatEngine
 
 app = FastAPI(
@@ -34,6 +33,7 @@ class QueryRequest(BaseModel):
     """Modelo para las peticiones de consulta al chatbot."""
     question: str
     conversation_id: Optional[str] = None
+    domains: Optional[List[str]] = None
 
 @app.options("/chatbot/query")
 async def options_chatbot():
@@ -45,8 +45,7 @@ async def options_chatbot():
     return response
 
 
-# Inicializar el question processor y el core
-question_processor = QuestionProcessor()
+# Inicializar el core
 chat_engine = ChatEngine()
 
 @app.post(
@@ -68,6 +67,7 @@ async def query_chatbot(request: QueryRequest, response: Response):
         request (QueryRequest): Contiene:
             - question: La pregunta del usuario como texto
             - conversation_id: (Opcional) ID de conversación para mantener contexto
+            - domains: (Opcional) Array de dominios para filtrar la búsqueda
         
     Returns:
         dict: Un diccionario con:
@@ -83,20 +83,14 @@ async def query_chatbot(request: QueryRequest, response: Response):
         response.headers["Access-Control-Allow-Methods"] = "POST, OPTIONS"
         response.headers["Access-Control-Allow-Headers"] = "Content-Type"
 
-        # 1. Procesar primero con el NLP
-        nlp_result = question_processor.process_question(request.question)
-        pred_intents = {"greeting", "farewell", "help", "thanks"}
-        # Si el intent es uno de los predeterminados, responder directamente
-        if nlp_result.get("intent") in pred_intents and nlp_result["confidence"] > 0.0:
-            nlp_result["conversation_id"] = request.conversation_id
-            return nlp_result
-
-        # 2. Si no, pasar al core
+        # Procesar directamente con el core
         core_result = await chat_engine.process_message(
-            user_id=request.conversation_id or "anonymous",
-            message=request.question
+            conversation_id=request.conversation_id or "anonymous",
+            message=request.question,
+            domains=request.domains
         )
-        # Si el core responde con algo útil, devolverlo
+        
+        # Devolver la respuesta del core
         core_response = core_result.get("response")
         if core_response and core_response.strip() and core_response.strip() != "[Error al generar respuesta]":
             return {
@@ -108,10 +102,15 @@ async def query_chatbot(request: QueryRequest, response: Response):
                 "source": core_result.get("source", "llm"),
                 "suggested_questions": []
             }
-
-        # 3. Si el core no responde, fallback a la respuesta genérica del NLP
-        nlp_result["conversation_id"] = request.conversation_id
-        return nlp_result
+        else:
+            # Si el core no responde adecuadamente, devolver mensaje genérico
+            return {
+                "response": "Lo siento, no he podido encontrar información relevante para tu pregunta. ¿Podrías reformularla de otra manera?",
+                "conversation_id": request.conversation_id,
+                "intent": "no_answer",
+                "confidence": 0.0,
+                "suggested_questions": []
+            }
 
     except Exception as e:
         # Log the error for debugging
