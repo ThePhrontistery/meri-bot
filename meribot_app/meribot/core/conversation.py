@@ -16,7 +16,6 @@ class ConversationContext:
     mediante el método get_history().
     """
     conversation_id: str = field(default_factory=lambda: str(uuid.uuid4()))
-    user_id: Optional[str] = None
     messages: List[Dict] = field(default_factory=list)
     is_active: bool = True
     created_at: datetime = field(default_factory=datetime.utcnow)
@@ -55,17 +54,6 @@ class ConversationContext:
 
 
 class ConversationManager:
-    def get_or_create_session(self, user_id: str) -> 'ConversationContext':
-        """
-        Devuelve la sesión activa para el usuario o la crea si no existe.
-        El ID de usuario se usa como clave de sesión.
-        """
-        # Buscar sesión por user_id (si existe)
-        for ctx in self.sessions.values():
-            if getattr(ctx, 'user_id', None) == user_id:
-                return ctx
-        # Si no existe, crear nueva sesión
-        return self.create_session(user_id=user_id)
     """
     Gestiona la creación y cierre de sesiones de conversación.
     Permite registrar, recuperar y cerrar sesiones activas.
@@ -73,14 +61,28 @@ class ConversationManager:
     def __init__(self):
         self.sessions: Dict[str, ConversationContext] = {}
 
-    def create_session(self, user_id: Optional[str] = None, metadata: Optional[Dict] = None) -> ConversationContext:
+    def get_or_create_session(self, conversation_id: str) -> 'ConversationContext':
+        """
+        Devuelve la sesión activa para el conversation_id o la crea si no existe.
+        Si conversation_id es 'anonymous' o vacío, genera uno nuevo.
+        """
+        if not conversation_id or conversation_id.lower() == "anonymous":
+            context = ConversationContext()
+            self.sessions[context.conversation_id] = context
+            return context
+        if conversation_id in self.sessions:
+            return self.sessions[conversation_id]
+        context = ConversationContext(conversation_id=conversation_id)
+        self.sessions[context.conversation_id] = context
+        return context
+
+    def create_session(self, metadata: Optional[Dict] = None) -> ConversationContext:
         """
         Crea una nueva sesión de conversación y la registra.
-        :param user_id: ID del usuario asociado (opcional)
         :param metadata: Metadatos adicionales (opcional)
         :return: Instancia de ConversationContext
         """
-        context = ConversationContext(user_id=user_id, metadata=metadata or {})
+        context = ConversationContext(metadata=metadata or {})
         self.sessions[context.conversation_id] = context
         return context
 
