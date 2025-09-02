@@ -7,7 +7,7 @@ import os
 from meribot.crawler.document_loader import parse_document, chunk_text_with_langchain, process_and_classify_chunks
 
 # Directorio con los documentos
-DOCS_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../Local_C&CA_host_web'))
+DOCS_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../data/scraped'))
 
 # Extensiones soportadas por parse_document
 EXTS = {'.pdf', '.html', '.htm', '.docx', '.xlsx'}
