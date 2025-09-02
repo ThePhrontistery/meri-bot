@@ -11,6 +11,52 @@ except ImportError:
 
 class ChromaDBConnector:
 
+    def similarity_search(self, collection_name: str, query_text: str, top_k: int = 5, where: dict = None, domains=None):
+        """
+        Realiza una búsqueda por similitud textual (no embeddings) en la colección indicada.
+        Puede usar la función nativa de ChromaDB si existe, o realizar una búsqueda simple por substring.
+        :param collection_name: Nombre de la colección en ChromaDB.
+        :param query_text: Texto de consulta.
+        :param top_k: Número de resultados a devolver.
+        :param where: Filtro opcional por metadatos.
+        :param domains: Lista de dominios para filtrar resultados.
+        :return: Lista de fragmentos relevantes (dicts con metadatos y score).
+        """
+        # Construir filtro para dominios si se proporcionan
+        if domains:
+            where = where or {}
+            where['dominio'] = {'$in': domains}
+        collection = self.get_collection(collection_name)
+        # Obtener todos los documentos de la colección
+        all_docs = collection.get(include=['documents', 'metadatas', 'ids'])
+        hits = []
+        for i, doc in enumerate(all_docs['documents']):
+            # Similitud simple: conteo de palabras compartidas (puedes mejorar con TF-IDF, fuzzy, etc.)
+            score = 0
+            if doc and query_text:
+                doc_words = set(str(doc).lower().split())
+                query_words = set(query_text.lower().split())
+                score = len(doc_words & query_words)
+            # Filtrado por metadatos
+            meta = all_docs['metadatas'][i] if all_docs.get('metadatas') else None
+            if where:
+                match = True
+                for k, v in where.items():
+                    if meta is None or (k not in meta) or (isinstance(v, dict) and '$in' in v and meta[k] not in v['$in']) or (not isinstance(v, dict) and meta[k] != v):
+                        match = False
+                        break
+                if not match:
+                    continue
+            hits.append({
+                'id': all_docs['ids'][i],
+                'document': doc,
+                'score': score,
+                'metadatas': meta
+            })
+        # Ordenar por score descendente y devolver los top_k
+        hits = sorted(hits, key=lambda x: x['score'], reverse=True)[:top_k]
+        return hits
+
     def semantic_search(self, collection_name: str, query_embedding: list, top_k: int = 5, where: dict = None, domains=None):
         """
         Realiza una búsqueda semántica en la colección indicada usando un embedding.
@@ -89,29 +135,14 @@ class VectorSearch:
         self.openai_deployment = os.getenv('AZURE_OPENAI_EMBEDDINGS_DEPLOYMENT')
         self.openai_api_version = os.getenv('AZURE_OPENAI_API_VERSION', '2024-12-01-preview')
 
-    def get_embedding(self, text: str) -> list:
-        """
-        Obtiene el embedding del texto usando Azure OpenAI Embeddings API.
-        """
-        url = f"{self.openai_endpoint}openai/deployments/{self.openai_deployment}/embeddings?api-version={self.openai_api_version}"
-        headers = {
-            "Content-Type": "application/json",
-            "api-key": self.openai_api_key
-        }
-        data = {"input": text}
-        response = requests.post(url, headers=headers, json=data)
-        response.raise_for_status()
-        embedding = response.json()["data"][0]["embedding"]
-        return embedding
 
     def search(self, message, domains=None, metadata=None, top_k=5):
         """
-        Realiza búsqueda semántica en ChromaDB usando el embedding del mensaje y filtrando por dominios.
+        Realiza búsqueda por similitud textual usando similarity_search de ChromaDBConnector.
         """
-        embedding = self.get_embedding(message)
-        results = self.chroma_connector.semantic_search(
+        results = self.chroma_connector.similarity_search(
             collection_name=self.collection_name,
-            query_embedding=embedding,
+            query_text=message,
             top_k=top_k,
             where=metadata,
             domains=domains
