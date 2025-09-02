@@ -28,10 +28,16 @@
 4.3 [x] * Upsert de fragmentos con claves determinísticas y metadatos.
 
 ## Fase 5: Orquestación y Automatización
-5.1 [ ] * Programar ejecución automática semanal
-5.2 [ ] * Usar un scheduler (ej: APScheduler) o integración con cron.
-5.3 [ ] * Implementar disparador manual desde Meri-Cli
+5.1 [ ] * Programar ejecución automática semanal con APScheduler leyendo parámetros desde YAML/JSON.
+5.2 [ ] * Permitir que el backend reprograma el job automáticamente al cambiar la configuración.
+5.3 [ ] * Implementar comandos en Meri-cli para modificar el horario del scheduler (ej: `meri-cli scheduler set --day sun --hour 2 --minute 0`).
 5.4 [ ] * Comando CLI para lanzar el crawler bajo demanda.
+5.5 [ ] * Añadir endpoint en la API para lanzar el proceso de crawling (`scraper.py`) desde meri-cli o cliente HTTP.
+5.6 [ ] * Añadir endpoint en la API para lanzar el procesamiento y chunking de documentos (`test_hash_local_docs.py`) desde meri-cli o cliente HTTP.
+5.7 [ ] * Permitir que meri-cli invoque estos endpoints para ejecución remota, controlada y monitorizable.
+5.8 [ ] * Exponer endpoints para consultar el estado, logs y resultados de los procesos.
+5.9 [ ] * Facilitar integración con dashboards, automatizaciones y otros sistemas externos mediante los endpoints.
+5.10 [ ] * Documentar los endpoints y su uso desde meri-cli.
 
 ## Fase 6: Reportes y Monitoreo
 6.1 [ ] * Generar reportes claros de resultados

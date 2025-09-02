@@ -30,3 +30,9 @@ pytest-cov>=4.0.0
 black>=23.3.0
 isort>=5.12.0
 mypy>=1.2.0
+
+# Scheduler
+APScheduler>=3.11.0
+
+# YAML
+PyYAML>=6.0.2

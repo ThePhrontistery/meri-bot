@@ -1,0 +1,4 @@
+schedule:
+  day_of_week: 'mon'
+  hour: 10
+  minute: 30
