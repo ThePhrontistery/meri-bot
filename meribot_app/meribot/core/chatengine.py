@@ -65,10 +65,10 @@ class ChatEngine:
         
         session = self.conversation_manager.get_or_create_session(conversation_id)
         context = session.get_history()
-        # 1. Buscar en caché
-        cached = self.cache.get(message)
-        if cached:
-            return {"type": "cache", "response": cached, "citations": [], "source": "cache"}
+        # 1. Buscar en caché (desactivado temporalmente)
+        # cached = self.cache.get(message)
+        # if cached:
+        #     return {"type": "cache", "response": cached, "citations": [], "source": "cache"}
         # 2. Plugins (pre-LLM)
         plugin_response = await self.plugin_manager.run_pre_llm_plugins(message, context)
         if plugin_response:
@@ -78,13 +78,10 @@ class ChatEngine:
         domain = domains[0] if domains and len(domains) > 0 else None
         relevant_chunks = self.vector_search.search(message, domain=domain)
         citations = [chunk["source"] for chunk in relevant_chunks] if relevant_chunks else []
-        
         # 4. LLM (con contexto y citación)
-        # Los metadatos se construyen internamente a partir de la búsqueda vectorial
         llm_metadata = {}
         if citations:
             llm_metadata["citar_fuentes"] = True
-        # Agregar metadatos recuperados de los chunks si existen
         if relevant_chunks:
             for chunk in relevant_chunks:
                 if "metadata" in chunk:
@@ -100,10 +97,10 @@ class ChatEngine:
             response = "[Error al generar respuesta]"
         # 5. Plugins (post-LLM)
         response = await self.plugin_manager.run_post_llm_plugins(response, context)
-        # 6. Actualizar historial y caché
+        # 6. Actualizar historial y caché (desactivado temporalmente)
         session.add_message("user", message)
         session.add_message("assistant", response)
-        self.cache.set(message, response)
+        # self.cache.set(message, response)
         return {
             "type": "llm",
             "response": response,
@@ -134,10 +131,9 @@ class ChatEngine:
         except ValueError as e:
             yield f"[Error de validación: {str(e)}]"
             return
-        
         session = self.conversation_manager.get_or_create_session(conversation_id)
         context = session.get_history()
-        # Plugins y caché no soportan streaming, así que solo LLM
+        # Plugins y caché no soportan streaming, así que solo LLM (caché desactivado)
         try:
             async for token in self.llm_engine.stream_response(
                 message, context=context
