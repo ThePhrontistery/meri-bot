@@ -69,10 +69,10 @@ class ChatEngine:
         # cached = self.cache.get(message)
         # if cached:
         #     return {"type": "cache", "response": cached, "citations": [], "source": "cache"}
-        # 2. Plugins (pre-LLM)
-        plugin_response = await self.plugin_manager.run_pre_llm_plugins(message, context)
-        if plugin_response:
-            return {"type": "plugin", "response": plugin_response, "citations": [], "source": "plugin"}
+        # 2. Plugins (pre-LLM) (desactivado temporalmente)
+        # plugin_response = await self.plugin_manager.run_pre_llm_plugins(message, context)
+        # if plugin_response:
+        #     return {"type": "plugin", "response": plugin_response, "citations": [], "source": "plugin"}
         # 3. Vector search (con filtrado por dominios)
         # Convertir la lista de dominios en un dominio único para la búsqueda (usar el primero si existe)
         domain = domains[0] if domains and len(domains) > 0 else None
@@ -95,8 +95,8 @@ class ChatEngine:
         except Exception as e:
             log_generation_failure(conversation_id, message, str(e))
             response = "[Error al generar respuesta]"
-        # 5. Plugins (post-LLM)
-        response = await self.plugin_manager.run_post_llm_plugins(response, context)
+        # 5. Plugins (post-LLM) (desactivado temporalmente)
+        # response = await self.plugin_manager.run_post_llm_plugins(response, context)
         # 6. Actualizar historial y caché (desactivado temporalmente)
         session.add_message("user", message)
         session.add_message("assistant", response)
@@ -133,7 +133,7 @@ class ChatEngine:
             return
         session = self.conversation_manager.get_or_create_session(conversation_id)
         context = session.get_history()
-        # Plugins y caché no soportan streaming, así que solo LLM (caché desactivado)
+        # Plugins y caché no soportan streaming, así que solo LLM (plugins desactivados)
         try:
             async for token in self.llm_engine.stream_response(
                 message, context=context
