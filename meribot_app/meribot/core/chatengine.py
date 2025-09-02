@@ -74,9 +74,8 @@ class ChatEngine:
         # if plugin_response:
         #     return {"type": "plugin", "response": plugin_response, "citations": [], "source": "plugin"}
         # 3. Vector search (con filtrado por dominios)
-        # Convertir la lista de dominios en un dominio único para la búsqueda (usar el primero si existe)
-        domain = domains[0] if domains and len(domains) > 0 else None
-        relevant_chunks = self.vector_search.search(message, domain=domain)
+        # Ahora se pasan todos los dominios recibidos a la búsqueda
+        relevant_chunks = self.vector_search.search(message, domains=domains)
         citations = [chunk["source"] for chunk in relevant_chunks] if relevant_chunks else []
         # 4. LLM (con contexto y citación)
         llm_metadata = {}
