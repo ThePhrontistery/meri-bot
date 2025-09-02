@@ -11,6 +11,7 @@ from meribot.core.cache import ResponseCache
 from meribot.core.llm_engine import LLMEngine
 from meribot.core.conversation import ConversationManager
 from meribot.core.logging import log_generation_failure
+from meribot.core.validation import validate_chat_engine_input
 
 class ChatEngine:
     """
@@ -39,8 +40,29 @@ class ChatEngine:
     ) -> Dict[str, Any]:
         """
         Procesa un mensaje de usuario y retorna la respuesta generada, citaciones y metadatos.
-        Flujo: caché -> plugins -> vector search -> LLM.
+        Flujo: validación -> caché -> plugins -> vector search -> LLM.
         """
+        # 0. Validar datos de entrada
+        try:
+            validated_input = validate_chat_engine_input(
+                conversation_id=conversation_id,
+                message=message,
+                domains=domains
+            )
+            # Usar los datos validados y sanitizados
+            conversation_id = validated_input.conversation_id
+            message = validated_input.message
+            domains = validated_input.domains
+        except ValueError as e:
+            # Retornar error de validación
+            return {
+                "type": "validation_error",
+                "response": f"Error de validación: {str(e)}",
+                "citations": [],
+                "source": "validation",
+                "error": str(e)
+            }
+        
         session = self.conversation_manager.get_or_create_session(conversation_id)
         context = session.get_history()
         # 1. Buscar en caché
@@ -98,6 +120,21 @@ class ChatEngine:
         """
         Genera respuesta en streaming, orquestando el flujo completo.
         """
+        # 0. Validar datos de entrada
+        try:
+            validated_input = validate_chat_engine_input(
+                conversation_id=conversation_id,
+                message=message,
+                domains=domains
+            )
+            # Usar los datos validados y sanitizados
+            conversation_id = validated_input.conversation_id
+            message = validated_input.message
+            domains = validated_input.domains
+        except ValueError as e:
+            yield f"[Error de validación: {str(e)}]"
+            return
+        
         session = self.conversation_manager.get_or_create_session(conversation_id)
         context = session.get_history()
         # Plugins y caché no soportan streaming, así que solo LLM

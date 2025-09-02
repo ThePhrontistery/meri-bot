@@ -92,6 +92,18 @@ async def query_chatbot(request: QueryRequest, response: Response):
         
         # Devolver la respuesta del core
         core_response = core_result.get("response")
+        
+        # Manejar errores de validación específicamente
+        if core_result.get("type") == "validation_error":
+            return {
+                "response": core_response,
+                "conversation_id": request.conversation_id,
+                "intent": "validation_error",
+                "confidence": 0.0,
+                "error": core_result.get("error", "Error de validación"),
+                "suggested_questions": []
+            }
+        
         if core_response and core_response.strip() and core_response.strip() != "[Error al generar respuesta]":
             return {
                 "response": core_response,
