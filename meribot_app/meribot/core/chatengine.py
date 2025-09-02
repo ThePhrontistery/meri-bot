@@ -12,6 +12,7 @@ from meribot.core.llm_engine import LLMEngine
 from meribot.core.conversation import ConversationManager
 from meribot.core.logging import log_generation_failure
 from meribot.core.validation import validate_chat_engine_input
+import os
 
 class ChatEngine:
     """
@@ -85,10 +86,17 @@ class ChatEngine:
             for chunk in relevant_chunks:
                 if "metadata" in chunk:
                     llm_metadata.update(chunk["metadata"])
+        # Preparar argumentos separados para el LLM
+        system_prompt = os.getenv("SYSTEM_PROMPT", "")
+        conversation_history = context
+        user_prompt = message
+        vector_db_texts = [chunk.get("document") for chunk in relevant_chunks] if relevant_chunks else []
         try:
             response = await self.llm_engine.generate_response(
-                message,
-                context=context,
+                system_prompt=system_prompt,
+                conversation_history=conversation_history,
+                user_prompt=user_prompt,
+                vector_db_texts=vector_db_texts,
                 metadata=llm_metadata
             )
         except Exception as e:
