@@ -28,7 +28,7 @@
 4.3 [x] * Upsert de fragmentos con claves determinísticas y metadatos.
 
 ## Fase 5: Orquestación y Automatización
-5.1 [ ] * Programar ejecución automática semanal con APScheduler leyendo parámetros desde YAML/JSON.
+5.1 [x] * Programar ejecución automática semanal con APScheduler leyendo parámetros desde YAML/JSON.
 5.2 [ ] * Permitir que el backend reprograma el job automáticamente al cambiar la configuración.
 5.3 [ ] * Implementar comandos en Meri-cli para modificar el horario del scheduler (ej: `meri-cli scheduler set --day sun --hour 2 --minute 0`).
 5.4 [ ] * Comando CLI para lanzar el crawler bajo demanda.
