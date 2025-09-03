@@ -28,7 +28,7 @@ class ChromaDBConnector:
             where['dominio'] = {'$in': domains}
         collection = self.get_collection(collection_name)
         # Obtener todos los documentos de la colección
-        all_docs = collection.get(include=['documents', 'metadatas', 'ids'])
+        all_docs = collection.get(include=['documents', 'metadatas'])
         hits = []
         for i, doc in enumerate(all_docs['documents']):
             # Similitud simple: conteo de palabras compartidas (puedes mejorar con TF-IDF, fuzzy, etc.)

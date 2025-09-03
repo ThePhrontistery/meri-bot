@@ -5,8 +5,10 @@ Soporta integración con Langchain, configuración dinámica, streaming, citaci�
 @author: MeriBot Team
 """
 import asyncio
+import os
+from dotenv import load_dotenv
 from typing import Any, Dict, List, Optional, AsyncGenerator
-from meribot.core.config import config
+load_dotenv()
 from meribot.core.logging import log_generation_failure
 from meribot.core.guardrails import apply_guardrails
 
@@ -15,10 +17,47 @@ class LLMProvider:
     def __init__(self, model: str, params: Dict[str, Any]):
         self.model = model
         self.params = params
-    async def generate(self, prompt: str, context: List[str] = None) -> str:
-        # Aquí iría la llamada real a Langchain/LLM
-        await asyncio.sleep(0.01)
-        return f"[LLM:{self.model}] {prompt}"
+        # Cargar variables de Azure OpenAI directamente del entorno
+        self.azure_api_key = os.getenv('AZURE_OPENAI_API_KEY')
+        self.azure_endpoint = os.getenv('AZURE_OPENAI_ENDPOINT')
+        self.azure_deployment = os.getenv('AZURE_OPENAI_DEPLOYMENT_NAME')
+        self.azure_embeddings_deployment = os.getenv('AZURE_OPENAI_EMBEDDINGS_DEPLOYMENT')
+        self.azure_api_version = os.getenv('AZURE_OPENAI_API_VERSION')
+    async def generate(self, prompt: str, user_prompt: str, context: List[str] = None) -> str:
+        """
+        Llama al endpoint de Azure OpenAI para obtener una respuesta generada por el modelo.
+        """
+        import requests
+        import json
+        # Construir mensajes para el modelo tipo chat
+        messages = [
+            {"role": "system", "content": prompt},
+            {"role": "user", "content": user_prompt}
+        ]
+        url = f"{self.azure_endpoint}/openai/deployments/{self.azure_deployment}/chat/completions?api-version={self.azure_api_version}"
+        headers = {
+            "Content-Type": "application/json",
+            "api-key": self.azure_api_key
+        }
+        payload = {
+            "messages": messages,
+            "temperature": self.params.get("temperature", 0.7),
+            "max_tokens": self.params.get("max_tokens", 512)
+        }
+        try:
+            # Ejecutar la petición en un hilo para no bloquear el event loop
+            import asyncio
+            loop = asyncio.get_event_loop()
+            response = await loop.run_in_executor(
+                None,
+                lambda: requests.post(url, headers=headers, data=json.dumps(payload), timeout=30)
+            )
+            response.raise_for_status()
+            result = response.json()
+            # Extraer el texto generado
+            return result["choices"][0]["message"]["content"]
+        except Exception as e:
+            return f"[Error Azure OpenAI]: {str(e)}"
     async def stream(self, prompt: str, context: List[str] = None) -> AsyncGenerator[str, None]:
         # Simula streaming token a token
         for word in (prompt.split()):
@@ -31,11 +70,12 @@ class LLMEngine:
     Permite configuración dinámica, streaming, citación y manejo de errores.
     """
     def __init__(self, provider: Optional[LLMProvider] = None, guardrails=None, logger=None):
-        self.model = config.LLM_MODEL
+        # Cargar parámetros del entorno
+        self.model = os.getenv('LLM_MODEL', 'gpt-3.5-turbo')
         self.params = {
-            "temperature": getattr(config, "TEMPERATURE", 0.7),
-            "max_tokens": getattr(config, "MAX_TOKENS", 512),
-            # "top_p": getattr(config, "TOP_P", 1.0),  # Solo si se añade a config
+            "temperature": float(os.getenv('TEMPERATURE', 0.7)),
+            "max_tokens": int(os.getenv('MAX_TOKENS', 512)),
+            # "top_p": float(os.getenv('TOP_P', 1.0)),  # Si se añade a .env
         }
         self.provider = provider or LLMProvider(self.model, self.params)
         # Permite inyectar guardrails y logger para testabilidad
@@ -61,14 +101,14 @@ class LLMEngine:
         if conversation_history:
             for msg in conversation_history:
                 prompt_parts.append(f"[{msg['role']}] {msg['content']}")
-        prompt_parts.append(f"[user] {user_prompt}")
+        # prompt_parts.append(f"[user] {user_prompt}")
         full_prompt = "\n".join(prompt_parts)
         safe_prompt = apply_guardrails(full_prompt)
         if safe_prompt is None:
             log_generation_failure(metadata.get("user_id", "unknown") if metadata else "unknown", user_prompt, "Guardrail rejection")
             return "[Input rechazado por política de seguridad]"
         try:
-            response = await self.provider.generate(safe_prompt)
+            response = await self.provider.generate(safe_prompt,user_prompt)
             # Simulación de citación automática
             if metadata and metadata.get("citar_fuentes"):
                 response += "\n\nFuente: https://ejemplo.com"
