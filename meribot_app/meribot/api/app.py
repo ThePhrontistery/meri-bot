@@ -19,6 +19,9 @@ app = FastAPI(
 )
 
 # Configuración de CORS
+from meribot.services.crawler_endpoint import router as crawler_router
+from meribot.services.complete_crawler_endpoint import router as complete_crawler_router
+from meribot.services.process_docs_endpoint import router as process_docs_router
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # En producción, especificar dominios permitidos
@@ -33,14 +36,20 @@ class QueryRequest(BaseModel):
     question: str
     conversation_id: Optional[str] = None
 
+
 @app.options("/chatbot/query")
 async def options_chatbot():
     """Handle OPTIONS for CORS preflight"""
-    response = JSONResponse(content={"status": "ok"})
-    response.headers["Access-Control-Allow-Origin"] = "*"
-    response.headers["Access-Control-Allow-Methods"] = "POST, OPTIONS"
-    response.headers["Access-Control-Allow-Headers"] = "Content-Type"
-    return response
+    headers = {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "POST, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type"
+    }
+    return JSONResponse(content={"status": "ok"}, headers=headers)
+
+app.include_router(crawler_router)
+app.include_router(complete_crawler_router)
+app.include_router(process_docs_router)
 
 # Initialize the question processor
 question_processor = QuestionProcessor()
