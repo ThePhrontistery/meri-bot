@@ -8,12 +8,12 @@ allowed_domains:
   - "cca.capgemini.com"
   - "capgemini.sharepoint.com"
 user_agent: "MeriBot/1.0"
-delay: 1.0  # segundos entre peticiones
+delay: 1.0 # segundos entre peticiones
 output_dir: "./data/scraped"
 log_level: "INFO"
 chroma_path: "./chroma_data"
 embedding_model: "all-MiniLM-L6-v2"
-max_depth: 3
+max_depth: 4
 file_types:
   - "html"
   - "pdf"
