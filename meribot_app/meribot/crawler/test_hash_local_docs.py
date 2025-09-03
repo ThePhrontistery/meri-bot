@@ -1,3 +1,6 @@
+
+import argparse
+import yaml
 try:
     from meribot.services.storage.chroma_integration import upsert_chunks_to_chroma
 except ImportError:
@@ -23,7 +26,34 @@ DOCS_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../data/s
 # Extensiones soportadas por parse_document
 EXTS = {'.pdf', '.html', '.htm', '.docx', '.xlsx'}
 
+
 def main():
+    parser = argparse.ArgumentParser(description="Procesa documentos descargados y los ingesta en ChromaDB")
+    parser.add_argument('--url', required=True, help='URL desde donde se descargan los documentos')
+    parser.add_argument('--domain', required=True, help='Dominio a procesar')
+    args = parser.parse_args()
+
+    # Validar parámetros
+    if not args.url.strip():
+        print('[ERROR] El parámetro url es obligatorio.')
+        return
+    if not args.domain.strip():
+        print('[ERROR] El parámetro domain es obligatorio.')
+        return
+
+    # Leer allowed_domains desde crawler_config.yaml
+    config_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../crawler_config.yaml'))
+    if not os.path.exists(config_path):
+        print(f'[ERROR] No se encontró el archivo de configuración: {config_path}')
+        return
+    with open(config_path, 'r', encoding='utf-8') as f:
+        config = yaml.safe_load(f)
+    allowed_domains = set(config.get('allowed_domains', []))
+    if args.domain not in allowed_domains:
+        print(f'[ERROR] domain no válido: {args.domain}. Allowed: {allowed_domains}')
+        return
+
+    # Usar la URL para descargar los documentos
     print(f"Procesando documentos en: {DOCS_DIR}")
     if not os.path.exists(DOCS_DIR):
         print(f"[INFO] El directorio de documentos no existe. Creando: {DOCS_DIR}")
@@ -39,7 +69,11 @@ def main():
     if not archivos_encontrados:
         print(f"[INFO] No se encontraron archivos soportados ({EXTS}) en {DOCS_DIR}. Ejecutando scraping...")
         import subprocess
-        result = subprocess.run(["python", "-m", "meribot.meri-cli.main", "scrape"], cwd=os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')), capture_output=True, text=True)
+        result = subprocess.run([
+            "python", "-m", "meribot.meri-cli.main", "scrape",
+            "--url", args.url,
+            "--output", DOCS_DIR
+        ], cwd=os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')), capture_output=True, text=True)
         print(result.stdout)
         print(result.stderr)
         # Reintentar búsqueda de archivos soportados
@@ -73,6 +107,7 @@ def main():
         metadata = doc.get('metadata', {})
         metadata['id'] = doc_id
         metadata['source_path'] = rel_path
+        metadata['domain'] = args.domain
         try:
             chunks = chunk_text_with_langchain(text, chunk_size=800, chunk_overlap=50)
         except Exception as e:

@@ -4,9 +4,10 @@
 seeds:
   - "https://cca.capgemini.com/web/home"
 allowed_domains:
-  - "cca.capgemini.com"
-  - "cca.capgemini.com"
-  - "capgemini.sharepoint.com"
+  - "onboarding"
+  - "training"
+  - "cca"
+  - "sdo"
 user_agent: "MeriBot/1.0"
 delay: 1.0 # segundos entre peticiones
 output_dir: "./data/scraped"

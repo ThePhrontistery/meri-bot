@@ -15,7 +15,8 @@ def cli():
 @click.option('--pdf-url', help='URL de un PDF para descargar')
 def scrape(url: Optional[str], output: Optional[str], pdf_url: Optional[str]):
     """Ejecuta el proceso de scraping en la URL especificada o según crawler_config.yaml."""
-    config_path = os.path.join(os.path.dirname(__file__), '../crawler/crawler_config.yaml')
+    # Buscar config en la raíz de meribot_app
+    config_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../crawler_config.yaml'))
     config = {}
     if os.path.exists(config_path):
         with open(config_path, 'r', encoding='utf-8') as f:
