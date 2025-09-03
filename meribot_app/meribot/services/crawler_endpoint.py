@@ -33,9 +33,18 @@ def scrape_documents(request: ScrapeRequest):
     if domain not in allowed_domains:
         raise HTTPException(status_code=400, detail=f"domain no válido: {domain}. Allowed: {allowed_domains}")
 
+
     # Directorio de documentos
     DOCS_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../data/scraped/cca.capgemini.com'))
-    if not os.path.exists(DOCS_DIR):
+    # Limpieza de la carpeta antes de ejecutar el scraping
+    import shutil
+    if os.path.exists(DOCS_DIR):
+        for root, dirs, files in os.walk(DOCS_DIR, topdown=False):
+            for name in files:
+                os.remove(os.path.join(root, name))
+            for name in dirs:
+                shutil.rmtree(os.path.join(root, name))
+    else:
         os.makedirs(DOCS_DIR, exist_ok=True)
 
     # Ejecutar scraping
