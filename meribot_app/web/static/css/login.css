@@ -1,0 +1,291 @@
+/* Estilos para el contenedor principal de la aplicación */
+.app-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: var(--capgemini-cool-grey);
+}
+
+/* Estilos para el encabezado */
+.app-header {
+    background-color: var(--capgemini-blue);
+    color: white;
+    padding: 0.5rem 1rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.header-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+}
+
+.logo h1 {
+    margin: 0;
+    font-size: 1.5rem;
+    line-height: 1.2;
+}
+
+.logo p {
+    margin: 0;
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+/* Estilos para el contenedor de login */
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 200px);
+    padding: 20px;
+    background-color: var(--capgemini-cool-grey);
+}
+
+.login-box {
+    background: white;
+    padding: 2.5rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+}
+
+.login-header {
+    margin-bottom: 2rem;
+}
+
+.login-header h2 {
+    color: var(--capgemini-blue);
+    margin-bottom: 0.5rem;
+}
+
+.login-header p {
+    color: var(--capgemini-dark-grey);
+    opacity: 0.8;
+}
+
+/* Estilos para el formulario */
+.login-form {
+    text-align: left;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--capgemini-dark-grey);
+    font-weight: 500;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: border-color 0.3s;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: var(--capgemini-blue);
+    box-shadow: 0 0 0 2px rgba(18, 171, 219, 0.2);
+}
+
+/* Estilos para el botón de login */
+.btn-login {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: var(--capgemini-blue);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.btn-login:hover {
+    background-color: #005d8c;
+}
+
+/* Estilos para el botón de logout */
+.btn-logout {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-logout:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Estilos para los controles de usuario */
+.user-controls {
+    margin-top: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+}
+
+#username-display {
+    font-weight: 600;
+    color: white;
+}
+
+/* Estilos para mensajes de error */
+.error-message {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #ff4444;
+    color: white;
+    padding: 1rem 1.5rem;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Estilos para el indicador de escritura */
+.typing-indicator {
+    display: flex;
+    align-items: center;
+    padding: 10px 16px;
+    background-color: #f1f1f1;
+    border-radius: 18px;
+    width: fit-content;
+    margin-bottom: 15px;
+}
+
+.typing span {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background-color: #666;
+    border-radius: 50%;
+    margin: 0 2px;
+    animation: typing 1s infinite ease-in-out;
+}
+
+.typing span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.typing span:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes typing {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-5px);
+    }
+}
+
+/* Estilos para mensaje de bienvenida */
+.welcome-message {
+    text-align: center;
+    padding: 2rem 0;
+    color: var(--capgemini-dark-grey);
+}
+
+.welcome-message h3 {
+    color: var(--capgemini-blue);
+    margin-bottom: 1rem;
+}
+
+.welcome-message p {
+    margin-bottom: 2rem;
+    opacity: 0.9;
+}
+
+/* Estilos para sugerencias de preguntas */
+.suggested-questions {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.suggestion {
+    background-color: #f5f9ff;
+    border: 1px solid #e1f0ff;
+    border-radius: 8px;
+    padding: 0.75rem 1.25rem;
+    color: var(--capgemini-blue);
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: left;
+}
+
+.suggestion:hover {
+    background-color: #e1f0ff;
+    transform: translateY(-2px);
+}
+
+.suggestion:active {
+    transform: translateY(0);
+}
+
+/* Estilos responsivos */
+@media (max-width: 768px) {
+    .login-box {
+        padding: 1.5rem;
+    }
+    
+    .user-controls {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .btn-logout {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.8rem;
+    }
+}
+
+/* Animación de entrada para mensajes */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

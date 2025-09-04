@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MariBot - Asistente Virtual C&CA</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤖</text></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/login.css">
+    <style>
+        :root {
+            --capgemini-blue: #0070ad;
+            --capgemini-vibrant-blue: #12abdb;
+            --capgemini-dark-grey: #272936;
+            --capgemini-cool-grey: #f6f6f6;
+            --capgemini-white: #ffffff;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Ubuntu', sans-serif;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--capgemini-cool-grey);
+            color: var(--capgemini-dark-grey);
+            line-height: 1.6;
+        }
+        
+        /* Estilo del contenedor principal del widget */
+        .app-container {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 380px;
+            height: 0;
+            opacity: 0;
+            display: flex;
+            flex-direction: column;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            overflow: hidden;
+            z-index: 1000;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+        }
+        
+        .app-container.expanded {
+            height: 65vh;
+            min-height: 450px;
+            max-height: 80vh;
+            opacity: 1;
+            pointer-events: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .app-container.minimized {
+            height: 50px;
+        }
+        
+        .app-container.minimized .chat-container,
+        .app-container.minimized .chat-input,
+        .app-container.minimized .logo {
+            display: none;
+        }
+        
+        /* Contenido oculto cuando está minimizado */
+        .app-container:not(.expanded) .chat-container,
+        .app-container:not(.expanded) .chat-input,
+        .app-container:not(.expanded) .app-header .logo,
+        .app-container:not(.expanded) .minimize-button {
+            display: none;
+        }
+        
+        /* Botón de minimizar/cerrar */
+        .minimize-button {
+            background: rgba(255, 255, 255, 0.15);
+            border: none;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.9;
+            transition: all 0.2s ease;
+            position: relative;
+            z-index: 3;
+        }
+        
+        .minimize-button:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: scale(1.05);
+            opacity: 1;
+        }
+        
+        .minimize-button:active {
+            transform: scale(0.95);
+        }
+        
+        .minimize-button:hover {
+            opacity: 1;
+        }
+        
+        /* Burbuja de chat flotante */
+        .chat-bubble {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 50%;
+            background: linear-gradient(135deg, #0070ad, #12abdb);
+            box-shadow: 0 5px 25px rgba(0,0,0,0.2);
+            border: 2px solid white;
+            z-index: 1001;
+            cursor: pointer;
+        }
+        
+        .chat-bubble:hover {
+            transform: scale(1.1);
+            background: linear-gradient(135deg, #006098, #0f9bc9);
+            box-shadow: 0 4px 15px rgba(0, 112, 173, 0.4);
+        }
+        
+        .chat-bubble:active {
+            transform: scale(0.95);
+        }
+        
+        .chat-bubble svg {
+            width: 28px;
+            height: 28px;
+            transition: transform 0.2s ease;
+        }
+        
+        .app-container.expanded .chat-bubble {
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.8);
+            transition: all 0.2s ease-out;
+        }
+        
+        /* Estilo del encabezado del widget */
+        .app-header {
+            background: linear-gradient(135deg, #0070ad, #12abdb);
+            color: white;
+            padding: 0 24px;
+            height: 72px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+            position: relative;
+            z-index: 2;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+        }
+        
+        .app-header .logo {
+            padding: 10px 0;
+        }
+        
+        .app-header h1 {
+            font-size: 1.3em;
+            margin: 0;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+        
+        .app-header p {
+            margin: 4px 0 0;
+            font-size: 0.85em;
+            opacity: 0.9;
+            font-weight: 400;
+        }
+        
+        .minimize-button {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5em;
+            cursor: pointer;
+            padding: 5px 10px;
+        }
+        
+        .app-header h1 {
+            margin: 0;
+            font-size: 2em;
+            font-weight: 700;
+        }
+        
+        .app-header p {
+            margin: 5px 0 0;
+            opacity: 0.8;
+            font-size: 0.85em;
+        }
+        
+        .suggested-questions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #e9ecef;
+        }
+        
+        .chat-input-container {
+            background: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+            padding: 15px;
+            position: sticky;
+            bottom: 0;
+            width: 100%;
+            box-sizing: border-box;
+            margin-top: auto; /* Empuja el contenedor hacia abajo */
+            flex-shrink: 0; /* Evita que se encoja */
+        }
+        
+        .chat-input {
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
+        }
+        
+        .chat-input textarea {
+            flex: 1;
+            border: 1px solid #e0e0e0;
+            border-radius: 20px;
+            padding: 10px 15px;
+            resize: none;
+            font-family: inherit;
+            font-size: 14px;
+            max-height: 120px;
+            overflow-y: auto;
+        }
+        
+        .chat-input button {
+            background: #0070ad;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            flex-shrink: 0;
+        }
+        
+        .chat-input button:hover {
+            background: #005d8f;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Scrollbar styling */
+        .chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .chat-messages::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+        
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 3px;
+        }
+        
+        .chat-messages::-webkit-scrollbar-thumb:hover {
+            background: #aaa;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            min-height: 0; /* Permite que los mensajes se desplacen */
+            padding-bottom: 0;
+        }
+        
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+            min-height: 0; /* Permite que el contenedor se encoja si es necesario */
+        }
+    </style>
+<body>
+    <!-- Burbuja de chat -->
+    <div class="chat-bubble" id="chat-bubble">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        </svg>
+    </div>
+    
+    <!-- Contenedor del chat (inicialmente oculto) -->
+    <div class="app-container" id="chat-widget">
+        <header class="app-header" id="chat-header">
+            <div class="logo">
+                <h1>MariBot</h1>
+                <p>Asistente virtual</p>
+            </div>
+            <button class="minimize-button" id="minimize-button" aria-label="Minimizar chat" title="Minimizar">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </header>
+        
+        <!-- Contenedor del chat (inicialmente oculto) -->
+        <div class="chat-container">
+            <div class="chat-messages" id="chat-messages">
+                <!-- Mensajes del chat se agregarán aquí dinámicamente -->
+                <div class="welcome-message">
+                    <h3>¡Bienvenido a MariBot!</h3>
+                    <p>Soy tu asistente virtual de C&CA. ¿En qué puedo ayudarte hoy?</p>
+                </div>
+            </div>
+            
+            <div class="chat-input-container">
+                <form id="chat-form" class="chat-input">
+                    <textarea id="user-input" placeholder="Escribe tu mensaje aquí..." rows="1" autofocus></textarea>
+                    <button type="submit" id="send-button" aria-label="Enviar mensaje">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="22" y1="2" x2="11" y2="13"></line>
+                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                        </svg>
+                    </button>
+                </form>
+                
+                <div class="suggested-questions">
+                    <button class="suggestion" data-question="¿Cuáles son los horarios de atención?">
+                        <span>¿Cuáles son los horarios de atención?</span>
+                    </button>
+                    <button class="suggestion" data-question="¿Cómo puedo contactar con soporte?">
+                        <span>¿Cómo puedo contactar con soporte?</span>
+                    </button>
+                    <button class="suggestion" data-question="¿Qué servicios ofrecen?">
+                        <span>¿Qué servicios ofrecen?</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        
+        <script>
+            const chatForm = document.getElementById('chat-form');
+            const input = document.getElementById('user-input');
+            const conversationId = 'conv_' + Math.random().toString(36).substr(2, 9);
+            
+            chatForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const message = input.value.trim();
+                
+                if (message) {
+                    // Add user message
+                    addMessage('user', message);
+                    input.value = '';
+                    
+                    try {
+                        // Show typing indicator
+                        const typingIndicator = addTypingIndicator();
+                        
+                        // Call the API
+                        const response = await fetch('http://localhost:8000/api/chat/query', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                question: message,
+                                conversation_id: conversationId
+                            })
+                        });
+                        
+                        // Remove typing indicator
+                        typingIndicator.remove();
+                        
+                        if (!response.ok) {
+                            throw new Error(`Error: ${response.status}`);
+                        }
+                        
+                        const data = await response.json();
+                        
+                        // Add bot response
+                        if (data.response) {
+                            addMessage('bot', data.response);
+                        } else {
+                            addMessage('bot', 'No pude generar una respuesta. ¿Podrías reformular tu pregunta?');
+                        }
+                        
+                    } catch (error) {
+                        console.error('Error:', error);
+                        addMessage('bot', 'Lo siento, ha ocurrido un error al procesar tu mensaje. Por favor, inténtalo de nuevo más tarde.');
+                    }
+                }
+        });
+        
+        function addMessage(sender, text) {
+            const messagesDiv = document.getElementById('chat-messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            messageDiv.innerHTML = `
+                <div class="message-content">
+                    ${text}
+                </div>
+            `;
+            messagesDiv.appendChild(messageDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            return messageDiv;
+        }
+        
+        function addTypingIndicator() {
+            const messagesDiv = document.getElementById('chat-messages');
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'message bot';
+            typingDiv.id = 'typing-indicator';
+            typingDiv.innerHTML = `
+                <div class="message-content">
+                    <span class="typing-dot"></span>
+                    <span class="typing-dot"></span>
+                    <span class="typing-dot"></span>
+                </div>
+            `;
+            messagesDiv.appendChild(typingDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            return typingDiv;
+        }
+        
+        // Handle Enter key in input
+        document.getElementById('user-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                document.getElementById('chat-form').dispatchEvent(new Event('submit'));
+            }
+        });
+
+        // Handle suggested questions
+        document.querySelectorAll('.suggestion').forEach(button => {
+            button.addEventListener('click', function() {
+                const question = this.getAttribute('data-question');
+                document.getElementById('user-input').value = question;
+                document.getElementById('chat-form').dispatchEvent(new Event('submit'));
+            });
+        });
+
+        // Toggle chat widget
+        const chatWidget = document.getElementById('chat-widget');
+        const chatHeader = document.getElementById('chat-header');
+        const minimizeButton = document.getElementById('minimize-button');
+        const chatMessages = document.getElementById('chat-messages');
+        
+        let isMinimized = false;
+        
+        // Auto-scroll al expandir
+        function scrollToBottom() {
+            setTimeout(() => {
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }, 100);
+        }
+        
+        // Mostrar/ocultar al hacer clic en la burbuja
+        document.getElementById('chat-bubble').addEventListener('click', function(e) {
+            e.stopPropagation();
+            chatWidget.classList.add('expanded');
+            document.getElementById('chat-bubble').style.opacity = '0';
+            document.getElementById('chat-bubble').style.pointerEvents = 'none';
+            scrollToBottom();
+        });
+        
+        // Cerrar al hacer clic en el botón de minimizar
+        minimizeButton.addEventListener('click', function(e) {
+            e.stopPropagation();
+            chatWidget.classList.remove('expanded');
+            // Mostrar la burbuja nuevamente
+            setTimeout(() => {
+                document.getElementById('chat-bubble').style.opacity = '1';
+                document.getElementById('chat-bubble').style.pointerEvents = 'auto';
+            }, 300);
+        });
+        
+        // Evitar que los clics dentro del chat cierren el widget
+        document.querySelector('.chat-container').addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+        
+        // Initial state
+        chatWidget.classList.add('expanded');
+        
+        // Auto-scroll to bottom on new messages
+        const observer = new MutationObserver(() => {
+            if (!isMinimized) {
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+        });
+        
+        observer.observe(chatMessages, { childList: true, subtree: true });
+    </script>
+    
+    <style>
+        /* Widget Styles */
+        .maribot-widget {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            width: 350px;
+            height: 500px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .maribot-widget.minimized {
+            height: 50px;
+        }
+        
+        .maribot-widget.hidden {
+            display: none;
+        }
+        
+        .widget-header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 15px;
+            position: relative;
+        }
+        
+        .widget-header h3 {
+            margin: 0 0 5px 0;
+            font-size: 1.2em;
+        }
+        
+        .widget-header p {
+            margin: 0;
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+        
+        .widget-control {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 1.2em;
+        }
+        
+        .widget-messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+        }
+        
+        .widget-input-container {
+            display: flex;
+            padding: 10px;
+            border-top: 1px solid #eee;
+        }
+        
+        .widget-input-container input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-right: 5px;
+        }
+        
+        .widget-input-container button {
+            padding: 8px 15px;
+            background-color: #2c3e50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .maribot-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background-color: #2c3e50;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 1001;
+            transition: all 0.3s ease;
+        }
+        
+        .maribot-toggle:hover {
+            background-color: #34495e;
+            transform: translateY(-2px);
+        }
+        
+        .maribot-toggle.active {
+            background-color: #e74c3c;
+        }
+    </style>
+</body>
+</html>

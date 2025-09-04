@@ -3,7 +3,7 @@ import os
 import webbrowser
 import sys
 
-PORT = 3000
+PORT = 8221
 HOST = 'localhost'
 
 def run(server_class=HTTPServer, handler_class=SimpleHTTPRequestHandler):

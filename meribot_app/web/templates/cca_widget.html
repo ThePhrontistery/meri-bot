@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buscador Semántico C&CA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Ubuntu:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --capgemini-blue: #0070ad;
+            --capgemini-vibrant-blue: #12abdb;
+            --capgemini-dark-grey: #272936;
+            --capgemini-cool-grey: #f6f6f6;
+            --capgemini-white: #ffffff;
+            --border-card: 18px;
+            --box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Base Styles */
+        body {
+            font-family: 'Ubuntu', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--capgemini-cool-grey);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Search Widget Styles */
+        .search-widget {
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            width: 380px;
+            max-height: 70vh;
+            background: var(--capgemini-white);
+            border-radius: var(--border-card);
+            box-shadow: var(--box-shadow);
+            display: none;
+            flex-direction: column;
+            z-index: 1000;
+            font-family: 'Ubuntu', sans-serif;
+            overflow: hidden;
+        }
+
+        .search-header {
+            background: var(--capgemini-blue);
+            color: var(--capgemini-white);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .search-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin: 0;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .search-close {
+            background: none;
+            border: none;
+            color: var(--capgemini-white);
+            font-size: 24px;
+            cursor: pointer;
+            padding: 5px;
+            line-height: 1;
+        }
+
+        .search-input-container {
+            position: relative;
+            padding: 15px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 45px 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: 'Ubuntu', sans-serif;
+        }
+
+        .search-button {
+            position: absolute;
+            right: 25px;
+            top: 25px;
+            background: var(--capgemini-vibrant-blue);
+            color: var(--capgemini-white);
+            border: none;
+            border-radius: 4px;
+            width: 36px;
+            height: 36px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .search-filters {
+            display: flex;
+            gap: 10px;
+            padding: 0 15px 15px;
+        }
+
+        .filter-group {
+            flex: 1;
+        }
+
+        .filter-group label {
+            display: block;
+            font-size: 12px;
+            color: var(--capgemini-dark-grey);
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .filter-group select {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 13px;
+            font-family: 'Ubuntu', sans-serif;
+            background-color: white;
+        }
+
+        .search-results {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 15px 15px;
+            max-height: 50vh;
+        }
+
+        .result-item {
+            background: var(--capgemini-cool-grey);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+
+        .result-title {
+            font-weight: 600;
+            color: var(--capgemini-blue);
+            margin: 0 0 8px 0;
+            font-size: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .result-content {
+            font-size: 13px;
+            color: var(--capgemini-dark-grey);
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+
+        .result-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .search-loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+            color: var(--capgemini-dark-grey);
+        }
+
+        .loading-spinner {
+            border: 3px solid rgba(0, 112, 173, 0.1);
+            border-top: 3px solid var(--capgemini-vibrant-blue);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 30px 15px;
+            color: #666;
+        }
+
+        .highlight {
+            background-color: rgba(18, 171, 219, 0.2);
+            padding: 0 2px;
+            border-radius: 2px;
+        }
+
+        .result-source {
+            background: rgba(0, 112, 173, 0.1);
+            color: var(--capgemini-blue);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        /* Chat Bubble */
+        .chat-bubble {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background-color: var(--capgemini-blue);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .chat-bubble:hover {
+            background-color: #005d92;
+            transform: scale(1.1);
+        }
+
+        .chat-bubble svg {
+            width: 30px;
+            height: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Bienvenido al Portal C&CA</h1>
+        <p>Este es un ejemplo de integración del widget de búsqueda semántica.</p>
+    </div>
+
+    <!-- Search Widget -->
+    <div class="search-widget" id="searchWidget">
+        <div class="search-header">
+            <h2 class="search-title">Buscador Semántico</h2>
+            <button class="search-close" id="closeSearch">&times;</button>
+        </div>
+        <div class="search-input-container">
+            <input type="text" class="search-input" id="searchInput" placeholder="Buscar en los documentos...">
+            <button class="search-button" id="searchButton">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+        <div class="search-filters">
+            <div class="filter-group">
+                <label for="docType">Tipo de documento</label>
+                <select id="docType">
+                    <option value="">Todos</option>
+                    <option value="pdf">PDF</option>
+                    <option value="docx">Word</option>
+                    <option value="html">HTML</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="sortBy">Ordenar por</label>
+                <select id="sortBy">
+                    <option value="relevance">Relevancia</option>
+                    <option value="date">Fecha</option>
+                </select>
+            </div>
+        </div>
+        <div class="search-results" id="searchResults">
+            <div class="no-results">
+                <i class="fas fa-search"></i>
+                <p>Ingresa un término de búsqueda para comenzar</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat Bubble -->
+    <div class="chat-bubble" id="chatBubble">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        </svg>
+    </div>
+
+    <script>
+        class SearchWidget {
+            constructor() {
+                this.widget = document.getElementById('searchWidget');
+                this.chatBubble = document.getElementById('chatBubble');
+                this.searchInput = document.getElementById('searchInput');
+                this.searchButton = document.getElementById('searchButton');
+                this.closeButton = document.getElementById('closeSearch');
+                this.searchResults = document.getElementById('searchResults');
+                this.docType = document.getElementById('docType');
+                this.sortBy = document.getElementById('sortBy');
+                
+                this.apiUrl = 'http://localhost:5000/api/search';
+                this.isOpen = false;
+                
+                this.initialize();
+            }
+            
+            initialize() {
+                // Event Listeners
+                this.chatBubble.addEventListener('click', () => this.toggleWidget());
+                this.closeButton.addEventListener('click', () => this.hideWidget());
+                this.searchButton.addEventListener('click', () => this.performSearch());
+                this.searchInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.performSearch();
+                });
+                
+                // Close when clicking outside
+                document.addEventListener('click', (e) => {
+                    if (!this.widget.contains(e.target) && e.target !== this.chatBubble && !this.chatBubble.contains(e.target)) {
+                        this.hideWidget();
+                    }
+                });
+                
+                console.log('Search Widget initialized');
+            }
+            
+            toggleWidget() {
+                if (this.isOpen) {
+                    this.hideWidget();
+                } else {
+                    this.showWidget();
+                }
+            }
+            
+            showWidget() {
+                this.widget.style.display = 'flex';
+                this.isOpen = true;
+                this.searchInput.focus();
+            }
+            
+            hideWidget() {
+                this.widget.style.display = 'none';
+                this.isOpen = false;
+            }
+            
+            async performSearch() {
+                const query = this.searchInput.value.trim();
+                
+                if (!query) {
+                    this.showNoResults('Ingresa un término de búsqueda');
+                    return;
+                }
+                
+                this.showLoading();
+                
+                try {
+                    const response = await fetch(this.apiUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            query: query,
+                            docType: this.docType.value || null,
+                            sortBy: this.sortBy.value
+                        })
+                    });
+                    
+                    if (!response.ok) throw new Error('Error en la búsqueda');
+                    
+                    const data = await response.json();
+                    this.displayResults(data.results || [], query);
+                    
+                } catch (error) {
+                    console.error('Search error:', error);
+                    this.showError('Error al realizar la búsqueda: ' + error.message);
+                }
+            }
+            
+            displayResults(results, query) {
+                if (!results || results.length === 0) {
+                    this.showNoResults('No se encontraron resultados');
+                    return;
+                }
+                
+                const resultsHtml = results.map(result => `
+                    <div class="result-item">
+                        <h3 class="result-title">
+                            ${this.highlightMatches(result.title || 'Documento sin título', query)}
+                            <span class="result-source">${this.getFileIcon(result.source)} ${this.formatSource(result.source)}</span>
+                        </h3>
+                        <div class="result-content">
+                            ${this.highlightMatches(this.truncateText(result.content, 200), query)}
+                        </div>
+                        <div class="result-meta">
+                            <span class="result-score">${(result.score * 100).toFixed(1)}% relevancia</span>
+                            ${result.page ? `<span>Página ${result.page}</span>` : ''}
+                        </div>
+                    </div>
+                `).join('');
+                
+                this.searchResults.innerHTML = resultsHtml;
+            }
+            
+            showLoading() {
+                this.searchResults.innerHTML = `
+                    <div class="search-loading">
+                        <div class="loading-spinner"></div>
+                        <p>Buscando información...</p>
+                    </div>
+                `;
+            }
+            
+            showNoResults(message) {
+                this.searchResults.innerHTML = `
+                    <div class="no-results">
+                        <i class="fas fa-search"></i>
+                        <p>${message}</p>
+                    </div>
+                `;
+            }
+            
+            showError(message) {
+                this.searchResults.innerHTML = `
+                    <div class="no-results">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <p>${message}</p>
+                    </div>
+                `;
+            }
+            
+            highlightMatches(text, query) {
+                if (!text || !query) return text || '';
+                
+                const terms = query.split(' ').filter(term => term.length > 2);
+                let highlighted = text;
+                
+                terms.forEach(term => {
+                    const regex = new RegExp(`(${this.escapeRegExp(term)})`, 'gi');
+                    highlighted = highlighted.replace(regex, '<span class="highlight">$1</span>');
+                });
+                
+                return highlighted;
+            }
+            
+            escapeRegExp(string) {
+                return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            }
+            
+            truncateText(text, maxLength) {
+                if (!text) return '';
+                if (text.length <= maxLength) return text;
+                return text.substring(0, maxLength) + '...';
+            }
+            
+            getFileIcon(filePath) {
+                if (!filePath) return '📄';
+                
+                const extension = (filePath.split('.').pop() || '').toLowerCase();
+                const icons = {
+                    'pdf': '📄',
+                    'doc': '📝',
+                    'docx': '📝',
+                    'txt': '📄',
+                    'html': '🌐',
+                    'htm': '🌐',
+                    'xls': '📊',
+                    'xlsx': '📊',
+                    'ppt': '📑',
+                    'pptx': '📑'
+                };
+                
+                return icons[extension] || '📄';
+            }
+            
+            formatSource(source) {
+                if (!source) return 'Documento';
+                return source.split('/').pop() || 'Documento';
+            }
+        }
+
+        // Initialize the widget when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            const searchWidget = new SearchWidget();
+            // Make it globally available for debugging
+            window.searchWidget = searchWidget;
+        });
+    </script>
+</body>
+</html>

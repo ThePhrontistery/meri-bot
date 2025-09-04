@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud & Custom Applications</title>
+    <link rel="icon" type="image/x-icon" href="static/favicon.ico">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Ubuntu:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="static/css/cca-styles.css">
+    <style>
+        :root {
+            --capgemini-blue: #0070ad;
+            --capgemini-vibrant-blue: #12abdb;
+            --capgemini-dark-grey: #272936;
+            --capgemini-cool-grey: #f6f6f6;
+            --capgemini-white: #ffffff;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Ubuntu', sans-serif;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--capgemini-white);
+            color: var(--capgemini-dark-grey);
+            line-height: 1.6;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Section -->
+    <header class="main-header">
+        <div class="header-content">
+            <div class="logo">
+                <img src="static/images/cca-logo.svg" alt="C&CA Logo" style="height: 50px;">
+            </div>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="#inicio">Inicio</a></li>
+                    <li><a href="#comunidad">Comunidad</a></li>
+                    <li><a href="#formacion">Formación</a></li>
+                    <li><a href="#recursos">Recursos</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-container">
+            <div class="hero-text">
+                <h1>Bienvenidos a Cloud & Custom Applications</h1>
+                <div class="logos">
+                    <img src="static/images/capgemini-logo.svg" alt="Capgemini" class="capgemini-logo" style="height: 40px;">
+                </div>
+                <p class="hero-subtitle">Innovación y excelencia en soluciones tecnológicas</p>
+            </div>
+            <div class="hero-image">
+                <img src="static/images/hero-image.svg" alt="Tecnología C&CA" style="max-width: 100%; height: auto;">
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Secciones de contenido irán aquí -->
+        <section id="inicio" class="content-section">
+            <h2>Nuestra Visión</h2>
+            <p>Somos el área de Cloud & Custom Applications de Capgemini, dedicados a ofrecer soluciones tecnológicas innovadoras y personalizadas.</p>
+        </section>
+    </main>
+
+    <!-- Burbuja de chat -->
+    <div class="chat-bubble" id="chat-bubble">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        </svg>
+    </div>
+    
+    <!-- Widget de chat -->
+    <div class="app-container" id="chat-widget">
+        <header class="app-header" id="chat-header">
+            <div class="logo">
+                <h1>MeriBot</h1>
+                <p>Asistente conversacional empresarial</p>
+            </div>
+            <button class="minimize-button" id="minimize-button">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </header>
+        
+        <div class="chat-container" id="chat-container">
+            <div class="welcome-message">
+                <p>¡Bienvenido! Soy MeriBot, tu asistente conversacional. ¿En qué puedo ayudarte hoy?</p>
+            </div>
+            <!-- Mensajes del chat se agregarán aquí dinámicamente -->
+        </div>
+        
+        <div class="chat-input">
+            <form id="chat-form">
+                <div class="typing-indicator" id="typing-indicator">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                <div class="input-container">
+                    <input type="text" id="user-input" placeholder="Escribe tu mensaje..." autocomplete="off">
+                    <button type="submit" class="send-button">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="22" y1="2" x2="11" y2="13"></line>
+                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                        </svg>
+                    </button>
+                </div>
+                <div class="suggested-questions" id="suggested-questions">
+                    <p>Preguntas sugeridas:</p>
+                    <div class="questions-container">
+                        <button type="button" class="suggestion">¿Cómo puedo acceder a los recursos de formación?</button>
+                        <button type="button" class="suggestion">¿Qué herramientas están disponibles para desarrolladores?</button>
+                        <button type="button" class="suggestion">¿Dónde encuentro la documentación técnica?</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Contacto</h3>
+                <p>Email: cca@capgemini.com</p>
+            </div>
+            <div class="footer-section">
+                <h3>Enlaces rápidos</h3>
+                <ul>
+                    <li><a href="#inicio">Inicio</a></li>
+                    <li><a href="#comunidad">Comunidad</a></li>
+                    <li><a href="#formacion">Formación</a></li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="static/js/cca-scripts.js"></script>
+    
+    <script>
+        (function() {
+            // Inicialización del widget de chat
+            document.addEventListener('DOMContentLoaded', function() {
+                const chatBubble = document.getElementById('chat-bubble');
+                const chatWidget = document.getElementById('chat-widget');
+                const chatContainer = document.getElementById('chat-container');
+                const chatForm = document.getElementById('chat-form');
+                const userInput = document.getElementById('user-input');
+                const typingIndicator = document.getElementById('typing-indicator');
+                const conversationId = 'conv_' + Math.random().toString(36).substr(2, 9);
+                
+                // Mensajes de respuesta del bot
+                const botResponses = [
+                    "¡Hola! ¿En qué puedo ayudarte hoy?",
+                    "Entiendo tu consulta. Déjame buscar esa información para ti.",
+                    "Gracias por tu pregunta. Estoy aquí para ayudarte.",
+                    "Puedo ayudarte con información sobre C&CA. ¿Qué necesitas saber?",
+                    "¿Hay algo más en lo que pueda ayudarte?"
+                ];
+                
+                // Funciones auxiliares
+                function addMessage(sender, text) {
+                    const messageDiv = document.createElement('div');
+                    messageDiv.className = 'message ' + sender + '-message';
+                    messageDiv.innerHTML = '<p>' + text + '</p>';
+                    chatContainer.appendChild(messageDiv);
+                    scrollToBottom();
+                    e.stopPropagation();
+                    chatWidget.classList.remove('expanded');
+                    chatBubble.style.opacity = '1';
+                    chatBubble.style.pointerEvents = 'auto';
+                });
+                
+                // Cerrar al hacer clic fuera del widget
+                document.addEventListener('click', function(e) {
+                    if (!chatWidget.contains(e.target) && !chatBubble.contains(e.target)) {
+                        chatWidget.classList.remove('expanded');
+                        chatBubble.style.opacity = '1';
+                        chatBubble.style.pointerEvents = 'auto';
+                    }
+                });
+                
+                // Manejar el envío del formulario
+                chatForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const message = userInput.value.trim();
+                    
+                    if (message) {
+                        // Agregar mensaje del usuario
+                        addMessage('user', message);
+                        userInput.value = '';
+                        
+                        // Simular respuesta del bot después de un retraso
+                        setTimeout(function() {
+                            addTypingIndicator();
+                            
+                            setTimeout(function() {
+                                removeTypingIndicator();
+                                const randomResponse = botResponses[Math.floor(Math.random() * botResponses.length)];
+                                addMessage('bot', randomResponse);
+                            }, 1500);
+                        }, 500);
+                    }
+                });
+                
+                // Manejar clic en sugerencias
+                var suggestionButtons = document.querySelectorAll('.suggestion');
+                for (var i = 0; i < suggestionButtons.length; i++) {
+                    suggestionButtons[i].addEventListener('click', function() {
+                        userInput.value = this.textContent;
+                        chatForm.dispatchEvent(new Event('submit'));
+                    });
+                }
+                
+                // Manejar la tecla Enter en el input
+                userInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        chatForm.dispatchEvent(new Event('submit'));
+                    }
+                });
+            });
+        })();
+    </script>
+    
+    <!-- Chat Widget Styles -->
+    <style>
+        /* Estilo del contenedor principal del widget */
+        .app-container {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 380px;
+            height: 0;
+            opacity: 0;
+            display: flex;
+            flex-direction: column;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            overflow: hidden;
+            z-index: 1000;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+        }
+        
+        .app-container.expanded {
+            height: 65vh;
+            min-height: 450px;
+            max-height: 80vh;
+            opacity: 1;
+            pointer-events: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .app-container.minimized {
+            height: 50px;
+        }
+        
+        .app-container.minimized .chat-container,
+        .app-container.minimized .chat-input,
+        .app-container.minimized .logo {
+            display: none;
+        }
+        
+        /* Contenido oculto cuando está minimizado */
+        .app-container:not(.expanded) .chat-container,
+        .app-container:not(.expanded) .chat-input,
+        .app-container:not(.expanded) .app-header .logo,
+        .app-container:not(.expanded) .minimize-button {
+            display: none;
+        }
+        
+        /* Botón de minimizar/cerrar */
+        .minimize-button {
+            background: rgba(255, 255, 255, 0.15);
+            border: none;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.9;
+            transition: all 0.2s ease;
+            position: relative;
+            z-index: 3;
+        }
+        
+        .minimize-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+        
+        /* Burbuja de chat */
+        .chat-bubble {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: var(--capgemini-vibrant-blue);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            z-index: 999;
+            transition: all 0.3s ease;
+        }
+        
+        .chat-bubble:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .chat-bubble svg {
+            width: 24px;
+            height: 24px;
+            color: white;
+        }
+        
+        /* Estilo del encabezado del chat */
+        .app-header {
+            background: var(--capgemini-vibrant-blue);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 20px 20px 0 0;
+        }
+        
+        .app-header .logo h1 {
+            font-size: 1.3em;
+            margin: 0;
+            font-weight: 600;
+            color: white;
+        }
+        
+        .app-header .logo p {
+            font-size: 0.8em;
+            margin: 0;
+            opacity: 0.9;
+        }
+        
+        /* Contenedor de mensajes */
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            background: #f8f9fa;
+        }
+        
+        /* Estilo de los mensajes */
+        .message {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            line-height: 1.4;
+            font-size: 0.95em;
+            position: relative;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .user-message {
+            align-self: flex-end;
+            background: var(--capgemini-blue);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+        
+        .bot-message {
+            align-self: flex-start;
+            background: white;
+            color: var(--capgemini-dark-grey);
+            border: 1px solid #e9ecef;
+            border-bottom-left-radius: 4px;
+        }
+        
+        /* Área de entrada de texto */
+        .chat-input {
+            padding: 15px 20px;
+            background: white;
+            border-top: 1px solid #e9ecef;
+            border-radius: 0 0 20px 20px;
+        }
+        
+        .input-container {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .chat-input input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #dee2e6;
+            border-radius: 20px;
+            font-size: 0.95em;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+        
+        .chat-input input:focus {
+            border-color: var(--capgemini-blue);
+        }
+        
+        .send-button {
+            background: var(--capgemini-vibrant-blue);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .send-button:hover {
+            background: var(--capgemini-blue);
+            transform: scale(1.05);
+        }
+        
+        .send-button:active {
+            transform: scale(0.95);
+        }
+        
+        .send-button svg {
+            width: 18px;
+            height: 18px;
+        }
+        
+        /* Preguntas sugeridas */
+        .suggested-questions {
+            margin-top: 15px;
+            font-size: 0.85em;
+            color: #6c757d;
+        }
+        
+        .suggested-questions p {
+            margin: 0 0 8px 0;
+            font-size: 0.9em;
+        }
+        
+        .questions-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .suggestion {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 15px;
+            padding: 8px 12px;
+            font-size: 0.85em;
+            color: var(--capgemini-dark-grey);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .suggestion:hover {
+            background: #e9ecef;
+            border-color: #ced4da;
+        }
+        
+        /* Indicador de escritura */
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 5px;
+        }
+        
+        .typing-dot {
+            width: 6px;
+            height: 6px;
+            background-color: #adb5bd;
+            border-radius: 50%;
+            display: inline-block;
+            animation: typingAnimation 1.4s infinite ease-in-out;
+        }
+        
+        .typing-dot:nth-child(1) { animation-delay: 0s; }
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+        
+        @keyframes typingAnimation {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-5px); }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Scrollbar personalizada */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+    </style>
+</head>
+<body>
+    <!-- Chat Bubble -->
+    <div class="chat-bubble" id="chat-bubble">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        </svg>
+    </div>
+    
+    <!-- Chat Widget -->
+    <div class="app-container" id="chat-widget">
+        <header class="app-header" id="chat-header">
+            <div class="logo">
+                <h1>MariBot</h1>
+                <p>Asistente virtual</p>
+            </div>
+            <button class="minimize-button" id="minimize-button">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </header>
+        
+        <div class="chat-container">
+            <div class="chat-messages" id="chat-messages">
+                <!-- Chat messages will be added here dynamically -->
+            </div>
+            
+            <div class="suggested-questions">
+                <button class="suggested-question">¿Qué es C&CA?</button>
+                <button class="suggested-question">¿Cómo puedo unirme a la comunidad?</button>
+                <button class="suggested-question">¿Qué tecnologías usan?</button>
+            </div>
+            
+            <form class="chat-form" id="chat-form">
+                <input type="text" id="user-input" placeholder="Escribe tu mensaje..." required>
+                <button type="submit" class="send-button" id="send-button">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                </button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Include external JavaScript file -->
+    <script src="static/js/chat-widget.js"></script>
+                        typing.parentNode.removeChild(typing);
+                    }
+                    
+                    // Añadir respuesta del bot
+                    const botResponses = [
+                        "Gracias por tu mensaje. Estoy procesando tu consulta...",
+                        "Entiendo que necesitas información sobre " + message + ". Déjame buscarla para ti.",
+                        "¡Buena pregunta! Voy a encontrar la mejor respuesta para ti.",
+                        "Estoy revisando nuestra base de conocimientos para darte una respuesta precisa."
+                    ];
+                    
+                    const randomResponse = botResponses[Math.floor(Math.random() * botResponses.length)];
+                    addMessage('bot', randomResponse);
+                    
+                }, 1000);
+            });
+            
+            // Mensaje de bienvenida inicial
+            setTimeout(() => {
+                const welcomeMessage = document.createElement('div');
+                welcomeMessage.className = 'message bot';
+                welcomeMessage.innerHTML = `
+                    <div class="message-content">
+                        <div class="message-text">¡Hola! Soy MariBot, tu asistente virtual de C&CA. ¿En qué puedo ayudarte hoy?</div>
+                    </div>
+                `;
+                chatMessages.appendChild(welcomeMessage);
+                scrollToBottom();
+            }, 500);
+        });
+    </script>
+</body>
+</html>

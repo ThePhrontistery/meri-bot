@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba de Buscador C&CA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Ubuntu:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+    /* Chat Bubble Styles */
+    .chat-bubble {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        width: 60px;
+        height: 60px;
+        background-color: #0070ad;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+        transition: all 0.3s ease;
+    }
+    
+    .chat-bubble:hover {
+        background-color: #005d92;
+        transform: scale(1.1);
+    }
+    
+    .chat-bubble svg {
+        width: 30px;
+        height: 30px;
+    }
+    /* Inline CSS for testing */
+    :root {
+        --capgemini-blue: #0070ad;
+        --capgemini-vibrant-blue: #12abdb;
+        --capgemini-dark-grey: #272936;
+        --capgemini-cool-grey: #f6f6f6;
+        --capgemini-white: #ffffff;
+        --border-card: 18px;
+        --box-shadow: 0 1px 8px hsla(194, 0%, 46%, 0.2);
+    }
+    
+    .search-widget {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 380px;
+        max-height: 600px;
+        background: var(--capgemini-white);
+        border-radius: var(--border-card);
+        box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
+        display: flex;
+        flex-direction: column;
+        z-index: 10000;
+        overflow: hidden;
+        font-family: 'Ubuntu', sans-serif;
+    }
+    
+    .search-header {
+        background: var(--capgemini-blue);
+        color: white;
+        padding: 15px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .search-title {
+        font-size: 18px;
+        font-weight: 700;
+        margin: 0;
+        font-family: 'Montserrat', sans-serif;
+    }
+    
+    .search-close {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 20px;
+        cursor: pointer;
+        padding: 5px;
+        line-height: 1;
+    }
+    
+    .search-input-container {
+        position: relative;
+        display: flex;
+        align-items: center;
+        padding: 15px;
+    }
+    
+    .search-input {
+        flex: 1;
+        padding: 12px 15px;
+        padding-right: 40px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 14px;
+        font-family: 'Ubuntu', sans-serif;
+    }
+    
+    .search-button {
+        position: absolute;
+        right: 25px;
+        background: var(--capgemini-vibrant-blue);
+        color: white;
+        border: none;
+        border-radius: 4px;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+    }
+    
+    .search-results {
+        flex: 1;
+        overflow-y: auto;
+        padding: 0 15px 15px;
+        max-height: 400px;
+    }
+    
+    .result-item {
+        background: var(--capgemini-cool-grey);
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 10px;
+    }
+    
+    .result-title {
+        font-weight: 600;
+        color: var(--capgemini-blue);
+        margin: 0 0 8px 0;
+        font-size: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .result-content {
+        font-size: 13px;
+        color: var(--capgemini-dark-grey);
+        margin-bottom: 10px;
+        line-height: 1.5;
+    }
+    
+    .result-meta {
+        display: flex;
+        justify-content: space-between;
+        font-size: 12px;
+        color: #666;
+    }
+    
+    .search-loading {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 30px;
+        color: var(--capgemini-dark-grey);
+    }
+    
+    .loading-spinner {
+        border: 3px solid rgba(0, 112, 173, 0.1);
+        border-top: 3px solid var(--capgemini-vibrant-blue);
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        animation: spin 1s linear infinite;
+        margin-bottom: 15px;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    .no-results {
+        text-align: center;
+        padding: 30px 15px;
+        color: #666;
+    }
+    
+    .highlight {
+        background-color: rgba(18, 171, 219, 0.2);
+        padding: 0 2px;
+        border-radius: 2px;
+    }
+    
+    .result-source {
+        background: rgba(0, 112, 173, 0.1);
+        color: var(--capgemini-blue);
+        padding: 2px 8px;
+        border-radius: 10px;
+        font-size: 11px;
+        font-weight: 500;
+    }
+    
+    .search-filters {
+        display: flex;
+        gap: 10px;
+        padding: 0 15px 15px;
+        flex-wrap: wrap;
+    }
+    
+    .filter-group {
+        flex: 1;
+        min-width: 120px;
+    }
+    
+    .filter-group label {
+        display: block;
+        font-size: 12px;
+        color: var(--capgemini-dark-grey);
+        margin-bottom: 5px;
+        font-weight: 500;
+    }
+    
+    .filter-group select {
+        width: 100%;
+        padding: 8px 10px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 13px;
+        font-family: 'Ubuntu', sans-serif;
+        background-color: white;
+    }
+    </style>
+    <style>
+    /* Chat Bubble Styles */
+    .chat-bubble {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        width: 60px;
+        height: 60px;
+        background-color: #0070ad;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+        transition: all 0.3s ease;
+    }
+    
+    .chat-bubble:hover {
+        background-color: #005d92;
+        transform: scale(1.1);
+    }
+    
+    .chat-bubble svg {
+        width: 30px;
+        height: 30px;
+    }
+        body {
+            font-family: 'Ubuntu', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f6f6f6;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #0070ad;
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .header h1 {
+            margin: 0;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .content {
+            background: white;
+            padding: 30px;
+            border-radius: 18px;
+            box-shadow: 0 1px 8px rgba(0, 0, 0, 0.1);
+        }
+        .floating-button {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background-color: #12abdb;
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 9999;
+            transition: all 0.3s ease;
+        }
+        .floating-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+            <h1>Cloud & Custom Applications</h1>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="content">
+            <h2>Bienvenido al portal de C&CA</h2>
+            <p>Este es un ejemplo de integración del buscador semántico en el estilo de C&CA.</p>
+            <p>Haz clic en el botón flotante en la esquina inferior derecha para abrir el buscador.</p>
+        </div>
+    </div>
+
+    <!-- Botón flotante para abrir el buscador -->
+    <div class="floating-button" id="search-toggle">
+        <i class="fas fa-search"></i>
+    </div>
+    
+    <!-- Chat Bubble -->
+    <div class="chat-bubble" id="chat-bubble">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        </svg>
+    </div>
+
+    <!-- Script del buscador -->
+    <script>
+    // Inline JavaScript for testing
+    class CCASearchWidget {
+        constructor(options = {}) {
+            this.options = {
+                apiUrl: options.apiUrl || '/api/search',
+                position: options.position || 'bottom-right',
+                theme: options.theme || 'light',
+                language: options.language || 'es',
+                autoInit: options.autoInit !== false
+            };
+            
+            this.isOpen = false;
+            this.isSearching = false;
+            
+            if (this.options.autoInit) {
+                this.init();
+            }
+        }
+
+        init() {
+            this.createWidget();
+            this.bindEvents();
+            this.render();
+            console.log('CCA Search Widget initialized');
+        }
+
+        createWidget() {
+            // Create container
+            this.container = document.createElement('div');
+            this.container.className = 'search-widget';
+            this.container.style.display = 'none';
+            
+            // Create widget HTML
+            this.container.innerHTML = `
+                <div class="search-header">
+                    <h2 class="search-title">Buscador Semántico</h2>
+                    <button class="search-close">&times;</button>
+                </div>
+                <div class="search-input-container">
+                    <input type="text" class="search-input" placeholder="Buscar en los documentos...">
+                    <button class="search-button">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+                <div class="search-filters">
+                    <div class="filter-group">
+                        <label for="doc-type">Tipo de documento</label>
+                        <select id="doc-type" class="doc-type">
+                            <option value="">Todos</option>
+                            <option value="pdf">PDF</option>
+                            <option value="docx">Word</option>
+                            <option value="html">HTML</option>
+                            <option value="txt">Texto</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="sort-by">Ordenar por</label>
+                        <select id="sort-by" class="sort-by">
+                            <option value="relevance">Relevancia</option>
+                            <option value="date">Fecha</option>
+                            <option value="title">Título</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="search-results">
+                    <div class="no-results">
+                        <i class="fas fa-search"></i>
+                        <p>Ingresa un término de búsqueda para comenzar</p>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(this.container);
+            
+            // Store references to important elements
+            this.searchInput = this.container.querySelector('.search-input');
+            this.searchButton = this.container.querySelector('.search-button');
+            this.resultsContainer = this.container.querySelector('.search-results');
+            this.closeButton = this.container.querySelector('.search-close');
+            this.docTypeFilter = this.container.querySelector('.doc-type');
+            this.sortByFilter = this.container.querySelector('.sort-by');
+            
+            console.log('Widget elements created');
+        }
+
+        bindEvents() {
+            // Toggle widget visibility
+            document.addEventListener('click', (e) => {
+                if (e.target.matches('.search-widget, .search-widget *')) return;
+                if (this.isOpen) this.hide();
+            });
+            
+            // Search on button click
+            this.searchButton.addEventListener('click', () => this.performSearch());
+            
+            // Search on Enter key
+            this.searchInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') this.performSearch();
+            });
+            
+            // Close button
+            this.closeButton.addEventListener('click', () => this.hide());
+            
+            console.log('Event listeners bound');
+        }
+
+        async performSearch() {
+            const query = this.searchInput.value.trim();
+            console.log('Performing search for:', query);
+            
+            if (!query) {
+                this.showNoResults('Ingresa un término de búsqueda');
+                return;
+            }
+            
+            this.showLoading();
+            
+            try {
+                const response = await fetch(this.options.apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        query: query,
+                        docType: this.docTypeFilter.value || null,
+                        sortBy: this.sortByFilter.value
+                    })
+                });
+                
+                console.log('Search response:', response);
+                
+                if (!response.ok) throw new Error('Error en la búsqueda');
+                
+                const data = await response.json();
+                console.log('Search results:', data);
+                this.displayResults(data.results || [], query);
+                
+            } catch (error) {
+                console.error('Search error:', error);
+                this.showError('Error al realizar la búsqueda: ' + error.message);
+            }
+        }
+
+        displayResults(results, query) {
+            console.log('Displaying results:', results);
+            
+            if (!results || results.length === 0) {
+                this.showNoResults('No se encontraron resultados');
+                return;
+            }
+            
+            const resultsHtml = results.map(result => `
+                <div class="result-item">
+                    <h3 class="result-title">
+                        ${this.highlightMatches(result.title || 'Documento sin título', query)}
+                        <span class="result-source">${this.getFileIcon(result.source)} ${this.formatSource(result.source)}</span>
+                    </h3>
+                    <div class="result-content">
+                        ${this.highlightMatches(this.truncateText(result.content, 200), query)}
+                    </div>
+                    <div class="result-meta">
+                        <span class="result-score">${(result.score * 100).toFixed(1)}% relevancia</span>
+                        ${result.page ? `<span>Página ${result.page}</span>` : ''}
+                    </div>
+                </div>
+            `).join('');
+            
+            this.resultsContainer.innerHTML = resultsHtml;
+        }
+
+        showLoading() {
+            console.log('Showing loading state');
+            this.resultsContainer.innerHTML = `
+                <div class="search-loading">
+                    <div class="loading-spinner"></div>
+                    <p>Buscando información...</p>
+                </div>
+            `;
+        }
+
+        showNoResults(message) {
+            console.log('Showing no results:', message);
+            this.resultsContainer.innerHTML = `
+                <div class="no-results">
+                    <i class="fas fa-search"></i>
+                    <p>${message}</p>
+                </div>
+            `;
+        }
+
+        showError(message) {
+            console.error('Showing error:', message);
+            this.resultsContainer.innerHTML = `
+                <div class="no-results">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <p>${message}</p>
+                </div>
+            `;
+        }
+
+        highlightMatches(text, query) {
+            if (!text || !query) return text || '';
+            
+            const terms = query.split(' ').filter(term => term.length > 2);
+            let highlighted = text;
+            
+            terms.forEach(term => {
+                const regex = new RegExp(`(${this.escapeRegExp(term)})`, 'gi');
+                highlighted = highlighted.replace(regex, '<span class="highlight">$1</span>');
+            });
+            
+            return highlighted;
+        }
+
+        escapeRegExp(string) {
+            return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        }
+
+        truncateText(text, maxLength) {
+            if (!text) return '';
+            if (text.length <= maxLength) return text;
+            return text.substring(0, maxLength) + '...';
+        }
+
+        getFileIcon(filePath) {
+            if (!filePath) return '📄';
+            
+            const extension = filePath.split('.').pop().toLowerCase();
+            const icons = {
+                'pdf': '📄',
+                'doc': '📝',
+                'docx': '📝',
+                'txt': '📄',
+                'html': '🌐',
+                'htm': '🌐',
+                'xls': '📊',
+                'xlsx': '📊',
+                'ppt': '📑',
+                'pptx': '📑'
+            };
+            
+            return icons[extension] || '📄';
+        }
+
+        formatSource(source) {
+            if (!source) return 'Documento';
+            return source.split('/').pop() || 'Documento';
+        }
+
+        show() {
+            console.log('Showing widget');
+            this.container.style.display = 'flex';
+            this.isOpen = true;
+            this.searchInput.focus();
+        }
+
+        hide() {
+            console.log('Hiding widget');
+            this.container.style.display = 'none';
+            this.isOpen = false;
+        }
+
+        toggle() {
+            console.log('Toggling widget');
+            if (this.isOpen) {
+                this.hide();
+            } else {
+                this.show();
+            }
+        }
+    }
+    
+    // Initialize the widget when the page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('DOM fully loaded');
+        
+        const searchWidget = new CCASearchWidget({
+            apiUrl: '/api/search',
+            theme: 'light',
+            language: 'es'
+        });
+        
+        // Add click handler for the floating search button
+        const toggleButton = document.getElementById('search-toggle');
+        if (toggleButton) {
+            toggleButton.addEventListener('click', function(e) {
+                console.log('Search toggle button clicked');
+                e.preventDefault();
+                searchWidget.toggle();
+            });
+        } else {
+            console.error('Search toggle button not found!');
+        }
+        
+        // Add click handler for the chat bubble
+        const chatBubble = document.getElementById('chat-bubble');
+        if (chatBubble) {
+            chatBubble.addEventListener('click', function(e) {
+                console.log('Chat bubble clicked');
+                e.preventDefault();
+                searchWidget.show();
+                // Scroll to the search input when chat bubble is clicked
+                if (searchWidget.searchInput) {
+                    searchWidget.searchInput.focus();
+                }
+            });
+        } else {
+            console.error('Chat bubble element not found!');
+        }
+        
+        // Add to window for debugging
+        window.searchWidget = searchWidget;
+        
+        console.log('Widget and chat bubble initialized');
+    });
+    </script>
+    <script>
+        // Single initialization point for the widget
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM fully loaded');
+            
+            // Initialize the search widget
+            const searchWidget = new CCASearchWidget({
+                apiUrl: '/api/search',
+                theme: 'light',
+                language: 'es'
+            });
+            
+            // Add click handler for the chat bubble
+            const chatBubble = document.getElementById('chat-bubble');
+            if (chatBubble) {
+                chatBubble.addEventListener('click', function(e) {
+                    console.log('Chat bubble clicked');
+                    e.preventDefault();
+                    searchWidget.show();
+                    // Focus the search input when chat bubble is clicked
+                    if (searchWidget.searchInput) {
+                        searchWidget.searchInput.focus();
+                    }
+                });
+            } else {
+                console.error('Chat bubble element not found!');
+            }
+            
+            // Add click handler for the search toggle button
+            const searchToggle = document.getElementById('search-toggle');
+            if (searchToggle) {
+                searchToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    searchWidget.toggle();
+                });
+            } else {
+                console.error('Search toggle button not found!');
+            }
+            
+            // Add to window for debugging
+            window.searchWidget = searchWidget;
+            
+            console.log('Widget and chat bubble initialized');
+        });
+    </script>
+</body>
+</html>
