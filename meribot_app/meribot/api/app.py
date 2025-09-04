@@ -2,15 +2,16 @@ from fastapi import FastAPI, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List
 import os
 import sys
 
 # Add the project root to the Python path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-# Import the question processor
-from meribot.nlp.processor import QuestionProcessor
+
+# Import el core
+from meribot.core.chatengine import ChatEngine
 
 app = FastAPI(
     title="MeriBot API",
@@ -32,6 +33,7 @@ class QueryRequest(BaseModel):
     """Modelo para las peticiones de consulta al chatbot."""
     question: str
     conversation_id: Optional[str] = None
+    domains: Optional[List[str]] = None
 
 @app.options("/chatbot/query")
 async def options_chatbot():
@@ -42,8 +44,9 @@ async def options_chatbot():
     response.headers["Access-Control-Allow-Headers"] = "Content-Type"
     return response
 
-# Initialize the question processor
-question_processor = QuestionProcessor()
+
+# Inicializar el core
+chat_engine = ChatEngine()
 
 @app.post(
     "/chatbot/query",
@@ -64,6 +67,7 @@ async def query_chatbot(request: QueryRequest, response: Response):
         request (QueryRequest): Contiene:
             - question: La pregunta del usuario como texto
             - conversation_id: (Opcional) ID de conversación para mantener contexto
+            - domains: (Opcional) Array de dominios para filtrar la búsqueda
         
     Returns:
         dict: Un diccionario con:
@@ -78,19 +82,51 @@ async def query_chatbot(request: QueryRequest, response: Response):
         response.headers["Access-Control-Allow-Origin"] = "*"
         response.headers["Access-Control-Allow-Methods"] = "POST, OPTIONS"
         response.headers["Access-Control-Allow-Headers"] = "Content-Type"
+
+        # Procesar directamente con el core
+        core_result = await chat_engine.process_message(
+            conversation_id=request.conversation_id or "anonymous",
+            message=request.question,
+            domains=request.domains
+        )
         
-        # Process the question using our processor
-        result = question_processor.process_question(request.question)
+        # Devolver la respuesta del core
+        core_response = core_result.get("response")
         
-        # Add conversation ID to the response if provided
-        result["conversation_id"] = request.conversation_id
+        # Manejar errores de validación específicamente
+        if core_result.get("type") == "validation_error":
+            return {
+                "response": core_response,
+                "conversation_id": core_result.get("conversation_id"),
+                "intent": "validation_error",
+                "confidence": 0.0,
+                "error": core_result.get("error", "Error de validación"),
+                "suggested_questions": []
+            }
         
-        return result
-        
+        if core_response and core_response.strip() and core_response.strip() != "[Error al generar respuesta]":
+            return {
+                "response": core_response,
+                "conversation_id": core_result.get("conversation_id"),
+                "intent": core_result.get("type", "llm"),
+                "confidence": 1.0,
+                "citations": core_result.get("citations", []),
+                "source": core_result.get("source", "llm"),
+                "suggested_questions": []
+            }
+        else:
+            # Si el core no responde adecuadamente, devolver mensaje genérico
+            return {
+                "response": "Lo siento, no he podido encontrar información relevante para tu pregunta. ¿Podrías reformularla de otra manera?",
+                "conversation_id": core_result.get("conversation_id"),
+                "intent": "no_answer",
+                "confidence": 0.0,
+                "suggested_questions": []
+            }
+
     except Exception as e:
         # Log the error for debugging
         print(f"Error processing question: {str(e)}")
-        
         # Return a user-friendly error message
         return {
             "response": "Lo siento, ha ocurrido un error al procesar tu pregunta. Por favor, inténtalo de nuevo más tarde.",
