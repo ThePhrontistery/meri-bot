@@ -1,0 +1,22 @@
+# Ejemplo de configuración para el Crawler de Meri-bot
+# Puedes copiar este archivo como crawler_config.yaml en el directorio del módulo crawler
+
+seeds:
+  - "https://cca.capgemini.com/web/home"
+allowed_domains:
+  - "onboarding"
+  - "training"
+  - "cca"
+  - "sdo"
+user_agent: "MeriBot/1.0"
+delay: 1.0 # segundos entre peticiones
+output_dir: "./data/scraped"
+log_level: "INFO"
+chroma_path: "./chroma_data"
+embedding_model: "all-MiniLM-L6-v2"
+max_depth: 4
+file_types:
+  - "html"
+  - "pdf"
+  - "docx"
+  - "xlsx"
