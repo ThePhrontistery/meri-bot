@@ -97,7 +97,7 @@ async def query_chatbot(request: QueryRequest, response: Response):
         if core_result.get("type") == "validation_error":
             return {
                 "response": core_response,
-                "conversation_id": request.conversation_id,
+                "conversation_id": core_result.get("conversation_id"),
                 "intent": "validation_error",
                 "confidence": 0.0,
                 "error": core_result.get("error", "Error de validación"),
@@ -107,7 +107,7 @@ async def query_chatbot(request: QueryRequest, response: Response):
         if core_response and core_response.strip() and core_response.strip() != "[Error al generar respuesta]":
             return {
                 "response": core_response,
-                "conversation_id": request.conversation_id,
+                "conversation_id": core_result.get("conversation_id"),
                 "intent": core_result.get("type", "llm"),
                 "confidence": 1.0,
                 "citations": core_result.get("citations", []),
@@ -118,7 +118,7 @@ async def query_chatbot(request: QueryRequest, response: Response):
             # Si el core no responde adecuadamente, devolver mensaje genérico
             return {
                 "response": "Lo siento, no he podido encontrar información relevante para tu pregunta. ¿Podrías reformularla de otra manera?",
-                "conversation_id": request.conversation_id,
+                "conversation_id": core_result.get("conversation_id"),
                 "intent": "no_answer",
                 "confidence": 0.0,
                 "suggested_questions": []

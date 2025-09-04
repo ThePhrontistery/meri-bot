@@ -107,6 +107,7 @@ class ChatEngine:
             "response": response,
             "citations": citations,
             "source": "llm",
+            "conversation_id": session.conversation_id,
         }
 
     async def stream_response(
