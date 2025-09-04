@@ -189,7 +189,7 @@ def validate_chat_engine_input(
 
 # Constantes para reutilización
 ALLOWED_DOMAINS = [
-    'hr', 'policies', 'intranet', 'access', 'tech', 'finance',
+    'hr', 'cca', 'onboarding', 'sdo', 'tech', 'finance',
     'legal', 'training', 'benefits', 'procedures', 'security',
     'facilities', 'projects', 'clients', 'tools'
 ]
