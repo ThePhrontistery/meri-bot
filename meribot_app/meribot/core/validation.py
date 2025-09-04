@@ -107,9 +107,9 @@ class ChatEngineRequest(BaseModel):
         # Lista de dominios permitidos (whitelist)
         allowed_domains = [
             'hr',           # Recursos Humanos
-            'policies',     # Políticas corporativas
-            'intranet',     # Intranet y sistemas internos
-            'access',       # Control de acceso
+            'cca',          # CCA General
+            'onboarding',   # Onboarding de empleados
+            'sdo',          # SDO - Servicios Digitales
             'tech',         # Tecnología e IT
             'finance',      # Finanzas
             'legal',        # Legal y compliance
