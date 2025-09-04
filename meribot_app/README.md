@@ -114,17 +114,93 @@ Abre tu navegador y navega a:
 - Interfaz del widget: http://localhost:3000
 - Documentación de la API: http://localhost:8000/docs
 
-### CLI de Administración
+### CLI de Administración (meri-cli)
+
+#### Ubicación
+Los archivos de meri-cli se encuentran en: `meribot/meri-cli/`
+
+#### Instalación para uso global (Windows)
+
+Para poder usar `meri-cli` desde cualquier ubicación en la terminal:
+
+```powershell
+# Navegar al directorio meri-cli
+cd meribot/meri-cli
+
+# Ejecutar el instalador
+.\install-meri-cli.ps1 -Install
+
+# Reiniciar la terminal o ejecutar:
+refreshenv
+```
+
+#### Uso directo (sin instalación)
 
 ```bash
-# Ver ayuda
-python -m meribot --help
+# Desde el directorio meri-cli
+cd meribot/meri-cli
+.\meri-cli.bat [comando] [opciones]
+# o
+python meri-cli.py [comando] [opciones]
+```
 
-# Ejecutar scraping manual
-python -m meribot scrape --url [URL]
+#### Comandos disponibles
+
+```bash
+# Ver ayuda general
+meri-cli --help
+
+# Ver ayuda del comando crawl
+meri-cli crawl --help
+
+# Ejecutar crawling completo (parámetros obligatorios)
+meri-cli crawl --url [URL] --dominio [DOMINIO]
+
+# Ejemplo de crawling básico
+meri-cli crawl --url "https://cca.capgemini.com/web/home" --dominio "cca"
+
+# Ejecutar crawling con opciones avanzadas
+meri-cli crawl --url [URL] --dominio [DOMINIO] --max-depth 3 --formats "html,pdf"
+
+# Simular crawling sin ejecutar (dry-run)
+meri-cli crawl --url [URL] --dominio [DOMINIO] --dry-run
+
+# Comando obsoleto para compatibilidad (usar crawl en su lugar)
+meri-cli scrape --url [URL]
 
 # Gestionar la base de datos
-python -m meribot db [--reset]
+meri-cli db [--reset]
+```
+
+#### Ejemplos de uso avanzado
+
+```bash
+# Desde el directorio meri-cli
+
+# Crawling con profundidad limitada y filtros
+.\meri-cli.bat crawl --url "https://cca.capgemini.com/web/home" --dominio "cca" --max-depth 2 --exclude ".*logout.*"
+
+# Crawling solo de PDFs
+.\meri-cli.bat crawl --url "https://cca.capgemini.com/web/home" --dominio "cca" --formats "pdf"
+
+# Procesamiento manual de URLs específicas
+.\meri-cli.bat crawl --url "https://cca.capgemini.com/web/home" --dominio "cca" --manual "https://cca.capgemini.com/page1,https://cca.capgemini.com/page2"
+
+# Conectar a un API en otro host
+.\meri-cli.bat crawl --url "https://cca.capgemini.com/web/home" --dominio "cca" --api-host "http://meribot-api:8000"
+```
+
+#### Uso como módulo Python (alternativo)
+
+```bash
+# Ver ayuda general
+python -m meribot.meri-cli.main --help
+
+# Ejecutar crawling
+python -m meribot.meri-cli.main crawl --url [URL] --dominio [DOMINIO]
+
+# Usar como módulo del paquete meribot
+python -m meribot --help
 ```
 
 ## Despliegue
