@@ -7,7 +7,39 @@ Utiliza Pydantic para validar y sanitizar los datos antes del procesamiento.
 from typing import List, Optional
 from pydantic import BaseModel, Field, validator
 import re
+import os
+import yaml
 
+# Ruta al archivo de configuración del crawler
+CRAWLER_CONFIG_PATH = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), '../../crawler_config.yaml')
+)
+
+def load_allowed_domains_from_yaml(config_path=CRAWLER_CONFIG_PATH):
+    """
+    Carga la lista de dominios permitidos desde crawler_config.yaml.
+    Devuelve una lista de strings. Lanza ValueError si no se puede cargar.
+    """
+    if not os.path.exists(config_path):
+        raise ValueError(f"No se encontró el archivo de configuración: {config_path}")
+    try:
+        with open(config_path, 'r', encoding='utf-8') as f:
+            config = yaml.safe_load(f)
+        allowed_domains = config.get('allowed_domains')
+        if not isinstance(allowed_domains, list) or not all(isinstance(d, str) for d in allowed_domains):
+            raise ValueError("El campo 'allowed_domains' debe ser una lista de strings en crawler_config.yaml")
+        # Normalizar dominios (minúsculas, sin espacios)
+        return [d.strip().lower() for d in allowed_domains if d.strip()]
+    except Exception as e:
+        raise ValueError(f"Error al cargar allowed_domains desde crawler_config.yaml: {e}")
+
+# Cargar una sola vez al importar el módulo
+try:
+    ALLOWED_DOMAINS = load_allowed_domains_from_yaml()
+except Exception as e:
+    ALLOWED_DOMAINS = []
+    # Si falla, se puede loggear o lanzar excepción según política del proyecto
+    # raise
 
 class ChatEngineRequest(BaseModel):
     """
@@ -103,50 +135,26 @@ class ChatEngineRequest(BaseModel):
         """
         if v is None:
             return v
-        
-        # Lista de dominios permitidos (whitelist)
-        allowed_domains = [
-            'hr',           # Recursos Humanos
-            'policies',     # Políticas corporativas
-            'intranet',     # Intranet y sistemas internos
-            'access',       # Control de acceso
-            'tech',         # Tecnología e IT
-            'finance',      # Finanzas
-            'legal',        # Legal y compliance
-            'training',     # Formación y desarrollo
-            'benefits',     # Beneficios y compensación
-            'procedures',   # Procedimientos operativos
-            'security',     # Seguridad corporativa
-            'facilities',   # Instalaciones y oficinas
-            'projects',     # Gestión de proyectos
-            'clients',      # Información de clientes
-            'tools'         # Herramientas corporativas
-        ]
-        
         if not isinstance(v, list):
             raise ValueError("domains debe ser una lista")
-        
+        if not ALLOWED_DOMAINS:
+            raise ValueError("No se pudo cargar la lista de dominios permitidos desde crawler_config.yaml")
         # Validar cada dominio
         for domain in v:
             if not isinstance(domain, str):
                 raise ValueError("Cada dominio debe ser una cadena de texto")
-            
             domain = domain.strip().lower()
             if not domain:
                 raise ValueError("Los dominios no pueden estar vacíos")
-            
-            if domain not in allowed_domains:
-                raise ValueError(f"Dominio no permitido: '{domain}'. Dominios permitidos: {', '.join(allowed_domains)}")
-        
+            if domain not in ALLOWED_DOMAINS:
+                raise ValueError(f"Dominio no permitido: '{domain}'. Dominios permitidos: {', '.join(ALLOWED_DOMAINS)}")
         # Normalizar dominios (convertir a minúsculas y eliminar espacios)
         normalized_domains = [domain.strip().lower() for domain in v]
-        
         # Eliminar duplicados manteniendo el orden
         unique_domains = []
         for domain in normalized_domains:
             if domain not in unique_domains:
                 unique_domains.append(domain)
-        
         return unique_domains
 
     class Config:
@@ -188,12 +196,6 @@ def validate_chat_engine_input(
 
 
 # Constantes para reutilización
-ALLOWED_DOMAINS = [
-    'hr', 'cca', 'onboarding', 'sdo', 'tech', 'finance',
-    'legal', 'training', 'benefits', 'procedures', 'security',
-    'facilities', 'projects', 'clients', 'tools'
-]
-
 MAX_MESSAGE_LENGTH = 4000
 MAX_CONVERSATION_ID_LENGTH = 100
 MAX_DOMAINS_COUNT = 5
