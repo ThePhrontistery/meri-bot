@@ -106,7 +106,7 @@ class ChromaDBConnector:
 class VectorSearch:
     """Implementación real de VectorSearch usando Azure OpenAI para embeddings y ChromaDB para búsqueda semántica."""
     def __init__(self, collection_name: str = None, chroma_connector: 'ChromaDBConnector' = None):
-        self.collection_name = collection_name or os.getenv('CHROMADB_COLLECTION', 'documentos')
+        self.collection_name = "mari_chunks"
         self.chroma_connector = chroma_connector or ChromaDBConnector(collection_name=self.collection_name)
 
     def search(self, message, domains=None, metadata=None, top_k=5):

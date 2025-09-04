@@ -103,15 +103,19 @@ class LLMEngine:
                 prompt_parts.append(f"[{msg['role']}] {msg['content']}")
         # prompt_parts.append(f"[user] {user_prompt}")
         full_prompt = "\n".join(prompt_parts)
-        safe_prompt = apply_guardrails(full_prompt)
-        if safe_prompt is None:
+        # CORE: Desactivar aplicación de guarrails
+        #safe_prompt = apply_guardrails(full_prompt)
+        if full_prompt is None:
             log_generation_failure(metadata.get("user_id", "unknown") if metadata else "unknown", user_prompt, "Guardrail rejection")
             return "[Input rechazado por política de seguridad]"
         try:
-            response = await self.provider.generate(safe_prompt,user_prompt)
+            response = await self.provider.generate(full_prompt,user_prompt)
             # Simulación de citación automática
+            # CORE: Desactivar citación automática
+            '''
             if metadata and metadata.get("citar_fuentes"):
                 response += "\n\nFuente: https://ejemplo.com"
+            '''
             return response
         except Exception as e:
             log_generation_failure(metadata.get("user_id", "unknown") if metadata else "unknown", user_prompt, str(e))

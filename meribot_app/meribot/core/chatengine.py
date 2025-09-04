@@ -68,7 +68,7 @@ class ChatEngine:
 
         # 3. Buscar en la base vectorial (usando todos los dominios recibidos)
         relevant_chunks = self.vector_search.search(message, domains=domains)
-        citations = [chunk["source"] for chunk in relevant_chunks] if relevant_chunks else []
+        citations = [chunk["metadatas"]["url"] for chunk in relevant_chunks] if relevant_chunks else []
         vector_db_texts = [chunk.get("document") for chunk in relevant_chunks] if relevant_chunks else []
 
         # 4. Preparar metadatos para el LLM
@@ -141,7 +141,7 @@ class ChatEngine:
         relevant_chunks = self.vector_search.search(message, domains=domains)
         vector_db_texts = [chunk.get("document") for chunk in relevant_chunks] if relevant_chunks else []
         llm_metadata = {}
-        citations = [chunk["source"] for chunk in relevant_chunks] if relevant_chunks else []
+        citations = [chunk["metadatas"]["url"] for chunk in relevant_chunks] if relevant_chunks else []
         if citations:
             llm_metadata["citar_fuentes"] = True
         if relevant_chunks:
