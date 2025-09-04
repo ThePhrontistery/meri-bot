@@ -1,26 +1,93 @@
-# Python-generated files
+
+# Python
 __pycache__/
-*.py[oc]
-build/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+*.egg
+*.egg-info/
 dist/
-wheels/
-*.egg-info
-chroma_data/
+build/
+*.log
+*.sqlite3
+*.db
+*.db-journal
+
 # Virtual environments
-.venv
+.env/
+.venv/
+venv/
+env/
+.mypy_cache/
+.pytest_cache/
+.cache/
+*.cover
+.coverage
+coverage.xml
+htmlcov/
+*.lock
 
-# configuration files
-.env
+# VS Code
+.vscode/
+.history/
 
-# OS specific files: MacOS
+# OS generated files
 .DS_Store
+Thumbs.db
+desktop.ini
 
-# Data files
-#db/
-data/
+# Docker
+*.pid
+*.pid.lock
+docker-compose.override.yml
+chroma_data/
+chroma_db/
+chroma/
+*.tar
+*.gz
 
-# Node js
+# Node.js (for frontend)
 node_modules/
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
 
-# Logs files
+# Frontend build artifacts
+meribot_app/web/static/js/*.js.map
+meribot_app/web/static/css/*.css.map
+
+# Environment & secrets
+.env
+.env.*
+*.secret
+*.key
+*.pem
+
+# Test & coverage
+tests/__pycache__/
+tests/.pytest_cache/
+tests/.mypy_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# Misc
 logs/
+*.bak
+*.swp
+*.swo
+
+# Ignore lockfiles except uv.lock
+Pipfile.lock
+poetry.lock
+package-lock.json
+yarn.lock
+
+# Ignore generated documentation
+docs/_build/
+docs/.doctrees/
+docs/.DS_Store
+
+# Ignore local web host artifacts
+Local_C&CA_host_web/
