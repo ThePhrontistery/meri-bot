@@ -28,7 +28,7 @@ class ChromaDBConnector:
     """
     def __init__(self, persist_directory: Optional[str] = None, collection_name: Optional[str] = None):
         self.persist_directory = persist_directory or os.path.join(os.path.dirname(__file__), '../../chroma_data')
-        self.collection_name = collection_name or os.getenv('CHROMADB_COLLECTION', 'documentos')
+        self.collection_name = "meri_chunks"
         self.openai_api_key = os.getenv('AZURE_OPENAI_API_KEY')
         self.openai_endpoint = os.getenv('AZURE_OPENAI_ENDPOINT')
         self.openai_deployment = os.getenv('AZURE_OPENAI_EMBEDDINGS_DEPLOYMENT')
@@ -51,9 +51,11 @@ class ChromaDBConnector:
         # Construir filtro para dominios si se proporcionan
         if domains:
             where = where or {}
-            where['dominio'] = {'$in': domains}
+            where['domain'] = {'$in': domains}
         # LangChain Chroma no soporta filtro directo por metadatos en similarity_search, así que filtramos después
         results = self.store.similarity_search(query_text, k=top_k)
+        print("-------------------------------")
+        print(f"Resultados encontrados:", results)
         hits = []
         for doc in results:
             meta = doc.metadata if hasattr(doc, 'metadata') else None
@@ -71,6 +73,8 @@ class ChromaDBConnector:
                 'score': None,  # LangChain no devuelve score en similarity_search
                 'metadatas': meta
             })
+        print("-------------------------------")
+        print(f"Resultados filtrados:", hits)
         return hits[:top_k]
 
     def semantic_search(self, query_text: str, top_k: int = 5, where: dict = None, domains=None):
@@ -80,7 +84,7 @@ class ChromaDBConnector:
         # Construir filtro para dominios si se proporcionan
         if domains:
             where = where or {}
-            where['dominio'] = {'$in': domains}
+            where['domain'] = {'$in': domains}
         # LangChain Chroma no soporta filtro directo por metadatos en similarity_search, así que filtramos después
         results = self.store.similarity_search(query_text, k=top_k)
         hits = []
@@ -106,7 +110,7 @@ class ChromaDBConnector:
 class VectorSearch:
     """Implementación real de VectorSearch usando Azure OpenAI para embeddings y ChromaDB para búsqueda semántica."""
     def __init__(self, collection_name: str = None, chroma_connector: 'ChromaDBConnector' = None):
-        self.collection_name = "mari_chunks"
+        self.collection_name = "meri_chunks"
         self.chroma_connector = chroma_connector or ChromaDBConnector(collection_name=self.collection_name)
 
     def search(self, message, domains=None, metadata=None, top_k=5):
