@@ -1,632 +1,471 @@
 <!DOCTYPE html>
-<html lang="es">
+<!-- saved from url=(0034)https://cca.capgemini.com/web/home -->
+<html lang="es" data-beasties-container="">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cloud & Custom Applications</title>
-    <link rel="icon" type="image/x-icon" href="static/favicon.ico">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Ubuntu:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="static/css/cca-styles.css">
-    <style>
-        :root {
-            --capgemini-blue: #0070ad;
-            --capgemini-vibrant-blue: #12abdb;
-            --capgemini-dark-grey: #272936;
-            --capgemini-cool-grey: #f6f6f6;
-            --capgemini-white: #ffffff;
-        }
-        
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
+    <meta charset="utf-8">
+    
+    <title>Cloud &amp; Custom Applications</title>
+    <!--<base href="/web/">--><base href=".">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="icon" type="image/x-icon" href="https://cca.capgemini.com/web/favicon.ico">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&amp;family=Ubuntu:wght@400;700&amp;display=swap">
+
+    <meta name="title" content="Cloud &amp; Custom Applications">
+    <meta name="description" content="Cloud &amp; Custom Applications es la ABL de Capgemini dedicada a soluciones en la nube, a medida con integraciones y lowcode.
+      Este portal te servirá para conocer más acerca de tu práctica, qué comunidades tenemos, formaciones, aplicaciones, plataformas formativas y estar al día de las últimas novedades y charlas de la práctica
+      ">
+
+    <meta name="keywords" content="Capgemini, Cloud, Custom Applications, ABL, Formación, Comunidad">
+    <meta name="author" content="C&amp;CA SDO">
+    <meta name="og:image" content="./images/pages/home/organigrama.png">
+    <meta name="og:locale" content="es_ES">
+            <style>
+                .meri-bot-icon {
+                    height: 32px;
+                    width: 32px;
+                    border-radius: 50%;
+                    margin-right: 12px;
+                    object-fit: cover;
+                    background: white;
+                }
+        /* Chatbot Widget Styles */
+        .chatbot-widget {
+            position: fixed;
+              top: 55%;
+              left: 50%;
+              transform: translate(-50%, -50%);
+            width: 50vw;
+            max-width: 50vw;
+            height: 60vh;
+            min-height: 50vh;
+            max-height: 700px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 5px 32px rgba(0, 0, 0, 0.25);
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+            overflow: hidden;
+            transition: all 0.3s ease;
             font-family: 'Ubuntu', sans-serif;
         }
         
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: var(--capgemini-white);
-            color: var(--capgemini-dark-grey);
-            line-height: 1.6;
-            font-size: 16px;
-        }
-    </style>
-</head>
-<body>
-    <!-- Header Section -->
-    <header class="main-header">
-        <div class="header-content">
-            <div class="logo">
-                <img src="static/images/cca-logo.svg" alt="C&CA Logo" style="height: 50px;">
-            </div>
-            <nav class="main-nav">
-                <ul>
-                    <li><a href="#inicio">Inicio</a></li>
-                    <li><a href="#comunidad">Comunidad</a></li>
-                    <li><a href="#formacion">Formación</a></li>
-                    <li><a href="#recursos">Recursos</a></li>
-                </ul>
-            </nav>
-        </div>
-    </header>
-
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="hero-container">
-            <div class="hero-text">
-                <h1>Bienvenidos a Cloud & Custom Applications</h1>
-                <div class="logos">
-                    <img src="static/images/capgemini-logo.svg" alt="Capgemini" class="capgemini-logo" style="height: 40px;">
-                </div>
-                <p class="hero-subtitle">Innovación y excelencia en soluciones tecnológicas</p>
-            </div>
-            <div class="hero-image">
-                <img src="static/images/hero-image.svg" alt="Tecnología C&CA" style="max-width: 100%; height: auto;">
-            </div>
-        </div>
-    </section>
-
-    <!-- Main Content -->
-    <main class="main-content">
-        <!-- Secciones de contenido irán aquí -->
-        <section id="inicio" class="content-section">
-            <h2>Nuestra Visión</h2>
-            <p>Somos el área de Cloud & Custom Applications de Capgemini, dedicados a ofrecer soluciones tecnológicas innovadoras y personalizadas.</p>
-        </section>
-    </main>
-
-    <!-- Burbuja de chat -->
-    <div class="chat-bubble" id="chat-bubble">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-        </svg>
-    </div>
-    
-    <!-- Widget de chat -->
-    <div class="app-container" id="chat-widget">
-        <header class="app-header" id="chat-header">
-            <div class="logo">
-                <h1>MeriBot</h1>
-                <p>Asistente conversacional empresarial</p>
-            </div>
-            <button class="minimize-button" id="minimize-button">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                </svg>
-            </button>
-        </header>
-        
-        <div class="chat-container" id="chat-container">
-            <div class="welcome-message">
-                <p>¡Bienvenido! Soy MeriBot, tu asistente conversacional. ¿En qué puedo ayudarte hoy?</p>
-            </div>
-            <!-- Mensajes del chat se agregarán aquí dinámicamente -->
-        </div>
-        
-        <div class="chat-input">
-            <form id="chat-form">
-                <div class="typing-indicator" id="typing-indicator">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </div>
-                <div class="input-container">
-                    <input type="text" id="user-input" placeholder="Escribe tu mensaje..." autocomplete="off">
-                    <button type="submit" class="send-button">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="22" y1="2" x2="11" y2="13"></line>
-                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                        </svg>
-                    </button>
-                </div>
-                <div class="suggested-questions" id="suggested-questions">
-                    <p>Preguntas sugeridas:</p>
-                    <div class="questions-container">
-                        <button type="button" class="suggestion">¿Cómo puedo acceder a los recursos de formación?</button>
-                        <button type="button" class="suggestion">¿Qué herramientas están disponibles para desarrolladores?</button>
-                        <button type="button" class="suggestion">¿Dónde encuentro la documentación técnica?</button>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Footer -->
-    <footer class="main-footer">
-        <div class="footer-content">
-            <div class="footer-section">
-                <h3>Contacto</h3>
-                <p>Email: cca@capgemini.com</p>
-            </div>
-            <div class="footer-section">
-                <h3>Enlaces rápidos</h3>
-                <ul>
-                    <li><a href="#inicio">Inicio</a></li>
-                    <li><a href="#comunidad">Comunidad</a></li>
-                    <li><a href="#formacion">Formación</a></li>
-                </ul>
-            </div>
-        </div>
-    </footer>
-
-    <!-- Scripts -->
-    <script src="static/js/cca-scripts.js"></script>
-    
-    <script>
-        (function() {
-            // Inicialización del widget de chat
-            document.addEventListener('DOMContentLoaded', function() {
-                const chatBubble = document.getElementById('chat-bubble');
-                const chatWidget = document.getElementById('chat-widget');
-                const chatContainer = document.getElementById('chat-container');
-                const chatForm = document.getElementById('chat-form');
-                const userInput = document.getElementById('user-input');
-                const typingIndicator = document.getElementById('typing-indicator');
-                const conversationId = 'conv_' + Math.random().toString(36).substr(2, 9);
-                
-                // Mensajes de respuesta del bot
-                const botResponses = [
-                    "¡Hola! ¿En qué puedo ayudarte hoy?",
-                    "Entiendo tu consulta. Déjame buscar esa información para ti.",
-                    "Gracias por tu pregunta. Estoy aquí para ayudarte.",
-                    "Puedo ayudarte con información sobre C&CA. ¿Qué necesitas saber?",
-                    "¿Hay algo más en lo que pueda ayudarte?"
-                ];
-                
-                // Funciones auxiliares
-                function addMessage(sender, text) {
-                    const messageDiv = document.createElement('div');
-                    messageDiv.className = 'message ' + sender + '-message';
-                    messageDiv.innerHTML = '<p>' + text + '</p>';
-                    chatContainer.appendChild(messageDiv);
-                    scrollToBottom();
-                    e.stopPropagation();
-                    chatWidget.classList.remove('expanded');
-                    chatBubble.style.opacity = '1';
-                    chatBubble.style.pointerEvents = 'auto';
-                });
-                
-                // Cerrar al hacer clic fuera del widget
-                document.addEventListener('click', function(e) {
-                    if (!chatWidget.contains(e.target) && !chatBubble.contains(e.target)) {
-                        chatWidget.classList.remove('expanded');
-                        chatBubble.style.opacity = '1';
-                        chatBubble.style.pointerEvents = 'auto';
-                    }
-                });
-                
-                // Manejar el envío del formulario
-                chatForm.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    const message = userInput.value.trim();
-                    
-                    if (message) {
-                        // Agregar mensaje del usuario
-                        addMessage('user', message);
-                        userInput.value = '';
-                        
-                        // Simular respuesta del bot después de un retraso
-                        setTimeout(function() {
-                            addTypingIndicator();
-                            
-                            setTimeout(function() {
-                                removeTypingIndicator();
-                                const randomResponse = botResponses[Math.floor(Math.random() * botResponses.length)];
-                                addMessage('bot', randomResponse);
-                            }, 1500);
-                        }, 500);
-                    }
-                });
-                
-                // Manejar clic en sugerencias
-                var suggestionButtons = document.querySelectorAll('.suggestion');
-                for (var i = 0; i < suggestionButtons.length; i++) {
-                    suggestionButtons[i].addEventListener('click', function() {
-                        userInput.value = this.textContent;
-                        chatForm.dispatchEvent(new Event('submit'));
-                    });
-                }
-                
-                // Manejar la tecla Enter en el input
-                userInput.addEventListener('keypress', function(e) {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        chatForm.dispatchEvent(new Event('submit'));
-                    }
-                });
-            });
-        })();
-    </script>
-    
-    <!-- Chat Widget Styles -->
-    <style>
-        /* Estilo del contenedor principal del widget */
-        .app-container {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            width: 380px;
-            height: 0;
-            opacity: 0;
-            display: flex;
-            flex-direction: column;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
-            overflow: hidden;
-            z-index: 1000;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            pointer-events: none;
-        }
-        
-        .app-container.expanded {
-            height: 65vh;
-            min-height: 450px;
-            max-height: 80vh;
-            opacity: 1;
-            pointer-events: auto;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .app-container.minimized {
-            height: 50px;
-        }
-        
-        .app-container.minimized .chat-container,
-        .app-container.minimized .chat-input,
-        .app-container.minimized .logo {
-            display: none;
-        }
-        
-        /* Contenido oculto cuando está minimizado */
-        .app-container:not(.expanded) .chat-container,
-        .app-container:not(.expanded) .chat-input,
-        .app-container:not(.expanded) .app-header .logo,
-        .app-container:not(.expanded) .minimize-button {
-            display: none;
-        }
-        
-        /* Botón de minimizar/cerrar */
-        .minimize-button {
-            background: rgba(255, 255, 255, 0.15);
-            border: none;
-            color: white;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            cursor: pointer;
-            padding: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0.9;
-            transition: all 0.2s ease;
-            position: relative;
-            z-index: 3;
-        }
-        
-        .minimize-button:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: scale(1.1);
-        }
-        
-        /* Burbuja de chat */
-        .chat-bubble {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            width: 60px;
-            height: 60px;
-            background: var(--capgemini-vibrant-blue);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-            z-index: 999;
-            transition: all 0.3s ease;
-        }
-        
-        .chat-bubble:hover {
-            transform: scale(1.1);
-            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.2);
-        }
-        
-        .chat-bubble svg {
-            width: 24px;
-            height: 24px;
-            color: white;
-        }
-        
-        /* Estilo del encabezado del chat */
-        .app-header {
-            background: var(--capgemini-vibrant-blue);
+        .chatbot-header {
+            background: #0070ad;
             color: white;
             padding: 15px 20px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            border-radius: 20px 20px 0 0;
+            justify-content: space-between;
         }
         
-        .app-header .logo h1 {
-            font-size: 1.3em;
-            margin: 0;
-            font-weight: 600;
-            color: white;
-        }
-        
-        .app-header .logo p {
-            font-size: 0.8em;
-            margin: 0;
-            opacity: 0.9;
-        }
-        
-        /* Contenedor de mensajes */
-        .chat-container {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
+        .chatbot-header .title-container {
             display: flex;
             flex-direction: column;
-            gap: 15px;
-            background: #f8f9fa;
+            align-items: center;
+            flex-grow: 1;
         }
         
-        /* Estilo de los mensajes */
+        .chatbot-header h2 {
+            font-size: 18px;
+            margin: 0;
+            font-family: 'Ubuntu', sans-serif;
+        }
+        
+        .chatbot-header .subtitle {
+            font-size: 13px;
+            opacity: 0.9;
+            margin-top: 3px;
+            font-family: 'Ubuntu', sans-serif;
+        }
+        
+        .chatbot-messages {
+            flex: 1;
+              padding: 15px 15px 120px 15px;
+            overflow-y: auto;
+            background: #f6f6f6;
+        }
+        
         .message {
+            margin-bottom: 15px;
             max-width: 80%;
-            padding: 12px 16px;
+            padding: 10px 15px;
             border-radius: 18px;
             line-height: 1.4;
-            font-size: 0.95em;
-            position: relative;
-            animation: fadeIn 0.3s ease;
-        }
-        
-        .user-message {
-            align-self: flex-end;
-            background: var(--capgemini-blue);
-            color: white;
-            border-bottom-right-radius: 4px;
+            word-wrap: break-word;
+            font-family: 'Ubuntu', sans-serif;
         }
         
         .bot-message {
-            align-self: flex-start;
-            background: white;
-            color: var(--capgemini-dark-grey);
-            border: 1px solid #e9ecef;
-            border-bottom-left-radius: 4px;
+            background: #e9ecef;
+            color: #272936;
+            border-bottom-left-radius: 5px;
+            margin-right: auto;
         }
         
-        /* Área de entrada de texto */
-        .chat-input {
-            padding: 15px 20px;
-            background: white;
-            border-top: 1px solid #e9ecef;
-            border-radius: 0 0 20px 20px;
+        .user-message {
+            background: #0070ad;
+            color: white;
+            border-bottom-right-radius: 5px;
+            margin-left: auto;
         }
         
-        .input-container {
+        .chatbot-input {
+            padding: 15px;
+            background: white;
+            border-top: 1px solid #eee;
             display: flex;
             gap: 10px;
-            align-items: center;
         }
         
-        .chat-input input {
+        .chatbot-input input {
             flex: 1;
-            padding: 12px 15px;
-            border: 1px solid #dee2e6;
-            border-radius: 20px;
-            font-size: 0.95em;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
             outline: none;
-            transition: border-color 0.3s ease;
+            font-family: 'Ubuntu', sans-serif;
         }
         
-        .chat-input input:focus {
-            border-color: var(--capgemini-blue);
-        }
-        
-        .send-button {
-            background: var(--capgemini-vibrant-blue);
+        .chatbot-input button {
+            background: #0070ad;
             color: white;
             border: none;
+            border-radius: 50%;
             width: 40px;
             height: 40px;
-            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: background-color 0.2s;
         }
         
-        .send-button:hover {
-            background: var(--capgemini-blue);
-            transform: scale(1.05);
+        .chatbot-input button:hover {
+            background: #005d8f;
         }
         
-        .send-button:active {
-            transform: scale(0.95);
-        }
-        
-        .send-button svg {
-            width: 18px;
-            height: 18px;
-        }
-        
-        /* Preguntas sugeridas */
-        .suggested-questions {
-            margin-top: 15px;
-            font-size: 0.85em;
-            color: #6c757d;
-        }
-        
-        .suggested-questions p {
-            margin: 0 0 8px 0;
-            font-size: 0.9em;
-        }
-        
-        .questions-container {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        
-        .suggestion {
-            background: #f8f9fa;
-            border: 1px solid #e9ecef;
-            border-radius: 15px;
-            padding: 8px 12px;
-            font-size: 0.85em;
-            color: var(--capgemini-dark-grey);
+        .chatbot-toggle {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            min-width: 180px;
+            height: 48px;
+            background: #0070ad;
+            color: white;
+            border: none;
+            border-radius: 24px;
+            font-size: 18px;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s ease;
-            text-align: left;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        
-        .suggestion:hover {
-            background: #e9ecef;
-            border-color: #ced4da;
-        }
-        
-        /* Indicador de escritura */
-        .typing-indicator {
+            z-index: 1001;
             display: flex;
             align-items: center;
-            gap: 5px;
-            margin-top: 5px;
+            justify-content: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            padding: 0 24px;
+            transition: all 0.2s;
         }
         
-        .typing-dot {
-            width: 6px;
-            height: 6px;
-            background-color: #adb5bd;
-            border-radius: 50%;
-            display: inline-block;
-            animation: typingAnimation 1.4s infinite ease-in-out;
+        .chatbot-toggle:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            background: #005d8f;
         }
         
-        .typing-dot:nth-child(1) { animation-delay: 0s; }
-        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
-        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
-        
-        @keyframes typingAnimation {
-            0%, 60%, 100% { transform: translateY(0); }
-            30% { transform: translateY(-5px); }
+        .hidden {
+            display: none !important;
         }
         
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        /* Scrollbar personalizada */
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 10px;
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: #c1c1c1;
-            border-radius: 10px;
-        }
-        
-        ::-webkit-scrollbar-thumb:hover {
-            background: #a8a8a8;
+        @media (max-width: 768px) {
+      .chatbot-widget {
+        width: 100vw;
+        height: 95vh;
+        max-height: 95vh;
+        top: 65%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        border-radius: 0;
+      }
+            
+            .chatbot-toggle {
+                bottom: 20px;
+                right: 20px;
+            }
         }
     </style>
-</head>
-<body>
-    <!-- Chat Bubble -->
-    <div class="chat-bubble" id="chat-bubble">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-        </svg>
-    </div>
-    
-    <!-- Chat Widget -->
-    <div class="app-container" id="chat-widget">
-        <header class="app-header" id="chat-header">
-            <div class="logo">
-                <h1>MariBot</h1>
-                <p>Asistente virtual</p>
-            </div>
-            <button class="minimize-button" id="minimize-button">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                </svg>
-            </button>
-        </header>
-        
-        <div class="chat-container">
-            <div class="chat-messages" id="chat-messages">
-                <!-- Chat messages will be added here dynamically -->
-            </div>
-            
-            <div class="suggested-questions">
-                <button class="suggested-question">¿Qué es C&CA?</button>
-                <button class="suggested-question">¿Cómo puedo unirme a la comunidad?</button>
-                <button class="suggested-question">¿Qué tecnologías usan?</button>
-            </div>
-            
-            <form class="chat-form" id="chat-form">
-                <input type="text" id="user-input" placeholder="Escribe tu mensaje..." required>
-                <button type="submit" class="send-button" id="send-button">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="22" y1="2" x2="11" y2="13"></line>
-                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                    </svg>
-                </button>
-            </form>
-        </div>
-    </div>
-    
-    <!-- Include external JavaScript file -->
-    <script src="static/js/chat-widget.js"></script>
-                        typing.parentNode.removeChild(typing);
-                    }
-                    
-                    // Añadir respuesta del bot
-                    const botResponses = [
-                        "Gracias por tu mensaje. Estoy procesando tu consulta...",
-                        "Entiendo que necesitas información sobre " + message + ". Déjame buscarla para ti.",
-                        "¡Buena pregunta! Voy a encontrar la mejor respuesta para ti.",
-                        "Estoy revisando nuestra base de conocimientos para darte una respuesta precisa."
-                    ];
-                    
-                    const randomResponse = botResponses[Math.floor(Math.random() * botResponses.length)];
-                    addMessage('bot', randomResponse);
-                    
-                }, 1000);
-            });
-            
-            // Mensaje de bienvenida inicial
-            setTimeout(() => {
-                const welcomeMessage = document.createElement('div');
-                welcomeMessage.className = 'message bot';
-                welcomeMessage.innerHTML = `
-                    <div class="message-content">
-                        <div class="message-text">¡Hola! Soy MariBot, tu asistente virtual de C&CA. ¿En qué puedo ayudarte hoy?</div>
-                    </div>
-                `;
-                chatMessages.appendChild(welcomeMessage);
-                scrollToBottom();
-            }, 500);
-        });
-    </script>
-</body>
-</html>
+    <style>:root{--fa-style-family-brands:"Font Awesome 6 Brands";--fa-font-brands:normal 400 1em/1 "Font Awesome 6 Brands"}@font-face{font-family:"Font Awesome 6 Brands";font-style:normal;font-weight:400;font-display:block;src:url("./media/fa-brands-400-Q3XCMWHQ.woff2") format("woff2"),url("./media/fa-brands-400-R2XQZCET.ttf") format("truetype")}:root{--fa-font-regular:normal 400 1em/1 "Font Awesome 6 Free"}@font-face{font-family:"Font Awesome 6 Free";font-style:normal;font-weight:400;font-display:block;src:url("./media/fa-regular-400-QSNYFYRT.woff2") format("woff2"),url("./media/fa-regular-400-XUOPSR7E.ttf") format("truetype")}:root{--fa-style-family-classic:"Font Awesome 6 Free";--fa-font-solid:normal 900 1em/1 "Font Awesome 6 Free"}@font-face{font-family:"Font Awesome 6 Free";font-style:normal;font-weight:900;font-display:block;src:url("./media/fa-solid-900-5ZUYHGA7.woff2") format("woff2"),url("./media/fa-solid-900-PJNKLK6W.ttf") format("truetype")}:root{--capgemini-blue: #0070ad;--capgemini-vibrant-blue: #12abdb;--capgemini-dark-grey: #272936;--capgemini-cool-grey: #f6f6f6;--capgemini-white: #ffffff;--color-text-light: var(--capgemini-white);--color-text-dark: var(--capgemini-dark-grey);--border-img: 20px;--border-card: 18px;--border-element: 14px;--border-input: 8px;--border-input-color: 1px solid #ccc;--title-bottom-space: 50px;--heading-bottom-space: 20px;--box-shadow: 0 1px 8px hsla(194, 0%, 46%, .2), 0 1px 8px hsla(194, 0%, 46%, .2);--box-shadow-hover: 0 10px 30px hsla(194, 0%, 46%, .4), 0 6px 24px hsla(194, 0%, 46%, .3)}
+* {
+    box-sizing: border-box;
+    -webkit-mask-size: 100%;
+    mask-size: 100%;
+}margin:0;font-family:Ubuntu,sans-serif}p{line-height:1.4em}a{text-underline-offset:4px;color:var(--capgemini-blue)}a:has(app-link-card,.talk-card){text-decoration:none;color:inherit}img,button,a,.talk-card,img:hover,button:hover,a:hover,.talk-card:hover{transition:all .15s ease-in-out}
+</style><link rel="stylesheet" href="./Cloud &amp; Custom Applications_files/styles-2QPKW3UZ.css" media="all" onload="this.media=&#39;all&#39;"><noscript><link rel="stylesheet" href="/web/styles-2QPKW3UZ.css"></noscript><style>app-layout[_ngcontent-ng-c2948372227]   .info-content[_ngcontent-ng-c2948372227]{display:flex;flex-direction:column;row-gap:78px}</style><style>[_nghost-ng-c3879817551]{display:flex;flex-direction:column;min-height:100vh}main[_ngcontent-ng-c3879817551]{padding:170px 6%;display:flex;flex-direction:column;row-gap:250px;background-image:url("/web/media/fondo-4VNA463A.jfif");background-repeat:repeat;flex:1;min-width:900px}</style><style>.hero[_ngcontent-ng-c72504376]{display:flex;align-items:center;justify-content:center}.hero[_ngcontent-ng-c72504376]   .hero-container[_ngcontent-ng-c72504376]{display:flex;justify-content:space-between;align-items:center;column-gap:15vw}.hero[_ngcontent-ng-c72504376]   .hero-container[_ngcontent-ng-c72504376]   .hero-text[_ngcontent-ng-c72504376]{display:flex;flex-direction:column;row-gap:var(--heading-bottom-space)}.hero[_ngcontent-ng-c72504376]   .hero-container[_ngcontent-ng-c72504376]   .hero-text[_ngcontent-ng-c72504376]   h1[_ngcontent-ng-c72504376]{font-size:60px;color:var(--capgemini-darkgrey)}.hero[_ngcontent-ng-c72504376]   .hero-container[_ngcontent-ng-c72504376]   .hero-text[_ngcontent-ng-c72504376]   .logos[_ngcontent-ng-c72504376]{display:flex;align-items:center}.hero[_ngcontent-ng-c72504376]   .hero-container[_ngcontent-ng-c72504376]   .hero-text[_ngcontent-ng-c72504376]   .logos[_ngcontent-ng-c72504376]   img[_ngcontent-ng-c72504376]:first-child{width:180px}.hero[_ngcontent-ng-c72504376]   .hero-container[_ngcontent-ng-c72504376]   .hero-text[_ngcontent-ng-c72504376]   .logos[_ngcontent-ng-c72504376]   img[_ngcontent-ng-c72504376]:last-child{width:320px}.hero[_ngcontent-ng-c72504376]   .hero-container[_ngcontent-ng-c72504376]   .hero-text[_ngcontent-ng-c72504376]   .text[_ngcontent-ng-c72504376]{font-size:32px;white-space:nowrap}.hero[_ngcontent-ng-c72504376]   .hero-container[_ngcontent-ng-c72504376]   .hero-image[_ngcontent-ng-c72504376]{display:flex;justify-content:flex-end}.hero[_ngcontent-ng-c72504376]   .hero-container[_ngcontent-ng-c72504376]   .hero-image[_ngcontent-ng-c72504376]   img[_ngcontent-ng-c72504376]{min-width:300px;max-width:90%;object-fit:cover}.hero[_ngcontent-ng-c72504376]   .cca-logo[_ngcontent-ng-c72504376]{background-color:var(--capgemini-vibrant-blue);width:200px;height:100px;-webkit-mask:url("/web/media/cca-logo-XA4KEIVO.svg") no-repeat center;mask:url("/web/media/cca-logo-XA4KEIVO.svg") no-repeat center;mask-size:contain}@media (max-width: 1300px){.hero[_ngcontent-ng-c72504376]   .hero-container[_ngcontent-ng-c72504376]{column-gap:10vw}.hero[_ngcontent-ng-c72504376]   .hero-container[_ngcontent-ng-c72504376]   .hero-text[_ngcontent-ng-c72504376]   h1[_ngcontent-ng-c72504376]{font-size:50px}.hero[_ngcontent-ng-c72504376]   .hero-container[_ngcontent-ng-c72504376]   .hero-text[_ngcontent-ng-c72504376]   .text[_ngcontent-ng-c72504376]{font-size:28px}}</style><style>.container[_ngcontent-ng-c4103120249]{text-align:center}.container[_ngcontent-ng-c4103120249]     app-heading h1.heading{margin-bottom:78px}.container[_ngcontent-ng-c4103120249]   .organigrama[_ngcontent-ng-c4103120249]{max-width:80%;min-height:500px}</style><style>.container[_ngcontent-ng-c227975733]{text-align:center}.container[_ngcontent-ng-c227975733]     app-heading h1.heading{margin-bottom:78px}.container[_ngcontent-ng-c227975733]   .image[_ngcontent-ng-c227975733]{max-width:80%;min-height:500px}</style><style>.carrera[_ngcontent-ng-c543148040]{display:flex;flex-direction:column;align-items:center}.carrera[_ngcontent-ng-c543148040]     app-heading h1.heading{margin-bottom:78px}.texto[_ngcontent-ng-c543148040]{font-weight:400;font-size:16px;text-align:center}.botones[_ngcontent-ng-c543148040]{margin-top:78px;display:flex;align-items:end;text-align:center;column-gap:25px}.botones[_ngcontent-ng-c543148040]     app-button button{min-width:315px}.botones[_ngcontent-ng-c543148040]     app-heading h4.heading{margin-bottom:32.5px}.segundo[_ngcontent-ng-c543148040]{margin-top:var(--heading-bottom-space)}.acabo[_ngcontent-ng-c543148040]{text-align:center;color:#12abdb}.familias[_ngcontent-ng-c543148040]{margin-top:70px;display:flex;margin-bottom:30px;margin-left:calc(50% - 447px)}.roles[_ngcontent-ng-c543148040]{display:flex;flex-direction:column}.container-roles[_ngcontent-ng-c543148040]{display:flex;justify-content:center;column-gap:40px}.pc[_ngcontent-ng-c543148040]{max-height:450px}.vector[_ngcontent-ng-c543148040]{height:60px;z-index:0;margin-top:-5px;margin-bottom:-5px}.vector98[_ngcontent-ng-c543148040]{margin-top:-10px;margin-bottom:-10px;height:65px}.vector100[_ngcontent-ng-c543148040]{margin-left:30px;margin-top:-10px;margin-bottom:-10px;height:65px}.vector101[_ngcontent-ng-c543148040]{margin-left:10px;margin-top:-10px;margin-bottom:-10px;height:65px}.enlaces[_ngcontent-ng-c543148040]{display:flex;flex-direction:column;justify-content:center;align-items:start;padding-top:105px}.engagement[_ngcontent-ng-c543148040]{margin-left:65px;z-index:1}.business[_ngcontent-ng-c543148040]{margin-left:-50px;z-index:1}.agile[_ngcontent-ng-c543148040]{margin-left:-10px;z-index:1}.architecture[_ngcontent-ng-c543148040]{margin-left:100px;z-index:1}.software[_ngcontent-ng-c543148040]{margin-left:-100px;z-index:1}.professional-evolution[_ngcontent-ng-c543148040]{margin-top:25px}.professional-evolution[_ngcontent-ng-c543148040]     app-button .button{width:315px}</style><style>.container[_ngcontent-ng-c3468906792]{display:flex;flex-direction:column;row-gap:78px}.container[_ngcontent-ng-c3468906792]     app-heading h1.heading{text-align:center}.subtitle-div[_ngcontent-ng-c3468906792]{margin-bottom:58.5px}.subtitle[_ngcontent-ng-c3468906792]{text-align:center}.texto[_ngcontent-ng-c3468906792]{text-align:center;margin-bottom:58.5px}.texto[_ngcontent-ng-c3468906792]   p[_ngcontent-ng-c3468906792]{font-size:18px}.boton[_ngcontent-ng-c3468906792]{display:flex;justify-content:center;align-items:center}.contactos[_ngcontent-ng-c3468906792]{text-align:center;margin-bottom:58.5px}.cards[_ngcontent-ng-c3468906792]{display:flex;justify-content:center;column-gap:35px;align-items:flex-start}.group-card[_ngcontent-ng-c3468906792], .hrcca-card[_ngcontent-ng-c3468906792]{display:flex;flex-direction:row;align-items:center;padding-right:15px;border-radius:var(--border-card);box-shadow:var(--box-shadow);background-color:var(--capgemini-white)}.formation[_ngcontent-ng-c3468906792]   .formation-card[_ngcontent-ng-c3468906792]{display:flex;flex-direction:row;align-items:center;padding-right:15px;border-radius:var(--border-card);box-shadow:var(--box-shadow);background-color:var(--capgemini-blue);color:var(--capgemini-white)}.formation[_ngcontent-ng-c3468906792]   .formation-card[_ngcontent-ng-c3468906792]   a[_ngcontent-ng-c3468906792]{color:var(--capgemini-white)}.formation[_ngcontent-ng-c3468906792]   .sharepoint[_ngcontent-ng-c3468906792]{display:flex;margin-top:20px;border:1px;padding:2px 20px 2px 2px;border-radius:var(--border-card);box-shadow:var(--box-shadow);background-color:var(--capgemini-white);cursor:default}.formation[_ngcontent-ng-c3468906792]   .sharepoint[_ngcontent-ng-c3468906792]   .sharepoint-text[_ngcontent-ng-c3468906792]{font-weight:400;font-size:16px;line-height:100%;letter-spacing:0%;padding:20px}.fondo[_ngcontent-ng-c3468906792]{background-color:#12abdb;border-radius:10px;width:60px;height:60px;margin:20px}.fondo-blanco[_ngcontent-ng-c3468906792]{background-color:var(--capgemini-white)}.group-img[_ngcontent-ng-c3468906792], .hrcca-img[_ngcontent-ng-c3468906792], .formation-img[_ngcontent-ng-c3468906792]{border-radius:10px;display:flex;justify-content:start;width:40px;height:40px;margin:10px}.group-title-div[_ngcontent-ng-c3468906792], .hrcca-title-div[_ngcontent-ng-c3468906792], .formation-title-div[_ngcontent-ng-c3468906792]{display:flex;flex-direction:column;padding-right:20px}.group-title[_ngcontent-ng-c3468906792], .hrcca-title[_ngcontent-ng-c3468906792], .formation-title[_ngcontent-ng-c3468906792]{font-weight:700;font-size:20px;line-height:100%;letter-spacing:0%;vertical-align:middle;padding-bottom:5px}.group-email-div[_ngcontent-ng-c3468906792], .hrcca-email-div[_ngcontent-ng-c3468906792], .formation-email-div[_ngcontent-ng-c3468906792]{display:flex}a[_ngcontent-ng-c3468906792]{color:var(--capgemini-blue)}.info-hover[_ngcontent-ng-c3468906792]{cursor:default}@media (max-width: 1280px){.group-card[_ngcontent-ng-c3468906792], .hrcca-card[_ngcontent-ng-c3468906792], .formation-card[_ngcontent-ng-c3468906792], .sharepoint[_ngcontent-ng-c3468906792]{transform:scale(.9)}}</style><style>.container[_ngcontent-ng-c2008796105]{display:flex;flex-direction:column;align-items:center}.container[_ngcontent-ng-c2008796105]   .title[_ngcontent-ng-c2008796105]{text-align:center;margin-bottom:58.5px}.container[_ngcontent-ng-c2008796105]   a[_ngcontent-ng-c2008796105]{width:fit-content;height:auto}.container[_ngcontent-ng-c2008796105]   a[_ngcontent-ng-c2008796105]   .catedra[_ngcontent-ng-c2008796105]{width:100%;height:100%;object-fit:cover;cursor:pointer;display:block;border-radius:var(--border-img);box-shadow:var(--box-shadow);transition:all .2s ease-in-out;margin-bottom:58.5px;min-height:500px}.container[_ngcontent-ng-c2008796105]   a[_ngcontent-ng-c2008796105]   .catedra[_ngcontent-ng-c2008796105]:hover{box-shadow:var(--box-shadow-hover)}.container[_ngcontent-ng-c2008796105]   .boton[_ngcontent-ng-c2008796105]{display:flex;justify-content:center}</style><style>.ideas4all[_ngcontent-ng-c2072541255]{display:flex;flex-direction:column;align-items:center}.ideas4all[_ngcontent-ng-c2072541255]   app-heading[_ngcontent-ng-c2072541255]{margin-bottom:58.5px}.ideas4all[_ngcontent-ng-c2072541255]   .text[_ngcontent-ng-c2072541255]{text-align:center}.ideas4all[_ngcontent-ng-c2072541255]   .text[_ngcontent-ng-c2072541255]   p[_ngcontent-ng-c2072541255]{margin:0 auto;max-width:700px}.ideas4all[_ngcontent-ng-c2072541255]   .text[_ngcontent-ng-c2072541255]   img[_ngcontent-ng-c2072541255]{width:75%;padding:40px 0}.ideas4all[_ngcontent-ng-c2072541255]   .text[_ngcontent-ng-c2072541255]   .color-primary[_ngcontent-ng-c2072541255]{color:var(--capgemini-blue)}.ideas4all[_ngcontent-ng-c2072541255]   .buttons[_ngcontent-ng-c2072541255]{display:flex;column-gap:25px;margin-top:58.5px}.ideas4all[_ngcontent-ng-c2072541255]   .buttons[_ngcontent-ng-c2072541255]     app-button button{min-width:290px}</style><style>header[_ngcontent-ng-c2877343965]{background-color:#272936;padding:7px 50px;border-radius:0 0 16px 16px}header[_ngcontent-ng-c2877343965]   nav[_ngcontent-ng-c2877343965]{display:flex;justify-content:space-between;align-items:center}header[_ngcontent-ng-c2877343965]   nav[_ngcontent-ng-c2877343965]   div[_ngcontent-ng-c2877343965]{display:flex;align-items:center}.simplifying-git-layout[_nghost-ng-c2877343965]   header[_ngcontent-ng-c2877343965], .simplifying-git-layout   [_nghost-ng-c2877343965]   header[_ngcontent-ng-c2877343965]{background-color:#ff792c!important}[_nghost-ng-c2877343965]{display:block;position:sticky;top:0;z-index:1000}</style><style>footer[_ngcontent-ng-c591848865]{background-color:#0070ad;padding:15px 50px;border-radius:16px 16px 0 0;display:flex;justify-content:space-between;align-items:center}footer[_ngcontent-ng-c591848865]   nav[_ngcontent-ng-c591848865]{flex:1}footer[_ngcontent-ng-c591848865]   app-footer-contact-form[_ngcontent-ng-c591848865]{flex:0}</style><style>.logo[_ngcontent-ng-c1404812477]{cursor:pointer;padding-bottom:7px}.logo[_ngcontent-ng-c1404812477]   img[_ngcontent-ng-c1404812477]{height:56px}</style><style>.menu[_ngcontent-ng-c254783044]{display:flex;gap:20px;position:relative}.menu[_ngcontent-ng-c254783044]   .menu-item[_ngcontent-ng-c254783044]{position:relative}.menu[_ngcontent-ng-c254783044]   .menu-item[_ngcontent-ng-c254783044]   a[_ngcontent-ng-c254783044]{text-decoration:none;color:var(--color-text-light);font-weight:700;padding:27px 10px;white-space:nowrap;outline:none}.menu[_ngcontent-ng-c254783044]   .menu-item[_ngcontent-ng-c254783044]   a.active[_ngcontent-ng-c254783044]{color:#12abdb}.menu[_ngcontent-ng-c254783044]   .menu-item[_ngcontent-ng-c254783044]   .submenu[_ngcontent-ng-c254783044]{display:none;position:absolute;top:250%;margin-top:-1px;right:-20%;flex-direction:column;background:#12abdb;border-radius:0 0 16px 16px;z-index:10}.menu[_ngcontent-ng-c254783044]   .menu-item[_ngcontent-ng-c254783044]:hover > app-header-elements[_ngcontent-ng-c254783044] > .submenu-container[_ngcontent-ng-c254783044] > .submenu[_ngcontent-ng-c254783044]{display:flex}.menu[_ngcontent-ng-c254783044]   .menu-item[_ngcontent-ng-c254783044]   .submenu-item[_ngcontent-ng-c254783044]   a[_ngcontent-ng-c254783044]{display:flex;justify-content:space-between;text-decoration:none;color:var(--color-text-light);font-weight:700;white-space:nowrap;padding:15px 20px}.menu[_ngcontent-ng-c254783044]   .menu-item[_ngcontent-ng-c254783044]   .submenu-item[_ngcontent-ng-c254783044]   a[_ngcontent-ng-c254783044]:hover{color:#272936;background-color:#3acdfb;box-shadow:0 4px 10px -10px #00000040}.menu[_ngcontent-ng-c254783044]   .menu-item[_ngcontent-ng-c254783044]   .submenu-item[_ngcontent-ng-c254783044]   a[_ngcontent-ng-c254783044]   .submenu-arrow[_ngcontent-ng-c254783044]{margin-left:auto}.menu[_ngcontent-ng-c254783044]   .menu-item[_ngcontent-ng-c254783044]   .submenu-item[_ngcontent-ng-c254783044]   a[_ngcontent-ng-c254783044]   .submenu-arrow[_ngcontent-ng-c254783044]:after{content:"\f105";font-family:"Font Awesome 6 Free";font-weight:900;font-size:12px;color:inherit}.menu[_ngcontent-ng-c254783044]   .menu-item[_ngcontent-ng-c254783044]   .submenu-item[_ngcontent-ng-c254783044]   .submenu-second-container[_ngcontent-ng-c254783044]{position:absolute;left:100%;z-index:15;margin-top:-48.5px;height:100%;flex-direction:column;display:flex;align-items:flex-start}.menu[_ngcontent-ng-c254783044]   .menu-item[_ngcontent-ng-c254783044]   .submenu-item[_ngcontent-ng-c254783044]   .submenu-second-container[_ngcontent-ng-c254783044]   .submenu-second[_ngcontent-ng-c254783044]{display:none;flex-direction:column;background:#247ba8;border-radius:16px;overflow:hidden;min-width:180px}.menu[_ngcontent-ng-c254783044]   .menu-item[_ngcontent-ng-c254783044]   .submenu-item[_ngcontent-ng-c254783044]   .submenu-second-container[_ngcontent-ng-c254783044]   .submenu-second[_ngcontent-ng-c254783044]   a[_ngcontent-ng-c254783044]{padding:15px 20px;display:block;text-decoration:none;color:var(--color-text-light)}.menu[_ngcontent-ng-c254783044]   .menu-item[_ngcontent-ng-c254783044]   .submenu-item[_ngcontent-ng-c254783044]   .submenu-second-container[_ngcontent-ng-c254783044]   .submenu-second[_ngcontent-ng-c254783044]   a[_ngcontent-ng-c254783044]:hover, .menu[_ngcontent-ng-c254783044]   .menu-item[_ngcontent-ng-c254783044]   .submenu-item[_ngcontent-ng-c254783044]   .submenu-second-container[_ngcontent-ng-c254783044]   .submenu-second[_ngcontent-ng-c254783044]   a.active[_ngcontent-ng-c254783044]{color:#272936;background:#3baee7;box-shadow:0 4px 10px -10px #00000040}.menu[_ngcontent-ng-c254783044]   .menu-item[_ngcontent-ng-c254783044]   .submenu-item[_ngcontent-ng-c254783044]   .submenu-second-container[_ngcontent-ng-c254783044]:hover   .submenu-second[_ngcontent-ng-c254783044], .menu[_ngcontent-ng-c254783044]   .menu-item[_ngcontent-ng-c254783044]   .submenu-item[_ngcontent-ng-c254783044]:hover   .submenu-second-container[_ngcontent-ng-c254783044]   .submenu-second[_ngcontent-ng-c254783044]{display:flex}.menu[_ngcontent-ng-c254783044]   .menu-item.open-submenu-second-left[_ngcontent-ng-c254783044]   .submenu-item[_ngcontent-ng-c254783044]   .submenu-second-container[_ngcontent-ng-c254783044]{left:auto;right:100%}.menu[_ngcontent-ng-c254783044]   .submenu-item[_ngcontent-ng-c254783044]:last-child > a[_ngcontent-ng-c254783044]{border-bottom-left-radius:16px;border-bottom-right-radius:16px}.simplifying-git-layout[_nghost-ng-c254783044]   .menu-item[_ngcontent-ng-c254783044]   .submenu[_ngcontent-ng-c254783044], .simplifying-git-layout   [_nghost-ng-c254783044]   .menu-item[_ngcontent-ng-c254783044]   .submenu[_ngcontent-ng-c254783044]{background:#fc9683}.simplifying-git-layout[_nghost-ng-c254783044]   .menu-item[_ngcontent-ng-c254783044]   .submenu-item[_ngcontent-ng-c254783044]   .submenu-second-container[_ngcontent-ng-c254783044]   .submenu-second[_ngcontent-ng-c254783044], .simplifying-git-layout   [_nghost-ng-c254783044]   .menu-item[_ngcontent-ng-c254783044]   .submenu-item[_ngcontent-ng-c254783044]   .submenu-second-container[_ngcontent-ng-c254783044]   .submenu-second[_ngcontent-ng-c254783044]{background:#f05133}.simplifying-git-layout[_nghost-ng-c254783044]   .menu-item[_ngcontent-ng-c254783044]   .submenu-item[_ngcontent-ng-c254783044]   .submenu-second-container[_ngcontent-ng-c254783044]   .submenu-second[_ngcontent-ng-c254783044]   a[_ngcontent-ng-c254783044]:hover, .simplifying-git-layout   [_nghost-ng-c254783044]   .menu-item[_ngcontent-ng-c254783044]   .submenu-item[_ngcontent-ng-c254783044]   .submenu-second-container[_ngcontent-ng-c254783044]   .submenu-second[_ngcontent-ng-c254783044]   a[_ngcontent-ng-c254783044]:hover{color:#fc9683}.simplifying-git-layout[_nghost-ng-c254783044]   .menu-item[_ngcontent-ng-c254783044]   .submenu-item[_ngcontent-ng-c254783044]   a[_ngcontent-ng-c254783044]:hover, .simplifying-git-layout   [_nghost-ng-c254783044]   .menu-item[_ngcontent-ng-c254783044]   .submenu-item[_ngcontent-ng-c254783044]   a[_ngcontent-ng-c254783044]:hover{color:#f05133}</style><style>.elements[_ngcontent-ng-c3990615194]{display:flex;align-items:center;justify-content:center;column-gap:20px}.elements[_ngcontent-ng-c3990615194]   a[_ngcontent-ng-c3990615194]   img[_ngcontent-ng-c3990615194]{max-height:40px}.elements[_ngcontent-ng-c3990615194]   .capgemini-logo[_ngcontent-ng-c3990615194]   img[_ngcontent-ng-c3990615194]{max-width:100px}.elements[_ngcontent-ng-c3990615194]   .cca-logo[_ngcontent-ng-c3990615194]{filter:brightness(5)}.elements[_ngcontent-ng-c3990615194]   .sdo-logo[_ngcontent-ng-c3990615194]   img[_ngcontent-ng-c3990615194]{max-width:50px}</style><style>[_nghost-ng-c2354199765]{--font-size-h1: 60px;--font-size-h2: 45px;--font-size-h3: 35px;--font-size-h4: 25px;--font-size-h5: 18px;--color-text-heading: var(--capgemini-darkgrey)}.heading[_ngcontent-ng-c2354199765]{font-family:Ubuntu,sans-serif;font-weight:700;color:var(--color-text-heading);line-height:1.3em}.heading[_ngcontent-ng-c2354199765]     span.color-primary{color:var(--capgemini-blue)}.heading[_ngcontent-ng-c2354199765]     span.color-secondary{color:var(--capgemini-vibrant-blue)}h1[_ngcontent-ng-c2354199765], .h1[_ngcontent-ng-c2354199765]{font-family:Montserrat,sans-serif;font-size:var(--font-size-h1)}h2[_ngcontent-ng-c2354199765], .h2[_ngcontent-ng-c2354199765]{font-size:var(--font-size-h2)}h3[_ngcontent-ng-c2354199765], .h3[_ngcontent-ng-c2354199765]{font-size:var(--font-size-h3)}h4[_ngcontent-ng-c2354199765], .h4[_ngcontent-ng-c2354199765]{font-size:var(--font-size-h4)}h5[_ngcontent-ng-c2354199765], .h5[_ngcontent-ng-c2354199765]{font-size:var(--font-size-h5)}</style><style>[_nghost-ng-c1250116468]{--capgemini-dark-blue: #005693;--capgemini-light-blue: #0093c3;--capgemini-grey: #3c3e4b;--capgemini-light-grey: #e6e6e6;--capgemini-medium-grey: #dadada;--git-orange-primary: #ff792c;--git-orange-secondary: #f05133;--git-salmon: #fc9683;--color-background-button-primary: var(--capgemini-blue);--color-background-button-secondary: var(--capgemini-vibrant-blue);--color-background-button-dark: var(--capgemini-dark-grey);--color-background-button-light: var(--capgemini-cool-grey);--color-background-button-primary-hover: var(--capgemini-dark-blue);--color-background-button-secondary-hover: var(--capgemini-light-blue);--color-background-button-dark-hover: var(--capgemini-grey);--color-background-button-light-hover: var(--capgemini-medium-grey);--color-background-button-dark-action: var(--capgemini-light-grey);--color-background-button-git-primary: var(--git-orange-primary);--color-background-button-git-secondary: var(--git-orange-secondary);--color-background-button-git-salmon: var(--git-salmon);--color-text-button-light: var(--color-text-light);--color-text-button-dark: var(--capgemini-dark-grey)}button[_ngcontent-ng-c1250116468]{border:none;cursor:pointer;transition:all .2s ease-in-out;text-align:center;white-space:nowrap}button.primary[_ngcontent-ng-c1250116468]{background-color:var(--color-background-button-primary);color:var(--color-text-button-light)}button.secondary[_ngcontent-ng-c1250116468]{background-color:var(--color-background-button-secondary);color:var(--color-text-button-light)}button.secondary-outlined[_ngcontent-ng-c1250116468]{background-color:var(--color-text-button-light);color:var(--color-background-button-secondary);outline:2px solid var(--color-background-button-secondary);outline-offset:-2px}button.dark[_ngcontent-ng-c1250116468]{background-color:var(--color-background-button-dark);color:var(--color-text-button-light)}button.light[_ngcontent-ng-c1250116468]{background-color:var(--color-background-button-light);color:var(--color-text-button-dark)}button.git-primary[_ngcontent-ng-c1250116468]{background-color:var(--color-background-button-git-primary);color:var(--color-text-button-light)}button.git-primary-reverse[_ngcontent-ng-c1250116468]{background-color:var(--capgemini-white);color:var(--color-background-button-git-primary);outline:2px solid var(--color-background-button-git-primary);outline-offset:-2px}button.git-secondary[_ngcontent-ng-c1250116468]{background-color:var(--color-background-button-git-secondary);color:var(--color-text-button-light);outline:2px solid var(--color-background-button-git-secondary);outline-offset:-2px}button.git-salmon[_ngcontent-ng-c1250116468]{background-color:var(--color-background-button-git-salmon);color:var(--color-text-button-dark);outline:2px solid var(--color-background-button-git-salmon);outline-offset:-2px}button[_ngcontent-ng-c1250116468]:hover.primary{background-color:var(--color-background-button-primary-hover);color:var(--color-text-button-light)}button[_ngcontent-ng-c1250116468]:hover.secondary{background-color:var(--color-background-button-secondary-hover);color:var(--color-text-button-light)}button[_ngcontent-ng-c1250116468]:hover.secondary-outlined{background-color:var(--color-background-button-secondary);color:var(--color-text-button-light)}button[_ngcontent-ng-c1250116468]:hover.dark{background-color:var(--color-background-button-dark-hover);color:var(--color-text-button-light)}button[_ngcontent-ng-c1250116468]:hover.light{background-color:var(--color-background-button-light-hover);color:var(--color-text-button-dark)}button[_ngcontent-ng-c1250116468]:hover.git-primary-reverse{background-color:var(--color-background-button-git-primary);color:var(--capgemini-white)}button[_ngcontent-ng-c1250116468]:hover.git-primary{background-color:#ff823a;color:var(--color-text-button-light)}button[_ngcontent-ng-c1250116468]:active.primary{background-color:var(--color-background-button-secondary);color:var(--color-text-button-light)}button[_ngcontent-ng-c1250116468]:active.secondary{background-color:var(--color-background-button-primary);color:var(--color-text-button-light)}button[_ngcontent-ng-c1250116468]:active.dark{background-color:var(--color-background-button-dark-action);color:var(--color-text-button-dark)}button[_ngcontent-ng-c1250116468]:active.light{background-color:var(--color-background-button-dark);color:var(--color-text-button-light)}button.small[_ngcontent-ng-c1250116468], button.medium[_ngcontent-ng-c1250116468], button.large[_ngcontent-ng-c1250116468]{font-size:16px;padding:14px 40px;border-radius:8px;font-weight:700}button.disabled[_ngcontent-ng-c1250116468]{opacity:.5;pointer-events:none;cursor:default}</style></head>
+
+  <body><!--nghm--><script type="text/javascript" id="ng-event-dispatch-contract">(()=>{function p(t,n,r,o,e,i,f,m){return{eventType:t,event:n,targetElement:r,eic:o,timeStamp:e,eia:i,eirp:f,eiack:m}}function u(t){let n=[],r=e=>{n.push(e)};return{c:t,q:n,et:[],etc:[],d:r,h:e=>{r(p(e.type,e,e.target,t,Date.now()))}}}function s(t,n,r){for(let o=0;o<n.length;o++){let e=n[o];(r?t.etc:t.et).push(e),t.c.addEventListener(e,t.h,r)}}function c(t,n,r,o,e=window){let i=u(t);e._ejsas||(e._ejsas={}),e._ejsas[n]=i,s(i,r),s(i,o,!0)}window.__jsaction_bootstrap=c;})();
+</script><script>window.__jsaction_bootstrap(document.body,"ng",["click","change","input"],["blur"]);</script>
+    <app-root ng-version="19.2.14" ng-server-context="ssg"><router-outlet></router-outlet><app-home _nghost-ng-c2948372227=""><app-layout _ngcontent-ng-c2948372227="" _nghost-ng-c3879817551=""><app-header _ngcontent-ng-c3879817551="" _nghost-ng-c2877343965=""><header _ngcontent-ng-c2877343965=""><nav _ngcontent-ng-c2877343965=""><div _ngcontent-ng-c2877343965=""><app-cca-logo _ngcontent-ng-c2877343965="" _nghost-ng-c1404812477=""><a _ngcontent-ng-c1404812477="" href="https://cca.capgemini.com/web/home" class="logo"><img _ngcontent-ng-c1404812477="" src="./Cloud &amp; Custom Applications_files/cca-logo.svg" alt="C&amp;CA Logo"></a></app-cca-logo></div><app-header-elements _ngcontent-ng-c2877343965="" _nghost-ng-c254783044=""><div _ngcontent-ng-c254783044="" class="menu-container"><div _ngcontent-ng-c254783044="" class="menu"><div _ngcontent-ng-c254783044="" class="menu-item"><a _ngcontent-ng-c254783044="" routerlinkactive="active" href="https://cca.capgemini.com/web/home" class="active"> Home <!----></a><app-header-elements _ngcontent-ng-c254783044="" _nghost-ng-c254783044=""><div _ngcontent-ng-c254783044="" class="menu-container submenu-container"><div _ngcontent-ng-c254783044="" class="submenu"><div _ngcontent-ng-c254783044="" class="submenu-item"><a _ngcontent-ng-c254783044="" routerlinkactive="active" href="https://cca.capgemini.com/web/home#meet-cca" class="active"> Conoce C&amp;CA <!----></a><!----></div><div _ngcontent-ng-c254783044="" class="submenu-item"><a _ngcontent-ng-c254783044="" routerlinkactive="active" href="https://cca.capgemini.com/web/home#cca-offering" class="active"> Qué ofrecemos <!----></a><!----></div><div _ngcontent-ng-c254783044="" class="submenu-item"><a _ngcontent-ng-c254783044="" routerlinkactive="active" href="https://cca.capgemini.com/web/home#cca-career" class="active"> Carrera profesional C&amp;CA <!----></a><!----></div><div _ngcontent-ng-c254783044="" class="submenu-item"><a _ngcontent-ng-c254783044="" routerlinkactive="active" href="https://cca.capgemini.com/web/home#cca-toolkit" class="active"> Documentos y Contacto <!----></a><!----></div><div _ngcontent-ng-c254783044="" class="submenu-item"><a _ngcontent-ng-c254783044="" routerlinkactive="active" href="https://cca.capgemini.com/web/home#catedra-uv" class="active"> Cátedra UV <!----></a><!----></div><div _ngcontent-ng-c254783044="" class="submenu-item"><a _ngcontent-ng-c254783044="" routerlinkactive="active" href="https://cca.capgemini.com/web/home#ideas4all" class="active"> IDEAS4ALL <!----></a><!----></div><!----></div></div></app-header-elements><!----></div><div _ngcontent-ng-c254783044="" class="menu-item"><a _ngcontent-ng-c254783044="" routerlinkactive="active" href="https://cca.capgemini.com/web/onboarding"> Onboarding <!----></a><app-header-elements _ngcontent-ng-c254783044="" _nghost-ng-c254783044=""><div _ngcontent-ng-c254783044="" class="menu-container submenu-container"><div _ngcontent-ng-c254783044="" class="submenu"><div _ngcontent-ng-c254783044="" class="submenu-item"><a _ngcontent-ng-c254783044="" routerlinkactive="active" href="https://cca.capgemini.com/web/onboarding#hr-documents"> Documentos de RRHH <!----></a><!----></div><div _ngcontent-ng-c254783044="" class="submenu-item"><a _ngcontent-ng-c254783044="" routerlinkactive="active" href="https://cca.capgemini.com/web/onboarding#first-steps"> Primeros pasos <span _ngcontent-ng-c254783044="" class="submenu-arrow"></span><!----></a><app-header-elements _ngcontent-ng-c254783044="" _nghost-ng-c254783044=""><div _ngcontent-ng-c254783044="" class="menu-container submenu-container submenu-second-container"><div _ngcontent-ng-c254783044="" class="submenu-second"><div _ngcontent-ng-c254783044="" class="submenu-item"><a _ngcontent-ng-c254783044="" routerlinkactive="active" href="https://cca.capgemini.com/web/onboarding#basic-config"> Configuración básica <!----></a><!----></div><div _ngcontent-ng-c254783044="" class="submenu-item"><a _ngcontent-ng-c254783044="" routerlinkactive="active" href="https://cca.capgemini.com/web/onboarding#employee-portal"> Portal del empleado <!----></a><!----></div><div _ngcontent-ng-c254783044="" class="submenu-item"><a _ngcontent-ng-c254783044="" routerlinkactive="active" href="https://cca.capgemini.com/web/onboarding#dedication"> Imputaciones <!----></a><!----></div><div _ngcontent-ng-c254783044="" class="submenu-item"><a _ngcontent-ng-c254783044="" routerlinkactive="active" href="https://cca.capgemini.com/web/onboarding#mandatory-training"> Formación Mandatory <!----></a><!----></div><!----></div></div></app-header-elements><!----></div><div _ngcontent-ng-c254783044="" class="submenu-item"><a _ngcontent-ng-c254783044="" routerlinkactive="active" href="https://cca.capgemini.com/web/onboarding#meet-sdo"> Conoce a la SDO <!----></a><!----></div><div _ngcontent-ng-c254783044="" class="submenu-item"><a _ngcontent-ng-c254783044="" routerlinkactive="active" href="https://cca.capgemini.com/web/onboarding#more-resources"> Qué más tenemos <span _ngcontent-ng-c254783044="" class="submenu-arrow"></span><!----></a><app-header-elements _ngcontent-ng-c254783044="" _nghost-ng-c254783044=""><div _ngcontent-ng-c254783044="" class="menu-container submenu-container submenu-second-container"><div _ngcontent-ng-c254783044="" class="submenu-second"><div _ngcontent-ng-c254783044="" class="submenu-item"><a _ngcontent-ng-c254783044="" routerlinkactive="active" href="https://cca.capgemini.com/web/onboarding/communities"> Comunidades <!----></a><!----></div><div _ngcontent-ng-c254783044="" class="submenu-item"><a _ngcontent-ng-c254783044="" routerlinkactive="active" href="https://cca.capgemini.com/web/onboarding/applications"> Aplicaciones <!----></a><!----></div><!----></div></div></app-header-elements><!----></div><div _ngcontent-ng-c254783044="" class="submenu-item"><a _ngcontent-ng-c254783044="" routerlinkactive="active" href="https://cca.capgemini.com/web/onboarding#software-install"> Instalar Software <!----></a><!----></div><!----></div></div></app-header-elements><!----></div><div _ngcontent-ng-c254783044="" class="menu-item open-submenu-second-left"><a _ngcontent-ng-c254783044="" routerlinkactive="active" href="https://cca.capgemini.com/web/training"> Formaciones <!----></a><app-header-elements _ngcontent-ng-c254783044="" _nghost-ng-c254783044=""><div _ngcontent-ng-c254783044="" class="menu-container submenu-container"><div _ngcontent-ng-c254783044="" class="submenu"><div _ngcontent-ng-c254783044="" class="submenu-item"><a _ngcontent-ng-c254783044="" routerlinkactive="active" href="https://cca.capgemini.com/web/training#mandatory-training"> Formaciones Mandatory <!----></a><!----></div><div _ngcontent-ng-c254783044="" class="submenu-item"><a _ngcontent-ng-c254783044="" routerlinkactive="active" href="https://cca.capgemini.com/web/training#sdo-itineraries"> AC&amp;CAdemy <!----></a><!----></div><div _ngcontent-ng-c254783044="" class="submenu-item"><a _ngcontent-ng-c254783044="" routerlinkactive="active" href="https://cca.capgemini.com/web/training#sdo-training"> Tutorial de la SDO <!----></a><!----></div><div _ngcontent-ng-c254783044="" class="submenu-item"><a _ngcontent-ng-c254783044="" routerlinkactive="active" href="https://cca.capgemini.com/web/training#sdo-git"> Simplifying Git <!----></a><!----></div><div _ngcontent-ng-c254783044="" class="submenu-item"><a _ngcontent-ng-c254783044="" routerlinkactive="active" href="https://cca.capgemini.com/web/training#on-your-own-training"> A tu ritmo <span _ngcontent-ng-c254783044="" class="submenu-arrow"></span><!----></a><app-header-elements _ngcontent-ng-c254783044="" _nghost-ng-c254783044=""><div _ngcontent-ng-c254783044="" class="menu-container submenu-container submenu-second-container"><div _ngcontent-ng-c254783044="" class="submenu-second"><div _ngcontent-ng-c254783044="" class="submenu-item"><a _ngcontent-ng-c254783044="" routerlinkactive="active" href="https://cca.capgemini.com/web/training/upskilling"> Upskilling <!----></a><!----></div><div _ngcontent-ng-c254783044="" class="submenu-item"><a _ngcontent-ng-c254783044="" routerlinkactive="active" href="https://cca.capgemini.com/web/training/education-resources"> Plataformas Formativas <!----></a><!----></div><!----></div></div></app-header-elements><!----></div><div _ngcontent-ng-c254783044="" class="submenu-item"><a _ngcontent-ng-c254783044="" routerlinkactive="active" href="https://cca.capgemini.com/web/training#certifications"> Certificaciones <!----></a><!----></div><div _ngcontent-ng-c254783044="" class="submenu-item"><a _ngcontent-ng-c254783044="" routerlinkactive="active" href="https://cca.capgemini.com/web/training/talks-catalog"> Catálogo de charlas <!----></a><!----></div><div _ngcontent-ng-c254783044="" class="submenu-item"><a _ngcontent-ng-c254783044="" routerlinkactive="active" href="https://cca.capgemini.com/web/training#sdo-workshops"> Mentorías/Workshops SDO <!----></a><!----></div><!----></div></div></app-header-elements><!----></div><div _ngcontent-ng-c254783044="" class="menu-item"><a _ngcontent-ng-c254783044="" routerlinkactive="active" href="https://cca.capgemini.com/web/sdo"> SDO <!----></a><app-header-elements _ngcontent-ng-c254783044="" _nghost-ng-c254783044=""><div _ngcontent-ng-c254783044="" class="menu-container submenu-container"><div _ngcontent-ng-c254783044="" class="submenu"><div _ngcontent-ng-c254783044="" class="submenu-item"><a _ngcontent-ng-c254783044="" routerlinkactive="active" href="https://cca.capgemini.com/web/sdo#sdo-who-we-are"> Quiénes somos <!----></a><!----></div><div _ngcontent-ng-c254783044="" class="submenu-item"><a _ngcontent-ng-c254783044="" routerlinkactive="active" href="https://cca.capgemini.com/web/sdo#sdo-objective-and-mission"> Objetivo y Misión <!----></a><!----></div><div _ngcontent-ng-c254783044="" class="submenu-item"><a _ngcontent-ng-c254783044="" routerlinkactive="active" href="https://cca.capgemini.com/web/sdo#sdo-testimonials"> Testimonios <!----></a><!----></div><div _ngcontent-ng-c254783044="" class="submenu-item"><a _ngcontent-ng-c254783044="" routerlinkactive="active" href="https://cca.capgemini.com/web/sdo#sdo-services"> Servicios <!----></a><!----></div><div _ngcontent-ng-c254783044="" class="submenu-item"><a _ngcontent-ng-c254783044="" routerlinkactive="active" href="https://cca.capgemini.com/web/sdo#sdo-contact-us"> Contáctanos <!----></a><!----></div><!----></div></div></app-header-elements><!----></div><div _ngcontent-ng-c254783044="" class="menu-item"><a _ngcontent-ng-c254783044="" routerlinkactive="active" href="https://cca.capgemini.com/web/faq"> FAQ <!----></a><app-header-elements _ngcontent-ng-c254783044="" _nghost-ng-c254783044=""><div _ngcontent-ng-c254783044="" class="menu-container submenu-container"><div _ngcontent-ng-c254783044="" class="submenu"><div _ngcontent-ng-c254783044="" class="submenu-item"><a _ngcontent-ng-c254783044="" routerlinkactive="active" href="https://cca.capgemini.com/web/faq#faq-search"> Consultar duda <!----></a><!----></div><div _ngcontent-ng-c254783044="" class="submenu-item"><a _ngcontent-ng-c254783044="" routerlinkactive="active" href="https://cca.capgemini.com/web/faq#Preguntas%20frecuentes%20Replicon"> Replicon <!----></a><!----></div><div _ngcontent-ng-c254783044="" class="submenu-item"><a _ngcontent-ng-c254783044="" routerlinkactive="active" href="https://cca.capgemini.com/web/faq#Otras%20preguntas%20frecuentes"> Generales <!----></a><!----></div><div _ngcontent-ng-c254783044="" class="submenu-item"><a _ngcontent-ng-c254783044="" routerlinkactive="active" href="https://cca.capgemini.com/web/faq#faq-suggestions-form"> Sugerencias <!----></a><!----></div><!----></div></div></app-header-elements><!----></div><!----></div></div></app-header-elements></nav></header></app-header><main _ngcontent-ng-c3879817551=""><app-home-hero _ngcontent-ng-c2948372227="" _nghost-ng-c72504376=""><div _ngcontent-ng-c72504376="" class="hero"><div _ngcontent-ng-c72504376="" class="hero-container"><div _ngcontent-ng-c72504376="" class="hero-text"><h1 _ngcontent-ng-c72504376="">Ya eres parte de</h1><div _ngcontent-ng-c72504376="" class="logos"><div _ngcontent-ng-c72504376="" class="cca-logo"></div><img _ngcontent-ng-c72504376="" src="./Cloud &amp; Custom Applications_files/capgemini.png" alt="Capgemini Logo"></div><div _ngcontent-ng-c72504376="" class="text"><p _ngcontent-ng-c72504376=""><strong _ngcontent-ng-c72504376="">Comienza tu nueva experiencia profesional</strong></p></div></div><div _ngcontent-ng-c72504376="" class="hero-image"><img _ngcontent-ng-c72504376="" src="./Cloud &amp; Custom Applications_files/hero.png" alt="Imagen Home"></div></div></div></app-home-hero><app-meet-cca _ngcontent-ng-c2948372227="" id="meet-cca" _nghost-ng-c4103120249=""><div _ngcontent-ng-c4103120249="" class="container"><app-heading _ngcontent-ng-c4103120249="" _nghost-ng-c2354199765=""><h1 _ngcontent-ng-c2354199765="" class="heading">Conoce al Comité de C&amp;CA</h1><!----><!----><!----><!----><!----><!----></app-heading><img _ngcontent-ng-c4103120249="" src="./Cloud &amp; Custom Applications_files/organigrama.png" alt="Organigrama C&amp;CA" class="organigrama"></div></app-meet-cca><app-cca-offering _ngcontent-ng-c2948372227="" id="cca-offering" _nghost-ng-c227975733=""><div _ngcontent-ng-c227975733="" class="container"><app-heading _ngcontent-ng-c227975733="" _nghost-ng-c2354199765=""><h1 _ngcontent-ng-c2354199765="" class="heading">¿Cómo trabajamos con nuestros clientes?</h1><!----><!----><!----><!----><!----><!----></app-heading><img _ngcontent-ng-c227975733="" src="./Cloud &amp; Custom Applications_files/flujo-trabajo-grey.png" alt="Flujo de trabajo con clientes" class="image"></div></app-cca-offering><app-cca-career _ngcontent-ng-c2948372227="" id="cca-career" _nghost-ng-c543148040=""><div _ngcontent-ng-c543148040="" class="container"><div _ngcontent-ng-c543148040="" class="carrera"><app-heading _ngcontent-ng-c543148040="" _nghost-ng-c2354199765=""><h1 _ngcontent-ng-c2354199765="" class="heading">Tu carrera profesional en C&amp;CA</h1><!----><!----><!----><!----><!----><!----></app-heading><div _ngcontent-ng-c543148040="" class="cabecera"><p _ngcontent-ng-c543148040="" class="texto"> En C&amp;CA creemos en el crecimiento de las personas dentro de la práctica, <br _ngcontent-ng-c543148040="">es por eso que queremos ofrecerte los recursos que te ayudarán a impulsarte. </p></div><div _ngcontent-ng-c543148040="" class="botones"><div _ngcontent-ng-c543148040="" class="container"><div _ngcontent-ng-c543148040="" class="primero"><a _ngcontent-ng-c543148040="" target="_blank" rel="noopener noreferrer" href="https://cca.capgemini.com/media/assets/DefinicionDeCompetenciasCCA.pdf"><app-button _ngcontent-ng-c543148040="" color="secondary-outlined" size="medium" _nghost-ng-c1250116468=""><button _ngcontent-ng-c1250116468="" class="medium secondary-outlined"> ¿Qué se espera de mi grado? </button></app-button></a></div></div><div _ngcontent-ng-c543148040="" class="container"><app-heading _ngcontent-ng-c543148040="" class="acabo" _nghost-ng-c2354199765=""><!----><!----><!----><h4 _ngcontent-ng-c2354199765="" class="heading">Acabo de entrar...</h4><!----><!----><!----></app-heading><div _ngcontent-ng-c543148040="" class="segundo"><a _ngcontent-ng-c543148040="" href="https://cca.capgemini.com/web/onboarding"><app-button _ngcontent-ng-c543148040="" color="dark" size="medium" _nghost-ng-c1250116468=""><button _ngcontent-ng-c1250116468="" class="medium dark"> ¿Por dónde empiezo? </button></app-button></a></div></div><div _ngcontent-ng-c543148040="" class="container"><div _ngcontent-ng-c543148040="" class="tercero"><a _ngcontent-ng-c543148040="" target="_blank" rel="noopener noreferrer" href="https://cca.capgemini.com/media/assets/C&amp;CA-ProfessionalCareer-ExpertiseLevelsv1.0.pdf"><app-button _ngcontent-ng-c543148040="" color="secondary-outlined" size="medium" _nghost-ng-c1250116468=""><button _ngcontent-ng-c1250116468="" class="medium secondary-outlined"> ¿Cómo progreso en mi carrera? </button></app-button></a></div></div></div><div _ngcontent-ng-c543148040="" class="professional-evolution"><a _ngcontent-ng-c543148040="" target="_blank" rel="noopener noreferrer" href="https://cca.capgemini.com/media/assets/C&amp;CA%20-%20Professional%20Career%20-%20Professional%20Evolution%20Plans%20v1.0.pdf"><app-button _ngcontent-ng-c543148040="" color="secondary-outlined" size="medium" _nghost-ng-c1250116468=""><button _ngcontent-ng-c1250116468="" class="medium secondary-outlined"> ¿Cómo puedo evolucionar profesionalmente? </button></app-button></a></div></div><!----></div></app-cca-career><div _ngcontent-ng-c2948372227="" class="info-content"><app-cca-toolkit _ngcontent-ng-c2948372227="" id="cca-toolkit" _nghost-ng-c3468906792=""><div _ngcontent-ng-c3468906792="" class="container"><div _ngcontent-ng-c3468906792="" class="title-div"><app-heading _ngcontent-ng-c3468906792="" class="title" _nghost-ng-c2354199765=""><h1 _ngcontent-ng-c2354199765="" class="heading">Información de interés de C&amp;CA</h1><!----><!----><!----><!----><!----><!----></app-heading></div><div _ngcontent-ng-c3468906792="" class="get-referral"><div _ngcontent-ng-c3468906792="" class="subtitle-div"><app-heading _ngcontent-ng-c3468906792="" class="subtitle" _nghost-ng-c2354199765=""><!----><h2 _ngcontent-ng-c2354199765="" class="heading">Get Referral</h2><!----><!----><!----><!----><!----></app-heading></div><div _ngcontent-ng-c3468906792="" class="texto"><p _ngcontent-ng-c3468906792="">Recomiéndanos talento y llévate una recompensa por ello</p></div><div _ngcontent-ng-c3468906792="" class="boton"><a _ngcontent-ng-c3468906792="" href="https://capgemini.sharepoint.com/sites/ES-HUB/SitePages/Published/Nuevo-reto-desbloqueado---Buscamos-talento.aspx?web=1" target="_blank" rel="noopener noreferrer"><app-button _ngcontent-ng-c3468906792="" color="dark" size="medium" _nghost-ng-c1250116468=""><button _ngcontent-ng-c1250116468="" class="medium dark"> ¡Quiero recomendar talento! </button></app-button></a></div></div><div _ngcontent-ng-c3468906792="" class="contacts"><div _ngcontent-ng-c3468906792="" class="contactos"><app-heading _ngcontent-ng-c3468906792="" class="subtitle" _nghost-ng-c2354199765=""><!----><h2 _ngcontent-ng-c2354199765="" class="heading">Contactos de interés</h2><!----><!----><!----><!----><!----></app-heading></div><div _ngcontent-ng-c3468906792="" class="cards"><div _ngcontent-ng-c3468906792="" class="group"><div _ngcontent-ng-c3468906792="" class="group-card"><div _ngcontent-ng-c3468906792="" class="fondo"><img _ngcontent-ng-c3468906792="" src="./Cloud &amp; Custom Applications_files/support.png" alt="Group IT" class="group-img"></div><div _ngcontent-ng-c3468906792="" class="group-title-div"><span _ngcontent-ng-c3468906792="" class="group-title">Group IT</span><div _ngcontent-ng-c3468906792="" class="group-email-div"><a _ngcontent-ng-c3468906792="" href="mailto:group.it.support@capgemini.com">group.it.support@capgemini.com</a></div></div></div></div><div _ngcontent-ng-c3468906792="" class="hrcca"><div _ngcontent-ng-c3468906792="" class="hrcca-card"><div _ngcontent-ng-c3468906792="" class="fondo"><img _ngcontent-ng-c3468906792="" src="./Cloud &amp; Custom Applications_files/hrcca.png" alt="HR C&amp;CA" class="hrcca-img"></div><div _ngcontent-ng-c3468906792="" class="hrcca-title-div"><span _ngcontent-ng-c3468906792="" class="hrcca-title">HR C&amp;CA</span><div _ngcontent-ng-c3468906792="" class="hrcca-email-div"><a _ngcontent-ng-c3468906792="" href="mailto:hr_cca@capgemini.com">hr_cca@capgemini.com</a></div></div></div></div><div _ngcontent-ng-c3468906792="" class="formation"><div _ngcontent-ng-c3468906792="" class="formation-card"><div _ngcontent-ng-c3468906792="" class="fondo fondo-blanco"><img _ngcontent-ng-c3468906792="" src="./Cloud &amp; Custom Applications_files/formation.png" alt="Formación interna" class="formation-img"></div><div _ngcontent-ng-c3468906792="" class="formation-title-div"><span _ngcontent-ng-c3468906792="" class="formation-title"> Formación interna <span _ngcontent-ng-c3468906792="" class="info-container"></span></span><div _ngcontent-ng-c3468906792="" class="formation-email-div"><a _ngcontent-ng-c3468906792="" href="mailto:formacion.interna.es@capgemini.com">formacion.interna.es@capgemini.com</a></div></div></div><div _ngcontent-ng-c3468906792="" class="sharepoint"><div _ngcontent-ng-c3468906792="" class="sharepoint-text"><p _ngcontent-ng-c3468906792=""> Formación Interna te ayudará a <strong _ngcontent-ng-c3468906792="">resolver <br _ngcontent-ng-c3468906792=""> dudas.</strong> Para obtener una certificación habla con <br _ngcontent-ng-c3468906792=""> tu EM y práctica </p><br _ngcontent-ng-c3468906792=""><a _ngcontent-ng-c3468906792="" href="https://capgemini.sharepoint.com/sites/FormacinContinua" target="_blank" rel="noopener noreferrer"> Sharepoint de Formación Interna </a></div></div></div></div></div></div></app-cca-toolkit><app-catedra-uv _ngcontent-ng-c2948372227="" id="catedra-uv" _nghost-ng-c2008796105=""><div _ngcontent-ng-c2008796105="" class="container"><div _ngcontent-ng-c2008796105="" class="title"><app-heading _ngcontent-ng-c2008796105="" _nghost-ng-c2354199765=""><!----><h2 _ngcontent-ng-c2354199765="" class="heading">Cátedra UV</h2><!----><!----><!----><!----><!----></app-heading></div><a _ngcontent-ng-c2008796105="" href="https://www.uv.es/capgeminiuv/" target="_blank" rel="noopener noreferrer"><img _ngcontent-ng-c2008796105="" src="./Cloud &amp; Custom Applications_files/catedra.png" alt="Cátedra UV" class="catedra"></a><div _ngcontent-ng-c2008796105="" class="boton"><a _ngcontent-ng-c2008796105="" href="https://www.uv.es/capgeminiuv/" target="_blank" rel="noopener noreferrer"><app-button _ngcontent-ng-c2008796105="" color="dark" size="medium" _nghost-ng-c1250116468=""><button _ngcontent-ng-c1250116468="" class="medium dark"> Acceder a la Cátedra UV </button></app-button></a></div></div></app-catedra-uv><app-ideas4all _ngcontent-ng-c2948372227="" _nghost-ng-c2072541255=""><div _ngcontent-ng-c2072541255="" id="ideas4all" class="ideas4all"><app-heading _ngcontent-ng-c2072541255="" _nghost-ng-c2354199765=""><!----><h2 _ngcontent-ng-c2354199765="" class="heading">IDEAS4ALL</h2><!----><!----><!----><!----><!----></app-heading><div _ngcontent-ng-c2072541255="" class="text"><p _ngcontent-ng-c2072541255=""> IDEAS4ALL es una iniciativa de C&amp;CA para que todas las personas puedan aportar ideas e incentivar ese espíritu emprendedor. Estamos buscando Impacto Social, Oportunidad Estratégica, Exploración Externa, Innovación Interna, Disruptivas y Colaboración Abierta. </p><br _ngcontent-ng-c2072541255=""><p _ngcontent-ng-c2072541255="">Si crees que tu idea puede encajar, no dudes en hacerla llegar...</p><img _ngcontent-ng-c2072541255="" src="./Cloud &amp; Custom Applications_files/steps-ideas4all.png" alt="Pasos Ideas4All"><p _ngcontent-ng-c2072541255=""> ¡<strong _ngcontent-ng-c2072541255="">Atrévete a dar el paso</strong>, sal de tu zona de confort y acepta el desafío con entusiasmo! </p><p _ngcontent-ng-c2072541255=""> Tu idea puede marcar la diferencia, <span _ngcontent-ng-c2072541255="" class="color-primary"><strong _ngcontent-ng-c2072541255="">¡deseamos conocerla!</strong></span></p></div><div _ngcontent-ng-c2072541255="" class="buttons"><a _ngcontent-ng-c2072541255="" target="_blank" rel="noopener noreferrer" href="mailto:ccaideas4all.es@capgemini.com?subject=%5BC%26CA%5D%5BIDEAS4ALL%5D%20Quiero%20proponeros%20una%20idea&amp;body=T%C3%ADtulo%20de%20la%20idea%0A%0A...%0A%0A%0APremisa%20de%20la%20idea%0A%0ADetalla%20brevemente%20la%20idea%2C%20qu%C3%A9%20objetivo%20tiene%2C%20cu%C3%A1l%20ser%C3%ADa%20su%20target%2C%20qu%C3%A9%20impacto%20tendr%C3%ADa%2C%20c%C3%B3mo%20beneficiar%C3%ADa%0A%0A%0ACategor%C3%ADa%20de%20la%20idea%20%0A%0AImpacto%20Social%20%2F%20Oportunidad%20Estrat%C3%A9gica%20%2F%20Exploraci%C3%B3n%20Externa%20%2F%20Innovaci%C3%B3n%20Interna%20%2F%20Disruptivas%20%2F%20Colaboraci%C3%B3n%20Abierta%0A"><app-button _ngcontent-ng-c2072541255="" color="dark" size="medium" _nghost-ng-c1250116468=""><button _ngcontent-ng-c1250116468="" class="medium dark"> Voy a proponer una idea </button></app-button></a><a _ngcontent-ng-c2072541255="" target="_blank" rel="noopener noreferrer" download="ideas4all-business_model_canvas.pptx" href="https://cca.capgemini.com/media/assets/business_model_canvas.pptx"><app-button _ngcontent-ng-c2072541255="" color="secondary-outlined" size="medium" _nghost-ng-c1250116468=""><button _ngcontent-ng-c1250116468="" class="medium secondary-outlined"> Usar plantilla de propuesta </button></app-button></a></div></div></app-ideas4all></div></main><app-footer _ngcontent-ng-c3879817551="" _nghost-ng-c591848865=""><footer _ngcontent-ng-c591848865=""><nav _ngcontent-ng-c591848865=""><app-footer-elements _ngcontent-ng-c591848865="" _nghost-ng-c3990615194=""><div _ngcontent-ng-c3990615194="" class="elements"><a _ngcontent-ng-c3990615194="" href="https://www.capgemini.com/es-es/" target="_blank" rel="noopener noreferrer" class="capgemini-logo"><img _ngcontent-ng-c3990615194="" src="./Cloud &amp; Custom Applications_files/capgemini-logo.png" alt="Capgemini Logo"></a><a _ngcontent-ng-c3990615194="" href="https://cca.capgemini.com/web/home" class="cca-logo"><img _ngcontent-ng-c3990615194="" src="./Cloud &amp; Custom Applications_files/cca-logo.svg" alt="C&amp;CA Logo"></a><a _ngcontent-ng-c3990615194="" href="https://cca.capgemini.com/web/sdo" class="sdo-logo"><img _ngcontent-ng-c3990615194="" src="./Cloud &amp; Custom Applications_files/sdo-logo.svg" alt="SDO Logo"></a></div></app-footer-elements></nav><!----></footer></app-footer></app-layout></app-home><!----></app-root>
+  <script src="./Cloud &amp; Custom Applications_files/polyfills-B6TNHZQ6.js.descargar" type="module"></script>
+  <script src="./Cloud &amp; Custom Applications_files/main-3W5F4XRX.js.descargar" type="module"></script>
+  
+  <!-- Search Widget -->
+  <!-- Eliminado widget Buscador Semántico -->
+
+<script id="ng-state" type="application/json">{"__nghData__":[{},{"t":{"3":"t0"},"c":{"3":[{"i":"t0","r":1,"t":{"3":"t1","4":"t2"},"c":{"3":[],"4":[]},"x":6}]}},{"t":{"3":"t0"},"c":{"3":[{"i":"t0","r":1,"t":{"3":"t1","4":"t2"},"c":{"3":[],"4":[]},"x":4}]}},{"t":{"3":"t0"},"c":{"3":[{"i":"t0","r":1,"t":{"3":"t1","4":"t2"},"c":{"3":[],"4":[]},"x":2}]}},{"t":{"3":"t0"},"c":{"3":[{"i":"t0","r":1,"t":{"3":"t1","4":"t2"},"c":{"3":[],"4":[]}},{"i":"t0","r":1,"t":{"3":"t1","4":"t2"},"c":{"3":[{"i":"t1","r":1}],"4":[{"i":"t2","r":1}]}},{"i":"t0","r":1,"t":{"3":"t1","4":"t2"},"c":{"3":[],"4":[]}},{"i":"t0","r":1,"t":{"3":"t1","4":"t2"},"c":{"3":[{"i":"t1","r":1}],"4":[{"i":"t2","r":1}]}},{"i":"t0","r":1,"t":{"3":"t1","4":"t2"},"c":{"3":[],"4":[]}}]}},{"t":{"3":"t0"},"c":{"3":[{"i":"t0","r":1,"t":{"3":"t1","4":"t2"},"c":{"3":[],"4":[]},"x":4},{"i":"t0","r":1,"t":{"3":"t1","4":"t2"},"c":{"3":[{"i":"t1","r":1}],"4":[{"i":"t2","r":1}]}},{"i":"t0","r":1,"t":{"3":"t1","4":"t2"},"c":{"3":[],"4":[]},"x":3}]}},{"t":{"3":"t0"},"c":{"3":[{"i":"t0","r":1,"t":{"3":"t1","4":"t2"},"c":{"3":[],"4":[]},"x":5}]}},{"t":{"3":"t0"},"c":{"3":[{"i":"t0","r":1,"t":{"3":"t1","4":"t2"},"c":{"3":[],"4":[{"i":"t2","r":1}]},"x":5}]}},{"t":{"3":"t3"},"c":{"3":[]}},{"e":{"0":6},"t":{"1":"t4","2":"t5","3":"t6","4":"t7","5":"t8"},"c":{"1":[{"i":"t4","r":1}],"2":[],"3":[],"4":[],"5":[]}},{"n":{"6":"5f2","8":"7f2"}},{"e":{"0":6},"t":{"1":"t4","2":"t5","3":"t6","4":"t7","5":"t8"},"c":{"1":[],"2":[],"3":[],"4":[],"5":[{"i":"t8","r":1}]}},{"n":{"13":"12f2"}},{"n":{"11":"10f2"}},{"e":{"0":6},"t":{"1":"t4","2":"t5","3":"t6","4":"t7","5":"t8"},"c":{"1":[],"2":[],"3":[],"4":[{"i":"t7","r":1}],"5":[]}},{"t":{"6":"t20"},"c":{"6":[{"i":"t20","r":1,"x":4}]}},{"t":{"6":"t20"},"c":{"6":[{"i":"t20","r":1,"x":7}]}},{"t":{"1":"t18","3":"t19"},"c":{"1":[],"3":[]}},{"n":{"6":"5f2"}},{"e":{"0":6},"t":{"1":"t4","2":"t5","3":"t6","4":"t7","5":"t8"},"c":{"1":[],"2":[{"i":"t5","r":1}],"3":[],"4":[],"5":[]}},{"t":{"2":"t11"},"c":{"2":[]}},{"t":{"9":"t21","21":"t24","22":"t25"},"c":{"9":[{"i":"t21","r":1,"t":{"8":"t22","18":"t23"},"c":{"8":[],"18":[]}}],"21":[{"i":"t24","r":1}],"22":[]},"n":{"12":"11f2"}},{"e":{"0":6},"t":{"1":"t4","2":"t5","3":"t6","4":"t7","5":"t8"},"c":{"1":[],"2":[],"3":[{"i":"t6","r":1}],"4":[],"5":[]}},{"t":{"2":"t26","3":"t27"},"c":{"2":[],"3":[{"i":"t27","r":2,"t":{"4":"t28"},"c":{"4":[{"i":"t28","r":1,"t":{"5":"t29"},"c":{"5":[{"i":"t29","r":1,"n":{"1":"0f2"},"x":2}]},"x":4},{"i":"t28","r":1,"t":{"5":"t29"},"c":{"5":[{"i":"t29","r":1,"n":{"1":"0f2"}}]}}]},"n":{"9":"8f2"}}]}},{"n":{"10":"9f2"}},{"n":{"1":"0fnf"}},{"c":{"0":[{"i":"c4103991847","r":1}]}}]}  </script>
+
+  <!-- Chatbot Widget -->
+    <button id="chatbotToggle" class="chatbot-toggle">
+    <img src="docs/meri-bot.png" alt="MeriBot" class="meri-bot-icon">
+        Asistente Meri-Bot
+    </button>
+  
+  <div id="chatbotWidget" class="chatbot-widget hidden">
+      <div class="chatbot-header">
+          <div class="title-container">
+              <h2>Asistente C&CA</h2>
+              <div class="subtitle">¿En qué puedo ayudarte hoy?</div>
+          </div>
+          <button id="closeChatbot" style="background: none; border: none; color: white; font-size: 20px; cursor: pointer; padding: 5px;">×</button>
+      </div>
+      
+      <div class="chatbot-messages" id="chatMessages">
+          <div class="message bot-message">
+              ¡Hola! Soy Meri, tu asistente virtual de C&CA. ¿En qué puedo ayudarte hoy?
+          </div>
+      </div>
+      
+      <div class="chatbot-input">
+          <input type="text" id="userInput" placeholder="Escribe tu mensaje..." autocomplete="off" />
+          <button id="sendButton" title="Enviar mensaje">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M22 2L11 13" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+          </button>
+      </div>
+  </div>
+
+  <script>
+      document.addEventListener('DOMContentLoaded', function() {
+          const chatbotWidget = document.getElementById('chatbotWidget');
+          const chatMessages = document.getElementById('chatMessages');
+          const userInput = document.getElementById('userInput');
+          const sendButton = document.getElementById('sendButton');
+          const chatbotToggle = document.getElementById('chatbotToggle');
+          const closeChatbot = document.getElementById('closeChatbot');
+          
+          // Toggle chatbot visibility
+          function toggleChatbot() {
+              chatbotWidget.classList.toggle('hidden');
+              if (!chatbotWidget.classList.contains('hidden')) {
+                  userInput.focus();
+              }
+          }
+          
+          chatbotToggle.addEventListener('click', toggleChatbot);
+          closeChatbot.addEventListener('click', toggleChatbot);
+          
+          // Add message to chat
+          function addMessage(message, isUser = false) {
+            const rowDiv = document.createElement('div');
+            rowDiv.className = isUser ? 'chat-row user-row' : 'chat-row bot-row';
+            if (!isUser) {
+                // MeriBot: mensaje forzado a la izquierda, icono debajo del texto
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message bot-message';
+                messageDiv.style.textAlign = 'left';
+                messageDiv.style.marginLeft = '0';
+                messageDiv.style.marginRight = 'auto';
+                const textSpan = document.createElement('span');
+                textSpan.textContent = message;
+                messageDiv.appendChild(textSpan);
+            // Contenedor vertical para mensaje y avatar
+            const verticalDiv = document.createElement('div');
+            verticalDiv.style.display = 'flex';
+            verticalDiv.style.flexDirection = 'column';
+            verticalDiv.style.alignItems = 'flex-start';
+            verticalDiv.appendChild(messageDiv);
+            // Icono debajo del texto, alineado a la izquierda
+            const avatarCol = document.createElement('div');
+            avatarCol.className = 'chat-avatar-below';
+            avatarCol.style.display = 'flex';
+            avatarCol.style.justifyContent = 'flex-start';
+            avatarCol.style.alignItems = 'flex-start';
+            avatarCol.style.marginTop = '8px';
+            avatarCol.style.marginLeft = '0';
+            const img = document.createElement('img');
+            img.className = 'chat-avatar';
+            img.src = 'docs/meri-bot.png';
+            img.alt = 'MeriBot';
+            avatarCol.appendChild(img);
+            verticalDiv.appendChild(avatarCol);
+            rowDiv.appendChild(verticalDiv);
+            } else {
+                // Usuario: mensaje y avatar a la derecha
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message user-message';
+                const textSpan = document.createElement('span');
+                textSpan.textContent = message;
+                messageDiv.appendChild(textSpan);
+                rowDiv.appendChild(messageDiv);
+                const avatarCol = document.createElement('div');
+                avatarCol.className = 'chat-avatar-right';
+                avatarCol.style.display = 'flex';
+                avatarCol.style.flexDirection = 'column';
+                avatarCol.style.justifyContent = 'flex-end';
+                avatarCol.style.alignItems = 'flex-end';
+                avatarCol.style.marginLeft = '8px';
+                avatarCol.style.height = '100%';
+                avatarCol.style.alignSelf = 'flex-end';
+                const img = document.createElement('img');
+                img.className = 'chat-avatar';
+                img.src = 'https://ui-avatars.com/api/?name=Usuario&background=cccccc&color=222222&size=48';
+                img.alt = 'Usuario';
+                avatarCol.appendChild(img);
+                rowDiv.appendChild(avatarCol);
+            }
+            chatMessages.appendChild(rowDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+          }
+          
+          // Handle send message
+          async function sendMessage() {
+              const message = userInput.value.trim();
+              if (message === '') return;
+              
+              // Add user message
+              addMessage(message, true);
+              userInput.value = '';
+              
+              try {
+                  // Show typing indicator
+                  const typingIndicator = document.createElement('div');
+                  typingIndicator.className = 'message bot-message';
+                  typingIndicator.id = 'typingIndicator';
+                  typingIndicator.textContent = 'Escribiendo...';
+                  chatMessages.appendChild(typingIndicator);
+                  chatMessages.scrollTop = chatMessages.scrollHeight;
+                  
+                  // Send message to backend
+                  const response = await fetch('http://localhost:8000/chatbot/query', {
+                      method: 'POST',
+                      headers: {
+                          'Content-Type': 'application/json',
+                      },
+                      body: JSON.stringify({
+                          question: message,
+                          chat_history: []
+                      })
+                  });
+                  
+                  // Remove typing indicator
+                  const indicator = document.getElementById('typingIndicator');
+                  if (indicator) indicator.remove();
+                  
+                  if (response.ok) {
+                      const data = await response.json();
+                      addMessage(data.answer || 'Lo siento, no pude procesar tu solicitud.');
+                  } else {
+                      throw new Error('Error en la respuesta del servidor');
+                  }
+              } catch (error) {
+                  console.error('Error:', error);
+                  addMessage('Lo siento, hubo un error al procesar tu mensaje. Por favor, inténtalo de nuevo más tarde.');
+              }
+          }
+          
+          // Event listeners
+          sendButton.addEventListener('click', sendMessage);
+          
+          userInput.addEventListener('keypress', function(e) {
+              if (e.key === 'Enter') {
+                  sendMessage();
+              }
+          });
+          
+          // Initial welcome message after a short delay
+          setTimeout(() => {
+              addMessage("Puedes preguntarme sobre nuestros servicios, tarifas o cualquier otra información sobre C&CA.");
+          }, 1500);
+      });
+  </script>
+</body></html>
+</script>
+<style>
+        .chat-avatar-below {
+            display: flex;
+            justify-content: flex-start;
+            align-items: flex-start;
+            margin-top: 8px;
+            margin-left: 0;
+        }
+        .bot-message {
+            text-align: left !important;
+            margin-left: 0 !important;
+            margin-right: auto !important;
+        }
+        .chat-row {
+            display: flex;
+            align-items: flex-end;
+            margin-bottom: 15px;
+        }
+        .bot-row {
+            flex-direction: row;
+            justify-content: flex-start;
+        }
+        .user-row {
+            flex-direction: row;
+            justify-content: flex-end;
+        }
+        .chat-avatar-left {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: flex-start;
+            margin-right: 16px; /* más espacio entre icono y texto */
+            height: 100%;
+            align-self: flex-end;
+        }
+        .bot-message {
+            margin-left: 0;
+            padding-top: 0;
+            background: #f6f6f6;
+            border-radius: 12px;
+            padding: 10px 16px;
+            max-width: 70%;
+            word-break: break-word;
+            text-align: left;
+            margin-right: 0;
+        }
+        .chat-avatar-right {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: flex-end;
+            margin-left: 8px;
+            height: 100%;
+            align-self: flex-end;
+        }
+.chat-avatar {
+    display: block;
+    margin: 8px auto 0 auto;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.chat-avatar-left {
+    width: 100%;
+    display: flex;
+    align-items: flex-start;
+    margin-top: 8px;
+}
+.chat-avatar-left .chat-avatar {
+    margin: 0;
+    margin-left: 0;
+    margin-right: auto;
+}
+</style>

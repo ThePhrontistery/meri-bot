@@ -1,0 +1,44 @@
+/* Estilos básicos para el widget MeriBot */
+.widget-meribot {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 350px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  z-index: 9999;
+  font-family: 'Ubuntu', Arial, sans-serif;
+}
+.widget-meribot-header {
+  background: #0070ad;
+  color: #fff;
+  padding: 12px 16px;
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+  font-weight: 600;
+}
+.widget-meribot-body {
+  padding: 16px;
+  min-height: 120px;
+}
+.widget-meribot-input {
+  display: flex;
+  border-top: 1px solid #eee;
+  padding: 8px;
+}
+.widget-meribot-input input {
+  flex: 1;
+  border: none;
+  padding: 8px;
+  border-radius: 8px;
+  margin-right: 8px;
+}
+.widget-meribot-input button {
+  background: #0070ad;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  cursor: pointer;
+}
