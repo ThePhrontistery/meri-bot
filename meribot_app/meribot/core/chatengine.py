@@ -84,6 +84,22 @@ class ChatEngine:
         system_prompt = os.getenv("SYSTEM_PROMPT", "")
         user_prompt = message
 
+        #CORETEAM
+        print("*********************************")
+        print("* ARGUMENTOS DE ACCESO A LLM    *")
+        print("*********************************")
+        print("system_prompt:", system_prompt)
+        print("--------------------------------")
+        print("conversation_history:", conversation_history)
+        print("--------------------------------")
+        print("user_prompt:", user_prompt)
+        print("--------------------------------")
+        print("vector_db_texts:", vector_db_texts)
+        print("--------------------------------")
+        print("llm_metadata:", llm_metadata)
+        print("--------------------------------")
+
+
         # 6. Llamar al LLM para generar la respuesta
         try:
             response = await self.llm_engine.generate_response(
