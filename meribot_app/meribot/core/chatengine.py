@@ -14,6 +14,12 @@ from meribot.core.logging import log_generation_failure
 from meribot.core.validation import validate_chat_engine_input
 import os
 
+TEMPLATE_PATH = os.path.join(os.path.dirname(__file__), 'templates', 'system_prompt.txt')
+
+def load_system_prompt():
+    with open(TEMPLATE_PATH, 'r', encoding='utf-8') as f:
+        return f.read()
+
 class ChatEngine:
     """
     Punto de entrada principal del CORE. Gestiona el flujo conversacional,
@@ -81,7 +87,7 @@ class ChatEngine:
                     llm_metadata.update(chunk["metadata"])
 
         # 5. Preparar argumentos para el LLM
-        system_prompt = os.getenv("SYSTEM_PROMPT", "")
+        system_prompt = load_system_prompt()
         user_prompt = message
 
         #CORETEAM
@@ -116,6 +122,10 @@ class ChatEngine:
         # 7. Actualizar historial de la conversación
         session.add_message("user", message)
         session.add_message("assistant", response)
+        print("--------------------------------")
+        conversation_history = session.get_history()
+        print("conversation_history:", conversation_history)
+        print("--------------------------------")
 
         # 8. Retornar respuesta y citaciones
         return {
@@ -165,7 +175,7 @@ class ChatEngine:
             for chunk in relevant_chunks:
                 if "metadata" in chunk:
                     llm_metadata.update(chunk["metadata"])
-        system_prompt = os.getenv("SYSTEM_PROMPT", "")
+        system_prompt = load_system_prompt()
         user_prompt = message
 
         # 4. Llamar al LLM en modo streaming
