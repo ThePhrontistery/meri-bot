@@ -28,7 +28,7 @@ class AzureOpenAIEmbeddings(Embeddings):
                 break
         
         self.endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
-        self.api_key = os.getenv("AZURE_OPENAI_KEY")
+        self.api_key = os.getenv("AZURE_OPENAI_API_KEY")
         self.deployment = os.getenv("AZURE_OPENAI_EMBEDDINGS_DEPLOYMENT")
         
         if not self.endpoint or not self.api_key or not self.deployment:

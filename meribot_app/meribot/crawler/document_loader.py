@@ -63,10 +63,10 @@ def get_azure_openai_embeddings(sentences: list[str]) -> np.ndarray:
     """
     Obtiene embeddings de Azure OpenAI para una lista de frases.
     Requiere las variables de entorno:
-        AZURE_OPENAI_ENDPOINT, AZURE_OPENAI_KEY, AZURE_OPENAI_DEPLOYMENT
+    AZURE_OPENAI_ENDPOINT, AZURE_OPENAI_API_KEY, AZURE_OPENAI_EMBEDDINGS_DEPLOYMENT
     """
     endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
-    api_key = os.getenv("AZURE_OPENAI_KEY")
+    api_key = os.getenv("AZURE_OPENAI_API_KEY")
     deployment = os.getenv("AZURE_OPENAI_EMBEDDINGS_DEPLOYMENT")
     if not endpoint or not api_key or not deployment:
         raise RuntimeError("Faltan variables de entorno para Azure OpenAI embeddings.")
@@ -312,12 +312,22 @@ def parse_xlsx(path: str, url: str = None) -> Dict[str, Any]:
     except Exception as e:
         return {"error": str(e), "text": None, "metadata": None}
 
+
 # PDF
 try:
     import fitz  # PyMuPDF
     PDF_AVAILABLE = True
 except ImportError:
     PDF_AVAILABLE = False
+
+# Forcibly re-check after install
+import importlib
+if not PDF_AVAILABLE:
+    try:
+        fitz = importlib.import_module('fitz')
+        PDF_AVAILABLE = True
+    except ImportError:
+        PDF_AVAILABLE = False
 
 def parse_pdf(path: str, url: str = None) -> Dict[str, Any]:
     """
