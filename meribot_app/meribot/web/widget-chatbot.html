@@ -595,20 +595,29 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            /* Asegura que el textarea se expanda */
+            min-width: 0;
         }
 
-        .input-container input {
-            flex: 1;
-            border: none;
-            outline: none;
-            background: transparent;
-            font-size: 14px;
-            padding: 8px 0;
+        .input-wrapper textarea {
+            width: 100%;
+            min-height: 36px;
+            max-height: 120px;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            background: #fff;
             color: var(--color-text-dark);
+            font-size: 14px;
+            padding: 8px 12px;
+            resize: none;
+            outline: none;
+            transition: border-color 0.2s;
+            box-sizing: border-box;
         }
 
-        .input-container input::placeholder {
-            color: #999;
+        .input-wrapper textarea:focus {
+            border-color: #12abdb;
+            background: #fff;
         }
 
         .selected-filters {
@@ -1019,7 +1028,7 @@
                         <!-- Wrapper del input -->
                         <div class="input-wrapper">
                             <!-- Input de texto -->
-                            <input type="text" id="messageInput" placeholder="Escribe tu pregunta...">
+                            <textarea id="messageInput" rows="2" placeholder="Escribe tu pregunta..." style="resize: none;"></textarea>
                         </div>
                         
                         <!-- Botón de envío -->
@@ -1208,8 +1217,11 @@
                 
                 // Enviar mensaje
                 sendButton.addEventListener('click', () => this.sendMessage());
-                messageInput.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') this.sendMessage();
+                messageInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' && e.ctrlKey) {
+                        this.sendMessage();
+                        e.preventDefault();
+                    }
                 });
                 
                 // Sistema de filtros
@@ -1239,6 +1251,12 @@
 
                 // Listeners para el panel
                 this.initializePanelListeners();
+
+                // Autoajustar altura del textarea
+                messageInput.addEventListener('input', function() {
+                    this.style.height = 'auto';
+                    this.style.height = (this.scrollHeight) + 'px';
+                });
             }
             
             toggleFilterDropdown() {
@@ -1344,6 +1362,8 @@
                 if (message) {
                     this.sendUserMessage(message);
                     input.value = '';
+                    // Ajustar altura tras limpiar
+                    input.style.height = '';
                 }
             }
             
