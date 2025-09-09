@@ -1172,7 +1172,7 @@
                     // Adaptar la lista simple de strings a objetos con id y name
                     this.availableDomains = (config.allowed_domains || []).map(domain => ({
                         id: domain,
-                        name: domain.charAt(0).toUpperCase() + domain.slice(1),
+                        name: domain, // Mostrar exactamente como en el config, sin capitalizar
                         color: '#0070ad', // color por defecto
                         description: ''
                     }));
@@ -1611,17 +1611,23 @@
                     const option = document.createElement('div');
                     option.className = 'filter-option';
                     option.setAttribute('data-domain-id', domain.id);
+                    // Marcar como seleccionado si está en selectedDomains
+                    if (this.selectedDomains.includes(domain.id)) {
+                        option.classList.add('selected');
+                    }
                     option.innerHTML = `
                         <div class="filter-option-content">
                             <div class="filter-option-name">${domain.name}</div>
                         </div>
-                        <div class="filter-checkbox">
-                            <i class="fas fa-check" style="font-size: 10px; display: none;"></i>
+                        <div class="filter-checkbox${this.selectedDomains.includes(domain.id) ? ' checked' : ''}">
+                            <i class="fas fa-check" style="font-size: 10px;${this.selectedDomains.includes(domain.id) ? '' : 'display: none;'}"></i>
                         </div>
                     `;
                     option.addEventListener('click', (e) => {
                         e.stopPropagation();
                         this.toggleDomainFilter(domain.id);
+                        // Volver a renderizar para reflejar el cambio visual inmediato
+                        this.initializeFilters();
                     });
                     dropdown.appendChild(option);
                 });
