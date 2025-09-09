@@ -1,0 +1,7 @@
+tasks:
+  - name: ejecutar_crawler_hoy
+    command: powershell -File meri-cli.ps1 crawl --url "https://cca.capgemini.com/web/onboarding" --dominio "onboarding"
+    type: date
+    date: "2025-09-09"
+    time: "12:03"
+    workdir: "C:/Meri_bot/meri-bot/meribot_app/meribot/meri-cli"
