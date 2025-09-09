@@ -1559,10 +1559,13 @@
             resetConversation() {
                 this.conversations = [];
                 this.conversationId = null; // Reiniciar conversation_id
+                this.selectedDomains = []; // Limpiar dominios seleccionados
                 const messagesContainer = document.getElementById('chatMessages');
                 if (messagesContainer) {
                     messagesContainer.innerHTML = '';
                 }
+                this.updateFilterUI();
+                this.updateSelectedFiltersDisplay();
             }
             
             toggleWidget() {
