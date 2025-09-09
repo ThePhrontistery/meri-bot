@@ -32,9 +32,7 @@ def run_crawler_job(command=None, workdir=None):
             if workdir:
                 logging.info(f"[SCHEDULER] Cambiando directorio de trabajo a: {workdir}")
                 os.chdir(workdir)
-            result = subprocess.run(command, shell=True, check=True, capture_output=True, text=True)
-            print(f"[SCHEDULER] Salida: {result.stdout}")
-            logging.info(f"[SCHEDULER] Salida: {result.stdout}")
+            result = subprocess.run(command, shell=True, check=True)
         except subprocess.CalledProcessError as e:
             print(f"[SCHEDULER] Error ejecutando comando: {e}")
             logging.error(f"[SCHEDULER] Error ejecutando comando: {e}")
@@ -62,6 +60,7 @@ def schedule_crawler_jobs(scheduler, config):
                 if date_str and time_str:
                     from datetime import datetime
                     dt = datetime.strptime(f"{date_str} {time_str}", "%Y-%m-%d %H:%M")
+                    print(f"[SCHEDULER] Programando job '{task.get('name', None)}' para {dt} con comando: {task.get('command')} en {workdir}")
                     scheduler.add_job(
                         run_crawler_job,
                         'date',
@@ -79,9 +78,18 @@ def schedule_crawler_jobs(scheduler, config):
             minute=config['schedule'].get('minute', 0)
         )
 
+
 def main():
+    import sys
+    import os
     scheduler = BlockingScheduler()
-    config = load_schedule_config()
+    # Permitir pasar la ruta del YAML como argumento
+    if len(sys.argv) > 1:
+        config_path = sys.argv[1]
+    else:
+        config_path = os.path.join(os.getcwd(), 'scheduler_config.yaml')
+    print(f"[SCHEDULER] Usando configuración: {config_path}")
+    config = load_schedule_config(config_path)
     schedule_crawler_jobs(scheduler, config)
     scheduler.start()
     import time
@@ -90,7 +98,7 @@ def main():
         while True:
             # Relee la configuración cada 60s y reprograma si hay cambios
             time.sleep(60)
-            new_config = load_schedule_config()
+            new_config = load_schedule_config(config_path)
             if new_config != config:
                 print("[SCHEDULER] Configuración cambiada. Reprogramando jobs...")
                 config = new_config
