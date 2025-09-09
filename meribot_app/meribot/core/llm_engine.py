@@ -1,7 +1,5 @@
 """
-llm_engine.py
 Motor de generación de respuestas con LLM para MeriBot CORE.
-Soporta integración con Langchain, configuración dinámica, streaming, citación y manejo robusto de errores.
 @author: MeriBot Team
 """
 import asyncio
@@ -12,7 +10,6 @@ load_dotenv()
 from meribot.core.logging import log_generation_failure
 from meribot.core.guardrails import apply_guardrails
 
-# Simulación de integración Langchain/LLM (mockable para tests)
 class LLMProvider:
     def __init__(self, model: str, params: Dict[str, Any]):
         self.model = model
@@ -27,9 +24,7 @@ class LLMProvider:
         """
         Llama al endpoint de Azure OpenAI para obtener una respuesta generada por el modelo.
         """
-        import requests
-        import json
-        # Construir mensajes para el modelo tipo chat
+        import requests, json, asyncio
         messages = [
             {"role": "system", "content": prompt},
             {"role": "user", "content": user_prompt}
@@ -45,8 +40,6 @@ class LLMProvider:
             "max_tokens": self.params.get("max_tokens", 512)
         }
         try:
-            # Ejecutar la petición en un hilo para no bloquear el event loop
-            import asyncio
             loop = asyncio.get_event_loop()
             response = await loop.run_in_executor(
                 None,
@@ -54,13 +47,14 @@ class LLMProvider:
             )
             response.raise_for_status()
             result = response.json()
-            # Extraer el texto generado
             return result["choices"][0]["message"]["content"]
         except Exception as e:
             return f"[Error Azure OpenAI]: {str(e)}"
     async def stream(self, prompt: str, context: List[str] = None) -> AsyncGenerator[str, None]:
-        # Simula streaming token a token
-        for word in (prompt.split()):
+        """
+        Simula streaming token a token.
+        """
+        for word in prompt.split():
             await asyncio.sleep(0.001)
             yield word + " "
 
@@ -75,7 +69,6 @@ class LLMEngine:
         self.params = {
             "temperature": float(os.getenv('TEMPERATURE', 0.7)),
             "max_tokens": int(os.getenv('MAX_TOKENS', 512)),
-            # "top_p": float(os.getenv('TOP_P', 1.0)),  # Si se añade a .env
         }
         self.provider = provider or LLMProvider(self.model, self.params)
         # Permite inyectar guardrails y logger para testabilidad
@@ -101,21 +94,12 @@ class LLMEngine:
         if conversation_history:
             for msg in conversation_history:
                 prompt_parts.append(f"[{msg['role']}] {msg['content']}")
-        # prompt_parts.append(f"[user] {user_prompt}")
         full_prompt = "\n".join(prompt_parts)
-        # CORE: Desactivar aplicación de guarrails
-        #safe_prompt = apply_guardrails(full_prompt)
         if full_prompt is None:
             log_generation_failure(metadata.get("user_id", "unknown") if metadata else "unknown", user_prompt, "Guardrail rejection")
             return "[Input rechazado por política de seguridad]"
         try:
-            response = await self.provider.generate(full_prompt,user_prompt)
-            # Simulación de citación automática
-            # CORE: Desactivar citación automática
-            '''
-            if metadata and metadata.get("citar_fuentes"):
-                response += "\n\nFuente: https://ejemplo.com"
-            '''
+            response = await self.provider.generate(full_prompt, user_prompt)
             return response
         except Exception as e:
             log_generation_failure(metadata.get("user_id", "unknown") if metadata else "unknown", user_prompt, str(e))
@@ -161,6 +145,3 @@ class LLMEngine:
                 str(e)
             )
             yield f"[Error: {str(e)}]"
-
-# Ejemplo de extensión: sustituir LLMProvider por integración real Langchain/OpenAI/Azure
-# Configuración avanzada vía config.py
