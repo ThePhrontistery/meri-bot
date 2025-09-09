@@ -959,6 +959,7 @@
             }
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body>
     <!-- Main content con Hero de CCA -->
@@ -1495,19 +1496,27 @@
                     `;
                 }
 
-                // Si es bot y hay fuente(s), el/los iconos van en la burbuja, esquina inferior derecha
+                // Procesar Markdown solo para mensajes del bot (no para el usuario ni para HTML ya seguro)
+                let processedText = text;
+                if (sender === 'bot') {
+                    // Si el texto ya contiene HTML (por ejemplo, mensajes de bienvenida), no procesar
+                    if (!/^\s*<.+?>/.test(text.trim())) {
+                        processedText = marked.parse(text, { breaks: true, gfm: true });
+                    }
+                }
+
                 let messageBubbleHTML = '';
                 if (sender === 'bot' && sourcesHTML) {
                     messageBubbleHTML = `
                         <div class="message-bubble" style="position: relative; padding-bottom: 32px;">
                             ${sourcesHTML}
-                            <div>${text}</div>
+                            <div>${processedText}</div>
                         </div>
                     `;
                 } else {
                     messageBubbleHTML = `
                         <div class="message-bubble" style="position: relative;">
-                            ${text}
+                            ${sender === 'bot' ? processedText : text}
                         </div>
                     `;
                 }
