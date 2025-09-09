@@ -3,7 +3,7 @@ Módulo para ejecución automática semanal del crawler usando APScheduler.
 """
 
 import yaml
-from apscheduler.schedulers.blocking import BlockingScheduler
+from apscheduler.schedulers.background import BackgroundScheduler
 import logging
 def load_schedule_config(config_path='scheduler_config.yaml'):
     """
@@ -21,20 +21,14 @@ def load_schedule_config(config_path='scheduler_config.yaml'):
         return {}
 
 
-
-def run_crawler_job(command=None, workdir=None):
+def run_crawler_job(command=None):
     import subprocess
-    import os
     if command:
-        print(f"[SCHEDULER] Lanzando job: {command} en {workdir}")
         logging.info(f"[SCHEDULER] Ejecutando comando: {command}")
         try:
-            if workdir:
-                logging.info(f"[SCHEDULER] Cambiando directorio de trabajo a: {workdir}")
-                os.chdir(workdir)
-            result = subprocess.run(command, shell=True, check=True)
+            result = subprocess.run(command, shell=True, check=True, capture_output=True, text=True)
+            logging.info(f"[SCHEDULER] Salida: {result.stdout}")
         except subprocess.CalledProcessError as e:
-            print(f"[SCHEDULER] Error ejecutando comando: {e}")
             logging.error(f"[SCHEDULER] Error ejecutando comando: {e}")
     else:
         # Fallback: ejecuta el crawler por defecto
@@ -45,10 +39,8 @@ def run_crawler_job(command=None, workdir=None):
 
 
 
-
 def schedule_crawler_jobs(scheduler, config):
     """Programa jobs de crawling según la configuración (semanal o puntual)."""
-    import os
     scheduler.remove_all_jobs()
     # Tareas puntuales
     if 'tasks' in config:
@@ -56,16 +48,14 @@ def schedule_crawler_jobs(scheduler, config):
             if task.get('type') == 'date':
                 date_str = task.get('date')
                 time_str = task.get('time')
-                workdir = task.get('workdir', os.getcwd())
                 if date_str and time_str:
                     from datetime import datetime
                     dt = datetime.strptime(f"{date_str} {time_str}", "%Y-%m-%d %H:%M")
-                    print(f"[SCHEDULER] Programando job '{task.get('name', None)}' para {dt} con comando: {task.get('command')} en {workdir}")
                     scheduler.add_job(
                         run_crawler_job,
                         'date',
                         run_date=dt,
-                        kwargs={'command': task.get('command'), 'workdir': workdir},
+                        kwargs={'command': task.get('command')},
                         id=task.get('name', None)
                     )
     # Configuración semanal (compatibilidad)
@@ -78,18 +68,9 @@ def schedule_crawler_jobs(scheduler, config):
             minute=config['schedule'].get('minute', 0)
         )
 
-
 def main():
-    import sys
-    import os
-    scheduler = BlockingScheduler()
-    # Permitir pasar la ruta del YAML como argumento
-    if len(sys.argv) > 1:
-        config_path = sys.argv[1]
-    else:
-        config_path = os.path.join(os.getcwd(), 'scheduler_config.yaml')
-    print(f"[SCHEDULER] Usando configuración: {config_path}")
-    config = load_schedule_config(config_path)
+    scheduler = BackgroundScheduler()
+    config = load_schedule_config()
     schedule_crawler_jobs(scheduler, config)
     scheduler.start()
     import time
@@ -98,7 +79,7 @@ def main():
         while True:
             # Relee la configuración cada 60s y reprograma si hay cambios
             time.sleep(60)
-            new_config = load_schedule_config(config_path)
+            new_config = load_schedule_config()
             if new_config != config:
                 print("[SCHEDULER] Configuración cambiada. Reprogramando jobs...")
                 config = new_config

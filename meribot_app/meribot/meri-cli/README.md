@@ -1,142 +1,173 @@
-# Capa Administrativa
+# meri-cli - Herramienta de línea de comandos para MeriBot
 
 ## Descripción
-Este módulo proporciona herramientas de línea de comandos (CLI) para la administración y mantenimiento del sistema MeriBot. Permite gestionar el scraper, la base de datos vectorial y realizar tareas administrativas sin necesidad de acceder directamente a la API o la base de datos.
+Este módulo proporciona la herramienta de línea de comandos oficial `meri-cli` para la gestión y administración del sistema MeriBot. Permite realizar operaciones de crawling, procesamiento de documentos y gestión de la base de datos vectorial de manera programática y controlada.
 
 ## Características Principales
-- Interfaz de línea de comandos intuitiva
-- Gestión del servicio de scraping
-- Administración de la base de datos vectorial
-- Herramientas de diagnóstico y monitoreo
-- Generación de informes
+- Interfaz de línea de comandos intuitiva con Click
+- Comunicación directa con el endpoint de crawling `/crawl-and-process`
+- Validación de dominios y URLs
+- Modo dry-run para simulación segura
+- Gestión de múltiples formatos de archivo (HTML, PDF, DOCX, XLSX)
+- Instalación opcional para uso global en el sistema
+
+## Instalación y Uso
+
+### Opción 1: Uso directo desde el directorio meri-cli
+```powershell
+cd meribot/meri-cli
+.\meri-cli.bat crawl --url "https://cca.capgemini.com/web/home" --dominio "cca"
+```
+
+### Opción 2: Instalación global (recomendado)
+```powershell
+cd meribot/meri-cli
+.\install-meri-cli.ps1 -Install
+# Reiniciar terminal
+meri-cli crawl --url "https://cca.capgemini.com/web/home" --dominio "cca"
+```
 
 ## Comandos Principales
 
-### Gestión del Scraper
+### Comando crawl (principal)
+Ejecuta el proceso completo de crawling y procesamiento de documentos.
+
+**Parámetros obligatorios:**
+- `--url`: URL inicial para el crawling
+- `--dominio`: Dominio al que pertenece la información
+
+**Parámetros opcionales:**
+- `--max-depth INTEGER`: Profundidad máxima de navegación (default: 2)
+- `--max-pages INTEGER`: Número máximo de páginas a explorar
+- `--include TEXT`: Patrón regex para incluir URLs
+- `--exclude TEXT`: Patrón regex para excluir URLs
+- `--formats TEXT`: Formatos de archivo a recolectar (default: html,pdf,docx,xlsx)
+- `--output TEXT`: Directorio destino para documentos
+- `--update-only`: Solo actualizar documentos nuevos o modificados
+- `--dry-run`: Simular crawling sin descargar
+- `--manual TEXT`: Lista de URLs separadas por comas para procesar manualmente
+- `--api-host TEXT`: Host del API de MeriBot (default: http://localhost:8000)
+
+### Ejemplos de uso
 ```bash
-# Ejecutar scraping manual
-meribot scrape --url https://cca.capgemini.com/web/home
+# Crawling básico
+meri-cli crawl --url "https://cca.capgemini.com/web/home" --dominio "cca"
 
-# Ver logs del scraper
-meribot logs scraper --tail 100
+# Con opciones avanzadas
+meri-cli crawl --url "https://cca.capgemini.com/web/home" --dominio "cca" \
+  --max-depth 3 \
+  --formats "html,pdf" \
+  --exclude ".*logout.*"
 
-# Forzar reindexación completa
-meribot scrape --reindex
+# Modo simulación
+meri-cli crawl --url "https://cca.capgemini.com/web/home" --dominio "cca" --dry-run
+
+# Procesamiento manual de URLs específicas
+meri-cli crawl --url "https://cca.capgemini.com/web/home" --dominio "cca" \
+  --manual "https://cca.capgemini.com/page1,https://cca.capgemini.com/page2"
 ```
 
-### Gestión de la Base de Datos
+### Comando db
+Gestiona la base de datos vectorial.
 ```bash
-# Ver estado de la base de datos
-meribot db status
-
-# Realizar respaldo
-meribot db backup --output backups/
-
-# Restaurar desde respaldo
-meribot db restore --input backups/backup_20230808.zip
-
-# Limpiar documentos obsoletos
-meribot db cleanup --older-than 30d
+# Resetear la base de datos (requiere confirmación)
+meri-cli db --reset
 ```
 
-### Herramientas de Diagnóstico
+### Comando scrape (obsoleto)
+Mantiene compatibilidad con versiones anteriores.
 ```bash
-# Verificar conectividad con servicios
-meribot diagnose connectivity
-
-# Verificar estado de la base vectorial
-meribot diagnose vector-db
-
-# Probar consultas de ejemplo
-meribot test queries --count 10
+meri-cli scrape --url "https://example.com"
 ```
 
 ## Estructura del Módulo
 ```
-cli/
+meri-cli/
 ├── __init__.py
-├── main.py              # Punto de entrada principal
-├── commands/            # Comandos CLI
-│   ├── scrape.py        # Comandos de scraping
-│   ├── db.py           # Comandos de base de datos
-│   └── diagnose.py     # Herramientas de diagnóstico
-└── utils/              # Utilidades
-    ├── output.py       # Formateo de salida
-    └── validators.py   # Validación de parámetros
+├── main.py                   # Implementación principal con Click
+├── meri-cli.py              # Script ejecutable Python
+├── meri-cli.bat             # Script batch para Windows
+├── meri-cli.ps1             # Script PowerShell
+├── install-meri-cli.ps1     # Instalador para uso global
+├── README.md                # Esta documentación
+└── GUIA-RAPIDA.md          # Guía de referencia rápida
 ```
 
 ## Configuración
-La CLI puede configurarse mediante:
-1. Archivo de configuración (`~/.meribot/config.ini`)
-2. Variables de entorno
-3. Argumentos de línea de comandos
+La herramienta lee la configuración desde `crawler_config.yaml` en el directorio raíz del proyecto:
 
-### Ejemplo de Configuración
-```ini
-[cli]
-# Nivel de verbosidad (DEBUG, INFO, WARNING, ERROR)
-log_level = INFO
-
-# Formato de salida (json, table, csv)
-output_format = table
-
-[scraper]
-# Directorio de salida por defecto
-output_dir = ./data/scraped
-
-# Usuario y contraseña para autenticación
-username = admin
-# password =  # Se recomienda usar variables de entorno
+```yaml
+seeds:
+  - "https://cca.capgemini.com/web/home"
+allowed_domains:
+  - "cca"
+  - "onboarding"
+  - "training"
+user_agent: "MeriBot/1.0"
+delay: 1.0
+output_dir: "./data/scraped"
+max_depth: 4
+file_types:
+  - "html"
+  - "pdf"
+  - "docx"
+  - "xlsx"
 ```
 
-## Variables de Entorno
+## Validaciones y Seguridad
+- **Validación de URL**: Verifica que la URL tenga protocolo válido
+- **Validación de dominio**: Comprueba que el dominio esté en la lista permitida
+- **Timeouts**: Configuración de timeouts para evitar colgues
+- **Dry-run**: Modo simulación para pruebas seguras
+- **Confirmación**: Operaciones destructivas requieren confirmación
+
+## Requisitos
+- Python 3.10 o superior
+- Dependencias: Click, requests, PyYAML, urllib3
+- Servidor FastAPI ejecutándose (por defecto en http://localhost:8000)
+- Configuración válida en `crawler_config.yaml`
+
+## Arquitectura de Comunicación
+```
+meri-cli → FastAPI Endpoint → Crawler Service → ChromaDB
+         ↓
+   /crawl-and-process
+```
+
+El CLI se comunica con el endpoint `/crawl-and-process` que:
+1. Valida los parámetros de entrada
+2. Ejecuta el scraping de documentos
+3. Procesa y fragmenta el contenido
+4. Almacena en la base de datos vectorial ChromaDB
+5. Retorna el resultado del procesamiento
+
+## Solución de Problemas
+
+### Error "Missing option '--dominio'"
+Asegúrate de incluir ambos parámetros obligatorios:
 ```bash
-# Nivel de log (DEBUG, INFO, WARNING, ERROR)
-export MERIBOT_LOG_LEVEL=INFO
-
-# Formato de salida (json, table, csv)
-export MERIBOT_OUTPUT_FORMAT=table
-
-# Configuración de ChromaDB
-export CHROMADB_HOST=localhost
-export CHROMADB_PORT=8000
+meri-cli crawl --url "https://example.com" --dominio "example"
 ```
 
-## Ejemplos de Uso Avanzado
-
-### Programar Tareas con Cron
+### Error de conexión con FastAPI
+Verifica que el servidor esté ejecutándose:
 ```bash
-# Ejecutar scraping automaticamente a las 2 AM cada viernes
-0 2 * * * /usr/local/bin/meribot scrape --url https://cca.capgemini.com/web/home --output /data/scraped/$(date +\%Y\%m\%d)
-
-# Respaldar la base de datos cada domingos a las 3 AM
-0 3 * * 0 /usr/local/bin/meribot db backup --output /backups/
+python -m meribot.api.app
 ```
 
-### Generar Informes
-```bash
-# Generar informe de uso
-meribot report usage --start 2023-01-01 --end 2023-12-31 --format pdf
+### Dominio no permitido
+Revisa `crawler_config.yaml` y asegúrate de que el dominio esté en `allowed_domains`.
 
-# Exportar datos de consultas
-meribot report queries --output queries.csv --format csv
+### Instalación global no funciona
+Reinicia la terminal después de ejecutar el instalador:
+```powershell
+.\install-meri-cli.ps1 -Install
+# Reiniciar terminal o ejecutar: refreshenv
 ```
 
-## Seguridad
-- Las credenciales sensibles deben manejarse mediante variables de entorno
-- Se recomienda usar cuentas con privilegios limitados
-- Todas las operaciones sensibles requieren confirmación
-- Los logs no incluyen información sensible
-
-## Dependencias
-- Click (para la interfaz de comandos)
-- Rich (para salida formateada)
-- PyYAML (para manejo de configuración)
-- python-dotenv (para variables de entorno)
-
-## Notas de Implementación
-- Los comandos deben ser atómicos y tener una única responsabilidad
-- Proporcionar siempre retroalimentación clara al usuario
-- Incluir validación de parámetros
-- Manejar adecuadamente los errores y proporcionar mensajes útiles
-- Documentar todos los comandos con ejemplos de uso
+## Notas de Desarrollo
+- Implementado con Click para una interfaz robusta
+- Soporte completo para PowerShell en Windows
+- Manejo de errores con mensajes informativos
+- Interfaz amigable con emojis y colores
+- Arquitectura modular y extensible
