@@ -1348,6 +1348,11 @@
             }
             
             sendUserMessage(message) {
+                const messageInput = document.getElementById('messageInput');
+                const sendButton = document.getElementById('sendButton');
+                // Deshabilitar input y botón
+                messageInput.disabled = true;
+                sendButton.disabled = true;
                 this.addMessage('user', message);
                 this.showTypingIndicator();
 
@@ -1367,6 +1372,9 @@
                 })
                 .then(async (response) => {
                     this.hideTypingIndicator();
+                    // Habilitar input y botón
+                    messageInput.disabled = false;
+                    sendButton.disabled = false;
                     if (!response.ok) {
                         throw new Error('Error en la respuesta del servidor');
                     }
@@ -1389,6 +1397,9 @@
                 })
                 .catch((error) => {
                     this.hideTypingIndicator();
+                    // Habilitar input y botón también en error
+                    messageInput.disabled = false;
+                    sendButton.disabled = false;
                     this.addMessage('bot', 'Error al conectar con el servidor: ' + error.message);
                 });
             }
