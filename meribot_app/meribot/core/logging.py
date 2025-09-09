@@ -16,6 +16,14 @@ LOG_FILE = os.getenv("MERIBOT_LOG_FILE", "logs/meribot_core.log")
 LOG_MAX_BYTES = int(os.getenv("MERIBOT_LOG_MAX_BYTES", 1048576))  # 1MB
 LOG_BACKUP_COUNT = int(os.getenv("MERIBOT_LOG_BACKUP_COUNT", 5))
 
+def ensure_log_dir_exists(log_file_path: str):
+    log_dir = os.path.dirname(log_file_path)
+    if log_dir and not os.path.exists(log_dir):
+        os.makedirs(log_dir, exist_ok=True)
+
+# Crear carpeta de logs si no existe
+ensure_log_dir_exists(LOG_FILE)
+
 # Formato estructurado JSON
 class JsonFormatter(logging.Formatter):
     def format(self, record):
