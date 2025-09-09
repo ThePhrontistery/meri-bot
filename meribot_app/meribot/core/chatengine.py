@@ -4,6 +4,7 @@ Coordinador principal del CORE de MeriBot. Orquesta plugins, vector search, cach
 Proporciona una interfaz asíncrona y extensible para la API y otros módulos.
 @author: MeriBot Team
 """
+
 from typing import Any, Dict, List, Optional, AsyncGenerator
 from meribot.core.plugin_manager import PluginManager
 from meribot.core.vector_search import VectorSearch
@@ -12,12 +13,15 @@ from meribot.core.llm_engine import LLMEngine
 from meribot.core.conversation import ConversationManager
 from meribot.core.logging import log_generation_failure
 from meribot.core.validation import validate_chat_engine_input
-import os
 
-TEMPLATE_PATH = os.path.join(os.path.dirname(__file__), 'templates', 'system_prompt.txt')
 
 def load_system_prompt():
-    with open(TEMPLATE_PATH, 'r', encoding='utf-8') as f:
+    """
+    Carga el prompt de sistema desde la ruta especificada en la variable de entorno SYSTEM_PROMPT_PATH.
+    """
+    import os
+    system_prompt_path = os.getenv('SYSTEM_PROMPT_PATH')
+    with open(system_prompt_path, 'r', encoding='utf-8') as f:
         return f.read()
 
 class ChatEngine:
@@ -74,16 +78,21 @@ class ChatEngine:
 
         # 3. Buscar en la base vectorial (usando todos los dominios recibidos)
         relevant_chunks = self.vector_search.search(message, domains=domains)
-        citations = [chunk["metadatas"]["url"] for chunk in relevant_chunks] if relevant_chunks else []
-        # Eliminar duplicados manteniendo el orden
-        print("-------------------------")
-        print("citations antes: ", citations)
+        citations = []
         seen = set()
-        citations = [x for x in citations if not (x in seen or seen.add(x))]
+        if relevant_chunks:
+            for chunk in relevant_chunks:
+                meta = chunk.get("metadatas", {})
+                title = meta.get("title")
+                url = meta.get("url")
+                key = (title, url)
+                if key not in seen:
+                    seen.add(key)
+                    citations.append({"title": title, "url": url})
         vector_db_texts = [chunk.get("document") for chunk in relevant_chunks] if relevant_chunks else []
 
-        print("-------------------------")
-        print("citations después: ", citations)
+        """ print("-------------------------")
+        print("citations después: ", citations) """
 
         # 4. Preparar metadatos para el LLM
         llm_metadata = {}
@@ -99,7 +108,7 @@ class ChatEngine:
         user_prompt = message
 
         #CORETEAM
-        print("*********************************")
+        """ print("*********************************")
         print("* ARGUMENTOS DE ACCESO A LLM    *")
         print("*********************************")
         print("system_prompt:", system_prompt)
@@ -111,7 +120,7 @@ class ChatEngine:
         print("vector_db_texts:", vector_db_texts)
         print("--------------------------------")
         print("llm_metadata:", llm_metadata)
-        print("--------------------------------")
+        print("--------------------------------") """
 
 
         # 6. Llamar al LLM para generar la respuesta
@@ -130,10 +139,10 @@ class ChatEngine:
         # 7. Actualizar historial de la conversación
         session.add_message("user", message)
         session.add_message("assistant", response)
-        print("--------------------------------")
+        """ print("--------------------------------")
         conversation_history = session.get_history()
         print("conversation_history:", conversation_history)
-        print("--------------------------------")
+        print("--------------------------------") """
 
         # 8. Retornar respuesta y citaciones
         return {
@@ -174,12 +183,19 @@ class ChatEngine:
 
         # 3. Buscar en la base vectorial (usando todos los dominios recibidos)
         relevant_chunks = self.vector_search.search(message, domains=domains)
+        citations = []
+        seen = set()
+        if relevant_chunks:
+            for chunk in relevant_chunks:
+                meta = chunk.get("metadatas", {})
+                title = meta.get("title")
+                url = meta.get("url")
+                key = (title, url)
+                if key not in seen:
+                    seen.add(key)
+                    citations.append({"title": title, "url": url})
         vector_db_texts = [chunk.get("document") for chunk in relevant_chunks] if relevant_chunks else []
         llm_metadata = {}
-        citations = [chunk["metadatas"]["url"] for chunk in relevant_chunks] if relevant_chunks else []
-        # Eliminar duplicados manteniendo el orden
-        seen = set()
-        citations = [x for x in citations if not (x in seen or seen.add(x))]
         if citations:
             llm_metadata["citar_fuentes"] = True
         if relevant_chunks:
