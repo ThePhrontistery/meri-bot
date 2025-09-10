@@ -34,7 +34,7 @@ class MeriBotWidget {
 
     async loadDomainsConfig() {
         try {
-            const response = await fetch('http://localhost:8000/allowed-domains');
+            const response = await fetch('http://localhost:8000/chatbot/allowed_domains');
             if (!response.ok) throw new Error('Network response was not ok');
             const config = await response.json();
             this.availableDomains = (config.allowed_domains || []).map(domain => ({
@@ -147,7 +147,7 @@ class MeriBotWidget {
         
         // Luego cargar la configuración de dominios
         try {
-            const response = await fetch('http://localhost:8000/allowed-domains');
+            const response = await fetch('http://localhost:8000/chatbot/allowed_domains');
             if (!response.ok) throw new Error('Network response was not ok');
             const config = await response.json();
             this.availableDomains = (config.allowed_domains || []).map(domain => ({
@@ -650,27 +650,29 @@ class MeriBotWidget {
     }
 
     closePanel() {
-        if (this.isOpen && this.widgetPanel && this.panelOverlay) {
-            this.isOpen = false;
-            
-            // Restaurar el botón flotante
+        // Restaurar el botón flotante
+        if (this.widgetTrigger) {
             this.widgetTrigger.classList.remove('active');
-            this.widgetTrigger.querySelector('.widget-text').textContent = 'Pregunta a Meribot';
-            this.widgetTrigger.setAttribute('aria-label', 'Abrir chat de MeriBot');
-            
-            this.widgetPanel.classList.remove('active');
-            this.panelOverlay.classList.remove('active');
-            
-            // Limpiar el textarea y reajustar su altura
-            if (this.messageInput) {
-                this.messageInput.value = '';
-                this.messageInput.style.height = '';
+            if (this.widgetTrigger.querySelector('.widget-text')) {
+                this.widgetTrigger.querySelector('.widget-text').textContent = 'Pregunta a Meribot';
             }
-            
-            setTimeout(() => {
-                this.panelOverlay.style.display = 'none';
-            }, 300);
+            this.widgetTrigger.setAttribute('aria-label', 'Abrir chat de MeriBot');
         }
+        if (this.widgetPanel) this.widgetPanel.classList.remove('active');
+        if (this.panelOverlay) this.panelOverlay.classList.remove('active');
+        // Limpiar el textarea y reajustar su altura
+        if (this.messageInput) {
+            this.messageInput.value = '';
+            this.messageInput.style.height = '';
+        }
+        // Limpiar dominios seleccionados y actualizar UI de filtros
+        this.selectedDomains = [];
+        this.updateFilterUI && this.updateFilterUI();
+        this.updateSelectedFiltersDisplay && this.updateSelectedFiltersDisplay();
+        setTimeout(() => {
+            if (this.panelOverlay) this.panelOverlay.style.display = 'none';
+        }, 300);
+        this.isOpen = false;
     }
 
     // Actualizar las opciones de filtro
