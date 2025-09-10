@@ -591,7 +591,7 @@ class MeriBotWidget {
                     });
                     tooltip.classList.toggle('active');
                 });
-                // Ocultar al hacer clic fuera
+                // Ocultar al hacer clic fuera (documento)
                 document.addEventListener('click', (e) => {
                     if (!indicator.contains(e.target)) {
                         tooltip.classList.remove('active');
@@ -602,6 +602,16 @@ class MeriBotWidget {
                     tooltip.classList.remove('active');
                 });
             });
+            // --- NUEVO: cerrar tooltip al hacer clic en el panel de conversación ---
+            const chatPanel = document.getElementById('widgetPanel');
+            if (chatPanel) {
+                chatPanel.addEventListener('click', (e) => {
+                    // Si el clic NO es sobre un icono de fuente ni sobre la tarjeta
+                    if (!e.target.closest('.source-indicator') && !e.target.closest('.source-tooltip')) {
+                        document.querySelectorAll('.source-tooltip.active').forEach(t => t.classList.remove('active'));
+                    }
+                });
+            }
         }
     }
     
