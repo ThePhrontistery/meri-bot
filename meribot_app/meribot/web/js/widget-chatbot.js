@@ -34,7 +34,7 @@ class MeriBotWidget {
 
     async loadDomainsConfig() {
         try {
-            const response = await fetch('./config/domains.json');
+            const response = await fetch('http://localhost:8000/allowed-domains');
             if (!response.ok) throw new Error('Network response was not ok');
             const config = await response.json();
             this.availableDomains = (config.allowed_domains || []).map(domain => ({
@@ -147,7 +147,7 @@ class MeriBotWidget {
         
         // Luego cargar la configuración de dominios
         try {
-            const response = await fetch('./config/domains.json');
+            const response = await fetch('http://localhost:8000/allowed-domains');
             if (!response.ok) throw new Error('Network response was not ok');
             const config = await response.json();
             this.availableDomains = (config.allowed_domains || []).map(domain => ({
