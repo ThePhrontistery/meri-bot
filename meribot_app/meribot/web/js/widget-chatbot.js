@@ -158,6 +158,9 @@ class MeriBotWidget {
     }
     
     initializeWidget() {
+        // Inicializar referencias DOM primero
+        this.initializeDOMReferences();
+
         // Validar que tenemos todos los elementos necesarios
         if (!this.widgetTrigger || !this.widgetPanel) {
             console.error('Error: Elementos del widget no encontrados');
@@ -167,6 +170,9 @@ class MeriBotWidget {
         // Inicializar eventos y funcionalidad
         this.initializeBasicEvents();
         this.initializeFilterEvents();
+        
+        // Inicializar filtros
+        this.initializeFilters();
         
         // Agregar mensaje de bienvenida
         this.showWelcomeMessage();
@@ -290,11 +296,32 @@ class MeriBotWidget {
     }
     
     toggleFilterDropdown() {
-        this.initializeFilters(); // Asegura que siempre esté actualizado al abrir
         const dropdown = document.getElementById('filterDropdown');
         const filterButton = document.getElementById('filterButton');
-        dropdown.classList.toggle('active');
-        filterButton.classList.toggle('active');
+        
+        if (!dropdown || !filterButton) {
+            console.error('Error: Filter elements not found');
+            return;
+        }
+        
+        // Toggle del estado del dropdown y el botón
+        const isActive = dropdown.classList.contains('active');
+        
+        // Si no está activo, actualizar las opciones antes de mostrar
+        if (!isActive) {
+            this.initializeFilters();
+        }
+        
+        // Aplicar las clases después de la inicialización
+        if (isActive) {
+            dropdown.classList.remove('active');
+            filterButton.classList.remove('active');
+        } else {
+            dropdown.classList.add('active');
+            filterButton.classList.add('active');
+            // Forzar un reflow para asegurar que la animación funcione
+            dropdown.offsetHeight;
+        }
     }
     
     closeFilterDropdown() {
@@ -307,8 +334,10 @@ class MeriBotWidget {
     
     toggleDomainFilter(domainId) {
         const index = this.selectedDomains.indexOf(domainId);
+        const isSelected = index > -1;
         
-        if (index > -1) {
+        // Actualizar estado
+        if (isSelected) {
             // Quitar filtro
             this.selectedDomains.splice(index, 1);
         } else {
@@ -316,7 +345,13 @@ class MeriBotWidget {
             this.selectedDomains.push(domainId);
         }
         
-        this.updateFilterUI();
+        // Actualizar UI inmediatamente
+        const checkbox = document.querySelector(`.filter-checkbox[data-domain="${domainId}"]`);
+        if (checkbox) {
+            checkbox.classList.toggle('checked', !isSelected);
+            checkbox.textContent = !isSelected ? '✓' : '';
+        }
+        
         this.updateSelectedFiltersDisplay();
     }
     
@@ -674,33 +709,59 @@ class MeriBotWidget {
         }
     }
 
-    // Asegurarse de que initializeFilters esté correctamente definido dentro de la clase
+    // Actualizar las opciones de filtro
     initializeFilters() {
         const dropdown = document.getElementById('filterDropdown');
-        if (!dropdown) return;
+        if (!dropdown) {
+            console.error('Error: Filter dropdown not found');
+            return;
+        }
+        
+        // Si el dropdown está visible, no reinicializar
+        if (dropdown.classList.contains('active')) {
+            return;
+        }
+        
+        // Limpiar el contenido actual
         dropdown.innerHTML = '';
+        
+        // Verificar si hay dominios disponibles
+        if (!this.availableDomains || this.availableDomains.length === 0) {
+            console.warn('No hay dominios disponibles para mostrar');
+            dropdown.innerHTML = '<div class="filter-option">No hay dominios disponibles</div>';
+            return;
+        }
+        
+        // Crear las opciones de filtro para cada dominio
         this.availableDomains.forEach(domain => {
             const option = document.createElement('div');
             option.className = 'filter-option';
             option.setAttribute('data-domain-id', domain.id);
-            // Marcar como seleccionado si está en selectedDomains
-            if (this.selectedDomains.includes(domain.id)) {
-                option.classList.add('selected');
-            }
+            const isSelected = this.selectedDomains.includes(domain.id);
+            
             option.innerHTML = `
-                <div class="filter-option-content">
-                    <div class="filter-option-name">${domain.name}</div>
-                </div>
-                <div class="filter-checkbox${this.selectedDomains.includes(domain.id) ? ' checked' : ''}">
-                    <i class="fas fa-check" style="font-size: 10px;${this.selectedDomains.includes(domain.id) ? '' : 'display: none;'}"></i>
+                <span>${domain.name}</span>
+                <div class="filter-checkbox ${isSelected ? 'checked' : ''}" data-domain="${domain.id}">
+                    ${isSelected ? '✓' : ''}
                 </div>
             `;
-            option.addEventListener('click', (e) => {
+            
+            if (domain.description) {
+                option.title = domain.description;
+            }
+            
+            // Agregar evento de clic
+            const handleClick = (e) => {
                 e.stopPropagation();
-                this.toggleDomainFilter(domain.id);
-                // Volver a renderizar para reflejar el cambio visual inmediato
-                this.initializeFilters();
-            });
+                const checkbox = option.querySelector('.filter-checkbox');
+                const domainId = checkbox.dataset.domain;
+                this.toggleDomainFilter(domainId);
+            };
+            
+            // Remover evento anterior si existe
+            option.removeEventListener('click', handleClick);
+            option.addEventListener('click', handleClick);
+            
             dropdown.appendChild(option);
         });
     }
@@ -717,32 +778,30 @@ class MeriBotWidget {
             return;
         }
 
+        // Remover eventos anteriores si existen
+        const oldButton = this.filterButton.cloneNode(true);
+        this.filterButton.parentNode.replaceChild(oldButton, this.filterButton);
+        this.filterButton = oldButton;
+
         // Toggle del dropdown al hacer clic en el botón
         this.filterButton.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
-            
-            // Toggle del estado del dropdown
-            const isActive = filterDropdown.classList.contains('active');
-            filterDropdown.classList.toggle('active');
-            this.filterButton.classList.toggle('active');
-            
-            // Si estamos abriendo el dropdown, actualizamos las opciones
-            if (!isActive) {
-                this.initializeFilterOptions(filterDropdown);
-            }
+            this.toggleFilterDropdown();
         });
 
-        // Cerrar dropdown al hacer clic en cualquier parte fuera
-        document.addEventListener('click', (e) => {
-            const clickedElement = e.target;
-            if (!this.filterButton.contains(clickedElement) && !filterDropdown.contains(clickedElement)) {
-                filterDropdown.classList.remove('active');
-                this.filterButton.classList.remove('active');
+        // Cerrar dropdown al hacer clic fuera
+        const handleClickOutside = (e) => {
+            if (!this.filterButton.contains(e.target) && !filterDropdown.contains(e.target)) {
+                this.closeFilterDropdown();
             }
-        });
-
-        // Inicializar las opciones del filtro
+        };
+        
+        // Remover listener anterior si existe
+        document.removeEventListener('click', handleClickOutside);
+        document.addEventListener('click', handleClickOutside);
+        
+        // Inicializar las opciones del filtro una sola vez
         this.initializeFilterOptions(filterDropdown);
     }
 
@@ -773,24 +832,9 @@ class MeriBotWidget {
                 e.stopPropagation();
                 const checkbox = option.querySelector('.filter-checkbox');
                 const domainId = checkbox.dataset.domain;
-                const isCurrentlySelected = checkbox.classList.contains('checked');
-
-                if (isCurrentlySelected) {
-                    // Deseleccionar
-                    checkbox.classList.remove('checked');
-                    checkbox.textContent = '';
-                    this.selectedDomains = this.selectedDomains.filter(id => id !== domainId);
-                } else {
-                    // Seleccionar
-                    checkbox.classList.add('checked');
-                    checkbox.textContent = '✓';
-                    if (!this.selectedDomains.includes(domainId)) {
-                        this.selectedDomains.push(domainId);
-                    }
-                }
-
-                // Actualizar la visualización de los filtros seleccionados
-                this.updateFilterSelection();
+                
+                // Usar toggleDomainFilter para manejar toda la lógica de actualización
+                this.toggleDomainFilter(domainId);
             });
 
             filterDropdown.appendChild(option);
