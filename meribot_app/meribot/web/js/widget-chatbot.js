@@ -390,7 +390,15 @@ class MeriBotWidget {
             checkbox.textContent = !isSelected ? '✓' : '';
         }
         
+        // No cerrar el dropdown después de seleccionar
         this.updateSelectedFiltersDisplay();
+        // Mantener el estado del dropdown y botón
+        const dropdown = document.getElementById('filterDropdown');
+        const filterButton = document.getElementById('filterButton');
+        if (dropdown && filterButton) {
+            dropdown.classList.add('active');
+            filterButton.classList.add('active');
+        }
     }
     
     updateFilterUI() {
@@ -835,16 +843,27 @@ class MeriBotWidget {
             this.toggleFilterDropdown();
         });
 
-        // Cerrar dropdown al hacer clic fuera
-        const handleClickOutside = (e) => {
-            if (!this.filterButton.contains(e.target) && !filterDropdown.contains(e.target)) {
+        // Manejar clics en el panel del widget
+        const handlePanelClick = (e) => {
+            // Si el dropdown está activo y el clic no fue ni en el dropdown ni en el botón de filtro
+            if (filterDropdown.classList.contains('active') && 
+                !filterDropdown.contains(e.target) && 
+                !this.filterButton.contains(e.target)) {
                 this.closeFilterDropdown();
             }
         };
+
+        // Remover listener anterior si existe del panel del widget
+        const widgetPanel = document.getElementById('widgetPanel');
+        if (widgetPanel) {
+            widgetPanel.removeEventListener('click', handlePanelClick);
+            widgetPanel.addEventListener('click', handlePanelClick);
+        }
         
-        // Remover listener anterior si existe
-        document.removeEventListener('click', handleClickOutside);
-        document.addEventListener('click', handleClickOutside);
+        // Prevenir que los clics dentro del dropdown lo cierren
+        filterDropdown.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
         
         // Inicializar las opciones del filtro una sola vez
         this.initializeFilterOptions(filterDropdown);
@@ -872,13 +891,11 @@ class MeriBotWidget {
                 option.title = domain.description;
             }
 
-            // Evento de clic en la opción
+            // Evento de clic en la opción que dispara la selección del filtro
             option.addEventListener('click', (e) => {
                 e.stopPropagation();
                 const checkbox = option.querySelector('.filter-checkbox');
                 const domainId = checkbox.dataset.domain;
-                
-                // Usar toggleDomainFilter para manejar toda la lógica de actualización
                 this.toggleDomainFilter(domainId);
             });
 
