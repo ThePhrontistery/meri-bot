@@ -8,6 +8,12 @@ import json
 import re
 from urllib.parse import urlparse
 
+# Importar los comandos db desde db_commands.py
+try:
+    from . import db_commands  # Para ejecución como módulo
+except ImportError:
+    import db_commands         # Para ejecución como script
+
 @click.group()
 def cli():
     """MeriBot CLI - Herramienta de administración para el chatbot empresarial."""
@@ -249,6 +255,9 @@ def db(reset: bool):
         click.echo("Reiniciando base de datos...")
     else:
         click.echo("Estado de la base de datos: OK")
+
+# Registrar el grupo de comandos db de db_commands.py
+cli.add_command(db_commands.db)
 
 if __name__ == '__main__':
     cli()
