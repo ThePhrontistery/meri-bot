@@ -1,41 +1,35 @@
 """
 chatengine.py
-Coordinador principal del CORE de MeriBot. Orquesta plugins, vector search, caché y LLM.
+Coordinador principal del CORE de MeriBot. Orquesta plugins, vector search y LLM.
 Proporciona una interfaz asíncrona y extensible para la API y otros módulos.
-@author: MeriBot Team
 """
+
 from typing import Any, Dict, List, Optional, AsyncGenerator
-from meribot.core.plugin_manager import PluginManager
-from meribot.core.vector_search import VectorSearch
-from meribot.core.cache import ResponseCache
-from meribot.core.llm_engine import LLMEngine
+from meribot.core.plugins.plugin_manager import PluginManager
+from meribot.core.db.vector_search import VectorSearch
+ 
+from meribot.core.llm.llm_engine import LLMEngine
 from meribot.core.conversation import ConversationManager
 from meribot.core.logging import log_generation_failure
-from meribot.core.validation import validate_chat_engine_input
-import os
+from meribot.core.validation import ChatEngineRequest
 
-TEMPLATE_PATH = os.path.join(os.path.dirname(__file__), 'templates', 'system_prompt.txt')
-
-def load_system_prompt():
-    with open(TEMPLATE_PATH, 'r', encoding='utf-8') as f:
-        return f.read()
+# Importar la función utilitaria desde utils
+from meribot.utils.utils import load_system_prompt
 
 class ChatEngine:
     """
     Punto de entrada principal del CORE. Gestiona el flujo conversacional,
-    orquesta plugins, vector search, caché y LLM, y expone una API asíncrona.
+    orquesta plugins, búsqueda vectorial y LLM, y expone una API asíncrona.
     """
     def __init__(
         self,
         plugin_manager: Optional[PluginManager] = None,
         vector_search: Optional[VectorSearch] = None,
-        cache: Optional[ResponseCache] = None,
         llm_engine: Optional[LLMEngine] = None,
         conversation_manager: Optional[ConversationManager] = None,
     ):
         self.plugin_manager = plugin_manager or PluginManager()
         self.vector_search = vector_search or VectorSearch()
-        self.cache = cache or ResponseCache()
         self.llm_engine = llm_engine or LLMEngine()
         self.conversation_manager = conversation_manager or ConversationManager()
 
@@ -49,9 +43,9 @@ class ChatEngine:
         Procesa un mensaje de usuario y retorna la respuesta generada, citaciones y metadatos.
         Flujo: validación -> obtención de contexto -> búsqueda vectorial -> LLM -> actualización de historial.
         """
-        # 1. Validar datos de entrada
+    # Validar datos de entrada
         try:
-            validated_input = validate_chat_engine_input(
+            validated_input = ChatEngineRequest(
                 conversation_id=conversation_id,
                 message=message,
                 domains=domains
@@ -59,7 +53,7 @@ class ChatEngine:
             conversation_id = validated_input.conversation_id
             message = validated_input.message
             domains = validated_input.domains
-        except ValueError as e:
+        except Exception as e:
             return {
                 "type": "validation_error",
                 "response": f"Error de validación: {str(e)}",
@@ -68,24 +62,28 @@ class ChatEngine:
                 "error": str(e)
             }
 
-        # 2. Obtener contexto de la conversación
+    # Obtener contexto de la conversación
         session = self.conversation_manager.get_or_create_session(conversation_id)
         conversation_history = session.get_history()
 
-        # 3. Buscar en la base vectorial (usando todos los dominios recibidos)
+    # Buscar en la base vectorial
         relevant_chunks = self.vector_search.search(message, domains=domains)
-        citations = [chunk["metadatas"]["url"] for chunk in relevant_chunks] if relevant_chunks else []
-        # Eliminar duplicados manteniendo el orden
-        print("-------------------------")
-        print("citations antes: ", citations)
+        citations = []
         seen = set()
-        citations = [x for x in citations if not (x in seen or seen.add(x))]
+        if relevant_chunks:
+            for chunk in relevant_chunks:
+                meta = chunk.get("metadatas", {})
+                title = meta.get("title")
+                url = meta.get("url")
+                key = (title, url)
+                if key not in seen:
+                    seen.add(key)
+                    citations.append({"title": title, "url": url})
         vector_db_texts = [chunk.get("document") for chunk in relevant_chunks] if relevant_chunks else []
 
-        print("-------------------------")
-        print("citations después: ", citations)
+    # ...
 
-        # 4. Preparar metadatos para el LLM
+    # Preparar metadatos para el LLM
         llm_metadata = {}
         if citations:
             llm_metadata["citar_fuentes"] = True
@@ -94,27 +92,14 @@ class ChatEngine:
                 if "metadata" in chunk:
                     llm_metadata.update(chunk["metadata"])
 
-        # 5. Preparar argumentos para el LLM
+    # Preparar argumentos para el LLM
         system_prompt = load_system_prompt()
         user_prompt = message
 
-        #CORETEAM
-        print("*********************************")
-        print("* ARGUMENTOS DE ACCESO A LLM    *")
-        print("*********************************")
-        print("system_prompt:", system_prompt)
-        print("--------------------------------")
-        print("conversation_history:", conversation_history)
-        print("--------------------------------")
-        print("user_prompt:", user_prompt)
-        print("--------------------------------")
-        print("vector_db_texts:", vector_db_texts)
-        print("--------------------------------")
-        print("llm_metadata:", llm_metadata)
-        print("--------------------------------")
+    # ...
 
 
-        # 6. Llamar al LLM para generar la respuesta
+    # Llamar al LLM para generar la respuesta
         try:
             response = await self.llm_engine.generate_response(
                 system_prompt=system_prompt,
@@ -127,15 +112,12 @@ class ChatEngine:
             log_generation_failure(conversation_id, message, str(e))
             response = "[Error al generar respuesta]"
 
-        # 7. Actualizar historial de la conversación
+    # Actualizar historial de la conversación
         session.add_message("user", message)
         session.add_message("assistant", response)
-        print("--------------------------------")
-        conversation_history = session.get_history()
-        print("conversation_history:", conversation_history)
-        print("--------------------------------")
+    # ...
 
-        # 8. Retornar respuesta y citaciones
+    # Retornar respuesta y citaciones
         return {
             "type": "llm",
             "response": response,
@@ -156,7 +138,7 @@ class ChatEngine:
         """
         # 1. Validar datos de entrada
         try:
-            validated_input = validate_chat_engine_input(
+            validated_input = ChatEngineRequest(
                 conversation_id=conversation_id,
                 message=message,
                 domains=domains
@@ -164,7 +146,7 @@ class ChatEngine:
             conversation_id = validated_input.conversation_id
             message = validated_input.message
             domains = validated_input.domains
-        except ValueError as e:
+        except Exception as e:
             yield f"[Error de validación: {str(e)}]"
             return
 
@@ -174,12 +156,19 @@ class ChatEngine:
 
         # 3. Buscar en la base vectorial (usando todos los dominios recibidos)
         relevant_chunks = self.vector_search.search(message, domains=domains)
+        citations = []
+        seen = set()
+        if relevant_chunks:
+            for chunk in relevant_chunks:
+                meta = chunk.get("metadatas", {})
+                title = meta.get("title")
+                url = meta.get("url")
+                key = (title, url)
+                if key not in seen:
+                    seen.add(key)
+                    citations.append({"title": title, "url": url})
         vector_db_texts = [chunk.get("document") for chunk in relevant_chunks] if relevant_chunks else []
         llm_metadata = {}
-        citations = [chunk["metadatas"]["url"] for chunk in relevant_chunks] if relevant_chunks else []
-        # Eliminar duplicados manteniendo el orden
-        seen = set()
-        citations = [x for x in citations if not (x in seen or seen.add(x))]
         if citations:
             llm_metadata["citar_fuentes"] = True
         if relevant_chunks:
