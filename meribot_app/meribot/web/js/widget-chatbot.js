@@ -182,7 +182,7 @@ class MeriBotWidget {
     }
 
     initializeBasicEvents() {
-        if (!this.widgetTrigger || !this.widgetPanel || !this.panelCloseButton || !this.panelOverlay) {
+        if (!this.widgetTrigger || !this.widgetPanel || !this.panelCloseButton || !this.panelOverlay || !this.messageInput || !this.sendButton) {
             console.error('Error: No se pudieron encontrar elementos básicos del DOM');
             return;
         }
@@ -205,6 +205,25 @@ class MeriBotWidget {
         // Prevenir que los clics dentro del panel lo cierren
         this.widgetPanel.addEventListener('click', (e) => {
             e.stopPropagation();
+        });
+
+        // Evento para enviar mensaje con el botón
+        this.sendButton.addEventListener('click', () => {
+            this.sendMessage();
+        });
+
+        // Evento para enviar mensaje con Enter (pero nueva línea con Shift+Enter)
+        this.messageInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                this.sendMessage();
+            }
+        });
+
+        // Auto-ajustar altura del textarea
+        this.messageInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
         });
     }
 
@@ -269,7 +288,7 @@ class MeriBotWidget {
     }
     
     initializeBasicEvents() {
-        if (!this.widgetTrigger || !this.widgetPanel || !this.panelCloseButton || !this.panelOverlay) {
+        if (!this.widgetTrigger || !this.widgetPanel || !this.panelCloseButton || !this.panelOverlay || !this.messageInput || !this.sendButton) {
             console.error('Error: No se pudieron encontrar elementos básicos del DOM');
             return;
         }
@@ -292,6 +311,25 @@ class MeriBotWidget {
         // Prevenir que los clics dentro del panel lo cierren
         this.widgetPanel.addEventListener('click', (e) => {
             e.stopPropagation();
+        });
+
+        // Evento para enviar mensaje con el botón
+        this.sendButton.addEventListener('click', () => {
+            this.sendMessage();
+        });
+
+        // Evento para enviar mensaje con Enter (pero nueva línea con Shift+Enter)
+        this.messageInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                this.sendMessage();
+            }
+        });
+
+        // Auto-ajustar altura del textarea
+        this.messageInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
         });
     }
     
