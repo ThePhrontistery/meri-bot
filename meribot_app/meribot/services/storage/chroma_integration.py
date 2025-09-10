@@ -128,14 +128,13 @@ def upsert_chunks_to_chroma(
         
         vectorstore, _ = get_chroma_collection_and_client(collection_name, persist_dir=persist_dir)
         print(f"[DEBUG] Upserting {len(chunks)} chunks en ChromaDB usando LangChain...")
-        
+    # ...existing code...
         # LangChain se encarga de generar los embeddings automáticamente
         vectorstore.add_texts(
             texts=chunks,
             metadatas=metadatas,
             ids=ids
         )
-        
         # Persistir cambios
         vectorstore.persist()
         

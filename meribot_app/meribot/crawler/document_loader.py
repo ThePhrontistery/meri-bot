@@ -32,7 +32,7 @@ SPLITTER_CHUNK_SIZE_DOC = 2000
 SPLITTER_CHUNK_OVERLAP_DOC = 50
 
 # Ruta por defecto para la base de datos de hashes (puedes cambiarla)
-HASH_DB_PATH = os.getenv('HASH_DB_PATH', 'hash_db.json')
+HASH_DB_PATH = os.getenv('HASH_DB_PATH', './chroma_data/hash_db.json')
 # Ejemplo de función para procesar y clasificar chunks según hash
 def process_and_classify_chunks(chunks: list, metadata_list: list, hash_db_path: str = HASH_DB_PATH):
     """
@@ -361,19 +361,35 @@ def parse_document(path: str, url: str = None) -> dict:
     :param url: url original del documento (opcional)
     :return: dict con 'text', 'metadata' o 'error'
     """
+    import re
+    def is_full_url(u):
+        # Considera como URL válida si empieza por http(s) o ftp
+        return isinstance(u, str) and re.match(r'^(https?|ftp)://', u)
+
+    # Si la url no es una URL completa, déjalo explícito en los metadatos
+    url_origen = url if is_full_url(url) else None
+    if url_origen is None and url:
+        url_origen = f"NO_URL_ORIGINAL: {url}"
+
     ext = os.path.splitext(path)[1].lower()
-    if ext in [".html", ".htm"]:
+    if ext in [".html", ".htm"] or ext == '':
         try:
             with open(path, encoding="utf-8") as f:
                 content = f.read()
-            return parse_html(content, url=url)
+            # Si no tiene extensión, comprobar si es HTML por contenido
+            if ext in [".html", ".htm"] or content.lstrip().lower().startswith('<!doctype html') or content.lstrip().lower().startswith('<html'):
+                result = parse_html(content, url=url_origen)
+                return result
         except Exception as e:
             return {"error": str(e), "text": None, "metadata": None}
-    elif ext == ".docx":
-        return parse_docx(path, url=url)
+        # Si no es HTML, seguir con el flujo normal
+        if ext == '':
+            return {"error": f"Formato no soportado: {ext}", "text": None, "metadata": None}
+    if ext == ".docx":
+        return parse_docx(path, url=url_origen)
     elif ext == ".xlsx":
-        return parse_xlsx(path, url=url)
+        return parse_xlsx(path, url=url_origen)
     elif ext == ".pdf":
-        return parse_pdf(path, url=url)
+        return parse_pdf(path, url=url_origen)
     else:
         return {"error": f"Formato no soportado: {ext}", "text": None, "metadata": None}

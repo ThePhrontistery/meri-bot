@@ -30,27 +30,40 @@ class WebScraper:
 
     def save_html(self, url, html):
         """
-        Guarda el HTML de la página en la ruta local correspondiente.
+        Guarda el HTML de la página en la ruta local correspondiente y la URL de origen en un archivo .url.
         """
         local_path = self._get_local_path(url, "html")
+        url_path = local_path + ".url"
         try:
             with open(local_path, "w", encoding="utf-8") as f:
                 f.write(html)
-            self.logger.info(f"[GUARDADO HTML] {local_path}")
+            # Guardar la URL de origen en un archivo .url junto al HTML
+            with open(url_path, "w", encoding="utf-8") as f_url:
+                f_url.write(url)
+            self.logger.info(f"[GUARDADO HTML] {local_path} y {url_path}")
         except Exception as e:
-            self.logger.error(f"Error guardando HTML {local_path}: {e}")
+            self.logger.error(f"Error guardando HTML {local_path} o .url: {e}")
 
     def download_file(self, url):
         """
         Descarga un archivo adjunto y lo guarda en la ruta local correspondiente.
+        Además, guarda la URL de origen en un archivo .url junto al documento, incluso si el archivo ya existe.
         """
         local_path = self._get_local_path(url, url.split(".")[-1].lower())
+        url_path = local_path + ".url"
         try:
-            resp = requests.get(url, headers={"User-Agent": self.user_agent}, timeout=20, verify=False)
-            resp.raise_for_status()
-            with open(local_path, "wb") as f:
-                f.write(resp.content)
-            self.logger.info(f"[DESCARGADO] {local_path}")
+            # Guardar la URL de origen en un archivo .url junto al documento SIEMPRE
+            with open(url_path, "w", encoding="utf-8") as f_url:
+                f_url.write(url)
+            # Descargar el archivo solo si no existe
+            if not os.path.exists(local_path):
+                resp = requests.get(url, headers={"User-Agent": self.user_agent}, timeout=20, verify=False)
+                resp.raise_for_status()
+                with open(local_path, "wb") as f:
+                    f.write(resp.content)
+                self.logger.info(f"[DESCARGADO] {local_path} (origen: {url})")
+            else:
+                self.logger.info(f"[YA EXISTE] {local_path} (origen: {url}) - Solo se actualizó el .url")
         except Exception as e:
             self.logger.error(f"Error descargando archivo {url}: {e}")
     """
