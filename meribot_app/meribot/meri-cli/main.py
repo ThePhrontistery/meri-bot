@@ -189,19 +189,24 @@ def scrape(url: Optional[str], output: Optional[str], pdf_url: Optional[str]):
         domain = config.get('allowed_domains', ['default'])[0]
         output = os.path.join(output_dir, domain)
     click.echo(f"Iniciando scraping de {url}...")
-    import requests
+    from meribot.crawler.scraper import WebScraper
     from bs4 import BeautifulSoup
-    from urllib.parse import urljoin, urlparse
+    from urllib.parse import urljoin
     os.makedirs(output, exist_ok=True)
+    # Instanciar WebScraper con config mínima
+    config = {
+        'output_dir': output,
+        'allowed_domains': [url.split('/')[2]] if url else [],
+        'file_types': ['pdf', 'docx', 'xlsx', 'html'],
+        'max_depth': 0
+    }
+    scraper = WebScraper(config)
     # Descargar HTML principal
     html_path = None
     if url:
         try:
-            resp = requests.get(url, timeout=10, verify=False)
-            resp.raise_for_status()
-            html_path = os.path.join(output, "index.html")
-            with open(html_path, "w", encoding=resp.encoding or "utf-8") as f:
-                f.write(resp.text)
+            scraper.save_html(url, requests.get(url, timeout=10, verify=False).text)
+            html_path = scraper._get_local_path(url, "html")
             click.echo(f"[SUCCESS] HTML guardado en {html_path}")
         except Exception as e:
             click.echo(f"[ERROR] Falló la descarga HTML: {e}")
@@ -220,13 +225,8 @@ def scrape(url: Optional[str], output: Optional[str], pdf_url: Optional[str]):
                 click.echo("[INFO] No se encontraron enlaces a PDFs en el HTML.")
             for pdf_url in pdf_links:
                 try:
-                    pdf_resp = requests.get(pdf_url, timeout=20, verify=False)
-                    pdf_resp.raise_for_status()
-                    pdf_name = os.path.basename(urlparse(pdf_url).path)
-                    out_path = os.path.join(output, pdf_name)
-                    with open(out_path, "wb") as f:
-                        f.write(pdf_resp.content)
-                    click.echo(f"[SUCCESS] PDF guardado en {out_path}")
+                    scraper.download_file(pdf_url)
+                    click.echo(f"[SUCCESS] PDF descargado y .url generado para {pdf_url}")
                 except Exception as e:
                     click.echo(f"[ERROR] Falló la descarga PDF {pdf_url}: {e}")
         except Exception as e:
@@ -235,12 +235,8 @@ def scrape(url: Optional[str], output: Optional[str], pdf_url: Optional[str]):
     # Descargar PDF manual si se proporciona
     if pdf_url:
         try:
-            resp = requests.get(pdf_url, timeout=20, verify=False)
-            resp.raise_for_status()
-            out_path = os.path.join(output, "document.pdf")
-            with open(out_path, "wb") as f:
-                f.write(resp.content)
-            click.echo(f"[SUCCESS] PDF guardado en {out_path}")
+            scraper.download_file(pdf_url)
+            click.echo(f"[SUCCESS] PDF descargado y .url generado para {pdf_url}")
         except Exception as e:
             click.echo(f"[ERROR] Falló la descarga PDF: {e}")
 
