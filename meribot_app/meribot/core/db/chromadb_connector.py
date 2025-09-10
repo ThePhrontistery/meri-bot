@@ -1,24 +1,21 @@
-
 import os
 from typing import Optional
 from langchain_chroma import Chroma
 from langchain_openai import AzureOpenAIEmbeddings
-
-
 
 class ChromaDBConnector:
     """
     Gestiona la conexión con ChromaDB y Azure OpenAI Embeddings.
     """
     def __init__(self, persist_directory: Optional[str] = None, collection_name: Optional[str] = None):
-        # Inicialización de parámetros
-        self.persist_directory = persist_directory or os.path.join(os.path.dirname(__file__), '../../chroma_data')
+        # Siempre recoger persist_directory desde la variable de entorno
+        env_persist_dir = os.getenv('CHROMA_PERSIST_DIRECTORY')
+        self.persist_directory = env_persist_dir or 'chroma_data'
         self.collection_name = collection_name or os.getenv('CHROMA_COLLECTION_NAME')
         self.openai_api_key = os.getenv('AZURE_OPENAI_API_KEY')
         self.openai_endpoint = os.getenv('AZURE_OPENAI_ENDPOINT')
         self.openai_deployment = os.getenv('AZURE_OPENAI_EMBEDDINGS_DEPLOYMENT')
         self.openai_api_version = os.getenv('AZURE_OPENAI_API_VERSION')
-        # Embeddings y store
         self.embeddings = AzureOpenAIEmbeddings(
             azure_deployment=self.openai_deployment,
             api_version=self.openai_api_version,
@@ -60,24 +57,3 @@ class ChromaDBConnector:
                 'metadatas': meta
             })
         return hits[:top_k]
-
-
-class VectorSearch:
-    """
-    Implementa VectorSearch usando Azure OpenAI y ChromaDB.
-    """
-    def __init__(self, collection_name: str = None, chroma_connector: 'ChromaDBConnector' = None):
-        self.collection_name = collection_name or os.getenv('CHROMA_COLLECTION_NAME')
-        self.chroma_connector = chroma_connector or ChromaDBConnector(collection_name=self.collection_name)
-
-    def search(self, message, domains=None, metadata=None, top_k=5):
-        """
-        Búsqueda por similitud textual.
-        """
-        return self.chroma_connector.similarity_search(
-            query_text=message,
-            top_k=top_k,
-            where=metadata,
-            domains=domains
-        )
-
