@@ -476,7 +476,7 @@ class MeriBotWidget {
                         data-source='${JSON.stringify(source)}' 
                         title="Ver fuente de información"
                         aria-label="Ver fuente de información"
-                        style="position: absolute; bottom: 8px; right: ${8 + idx * 28}px; z-index: 10;">
+                        style="position: absolute; bottom: 8px; right: ${8 + idx * 28}px; z-index: 10; cursor: pointer;">
                         <i class="fas fa-link"></i>
                         <div class="source-tooltip">
                             <div class="source-tooltip-title">
@@ -485,7 +485,7 @@ class MeriBotWidget {
                             <div class="source-tooltip-subtitle">
                                 ${source.title || ''}
                             </div>
-                            <a href="${url}" target="_blank" class="source-tooltip-link">
+                            <a href="${url}" target="_blank" class="source-tooltip-link" title="${url}">
                                 ${linkText} <i class="fas fa-external-link-alt"></i>
                             </a>
                         </div>
@@ -504,7 +504,7 @@ class MeriBotWidget {
                     data-source='${JSON.stringify(sources)}' 
                     title="Ver fuente de información"
                     aria-label="Ver fuente de información"
-                    style="position: absolute; bottom: 8px; right: 8px; z-index: 10;">
+                    style="position: absolute; bottom: 8px; right: 8px; z-index: 10; cursor: pointer;">
                     <i class="fas fa-link"></i>
                     <div class="source-tooltip">
                         <div class="source-tooltip-title">
@@ -513,7 +513,7 @@ class MeriBotWidget {
                         <div class="source-tooltip-subtitle">
                             ${sources.title || ''}
                         </div>
-                        <a href="${url}" target="_blank" class="source-tooltip-link">
+                        <a href="${url}" target="_blank" class="source-tooltip-link" title="${url}">
                             ${linkText} <i class="fas fa-external-link-alt"></i>
                         </a>
                     </div>
@@ -571,14 +571,48 @@ class MeriBotWidget {
         setTimeout(() => {
             messageDiv.style.opacity = '1';
             messageDiv.style.transform = 'translateY(0)';
-            this.scrollToBottom();
         }, 50);
         messageDiv.style.transform = 'translateY(20px)';
         setTimeout(() => {
-            messageDiv.style.opacity = '1';
-            messageDiv.style.transform = 'translateY(0)';
-            messageDiv.style.transition = 'all 0.3s ease';
+            this.scrollToBottom();
         }, 50);
+
+        // --- NUEVO: eventos para mostrar/ocultar tooltip de fuente ---
+        if (sender === 'bot' && sources && Array.isArray(sources) && sources.length > 0) {
+            const indicators = messageDiv.querySelectorAll('.source-indicator');
+            indicators.forEach(indicator => {
+                const tooltip = indicator.querySelector('.source-tooltip');
+                // Mostrar al hacer clic
+                indicator.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    // Cerrar otros tooltips abiertos
+                    document.querySelectorAll('.source-tooltip.active').forEach(t => {
+                        if (t !== tooltip) t.classList.remove('active');
+                    });
+                    tooltip.classList.toggle('active');
+                });
+                // Ocultar al hacer clic fuera (documento)
+                document.addEventListener('click', (e) => {
+                    if (!indicator.contains(e.target)) {
+                        tooltip.classList.remove('active');
+                    }
+                });
+                // Opcional: ocultar al perder foco
+                indicator.addEventListener('blur', () => {
+                    tooltip.classList.remove('active');
+                });
+            });
+            // --- NUEVO: cerrar tooltip al hacer clic en el panel de conversación ---
+            const chatPanel = document.getElementById('widgetPanel');
+            if (chatPanel) {
+                chatPanel.addEventListener('click', (e) => {
+                    // Si el clic NO es sobre un icono de fuente ni sobre la tarjeta
+                    if (!e.target.closest('.source-indicator') && !e.target.closest('.source-tooltip')) {
+                        document.querySelectorAll('.source-tooltip.active').forEach(t => t.classList.remove('active'));
+                    }
+                });
+            }
+        }
     }
     
     showTypingIndicator() {
