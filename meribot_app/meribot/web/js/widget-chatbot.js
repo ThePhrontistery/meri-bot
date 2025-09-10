@@ -861,10 +861,7 @@ class MeriBotWidget {
         this.initializeDOMReferences();
         
         // Solo continuar si las referencias DOM son válidas
-        if (this.widgetTrigger && this.widgetPanel && this.panelOverlay) {
-            this.initialize();
-            this.loadDomainsConfig();
-        } else {
+        if (!(this.widgetTrigger && this.widgetPanel && this.panelOverlay)) {
             console.error('Error: No se pudieron encontrar elementos DOM requeridos');
         }
     }
