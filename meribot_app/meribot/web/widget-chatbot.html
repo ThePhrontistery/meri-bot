@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Widget MeriBot</title>
+    
+    <!-- Font Awesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    
+    <!-- Estilos propios -->
+    <link rel="stylesheet" href="./css/widget-chatbot.css">
+    
+    <!-- Marked.js para procesar Markdown -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+    <!-- Main content con Hero de CCA -->
+    <main style="padding: 50px 6%; display: flex; flex-direction: column; row-gap: 250px; background-image: url('./img/CCA_Hero.png'); background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: fixed; flex: 1; min-width: 900px; position: relative; min-height: 100vh;">
+        
+        <!-- Overlay para mejorar legibilidad -->
+        <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255, 255, 255, 0.1); z-index: 1;"></div>
+        
+        <!-- Contenido con z-index superior -->
+        <div style="position: relative; z-index: 2; display: flex; flex-direction: column; row-gap: 250px; align-items: center; justify-content: center; height: 100%;">
+        
+        </div>
+    </main>
+
+    <!-- Widget MeriBot -->
+    <div class="meribot-widget">
+        <!-- Panel del chat -->
+        <div class="widget-panel" id="widgetPanel">
+            <!-- Botón de cierre -->
+            <button class="panel-close-button" id="panelCloseButton">
+                <i class="fas fa-times"></i>
+            </button>
+            
+            <!-- Header -->
+            <div class="widget-header">
+                <div class="avatar"></div>
+                <div class="info">
+                    <h3>MeriBot</h3>
+                    <p>Asistente virtual CCA • <span class="status-indicator"></span> En línea</p>
+                </div>
+            </div>
+            
+            <!-- Contenedor del chat -->
+            <div class="chat-container">
+                <!-- Mensajes -->
+                <div class="chat-messages" id="chatMessages">
+                    <!-- Los mensajes se cargan dinámicamente -->
+                </div>
+                
+                <!-- Indicador de escritura -->
+                <div class="typing-indicator" id="typingIndicator">
+                    <div class="avatar-small" style="background: var(--capgemini-white); background-image: url('./img/Icono_Widget.png'); background-size: 80%; background-repeat: no-repeat; background-position: center; border: 2px solid var(--capgemini-vibrant-blue);"></div>
+                    <div>
+                        <div class="typing-dots">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Input de mensaje -->
+            <div class="chat-input">
+                <div class="input-container">
+                    <!-- Fila superior con filtro, input y botón enviar -->
+                    <div class="input-top-row">
+                        <!-- Botón de filtro -->
+                        <div class="filter-button" id="filterButton">
+                            <i class="fas fa-filter"></i>
+                        </div>
+                        <!-- Dropdown de filtros -->
+                        <div class="filter-dropdown" id="filterDropdown">
+                            <!-- Las opciones se cargan dinámicamente -->
+                        </div>
+                        
+                        <!-- Wrapper del input -->
+                        <div class="input-wrapper">
+                            <!-- Input de texto -->
+                            <textarea id="messageInput" rows="2" placeholder="Escribe tu pregunta..." style="resize: none;"></textarea>
+                        </div>
+                        
+                        <!-- Botón de envío -->
+                        <button class="send-button" id="sendButton">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- Filtros seleccionados (aparecen abajo cuando hay alguno) -->
+                    <div class="selected-filters" id="selectedFilters"></div>
+                </div>
+            </div>
+            
+            <!-- Disclaimer footer -->
+            <div class="disclaimer-footer">
+                <span class="meribot-name">MeriBot</span> podría generar respuestas incorrectas. Te recomendamos verificar la información antes de usarla.
+            </div>
+        </div>
+        
+        <!-- Botón flotante trigger -->
+        <button class="widget-trigger" id="widgetTrigger" aria-label="Abrir chat de MeriBot">
+            <div class="widget-icon"></div>
+            <span class="widget-text">Pregunta a Meribot</span>
+            <div class="notification-badge"></div>
+        </button>
+    </div>
+
+    <!-- Overlay para cuando el panel esté centrado -->
+    <div class="panel-overlay" id="panelOverlay"></div>
+
+    <!-- Script principal -->
+    <script src="./js/widget-chatbot.js"></script>
+    <!-- Instancia automática: NO agregar new MeriBotWidget() aquí, ya lo hace el JS -->
+</body>
+</html>
