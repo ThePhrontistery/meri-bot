@@ -485,7 +485,7 @@ class MeriBotWidget {
                             <div class="source-tooltip-subtitle">
                                 ${source.title || ''}
                             </div>
-                            <a href="${url}" target="_blank" class="source-tooltip-link">
+                            <a href="${url}" target="_blank" class="source-tooltip-link" title="${url}">
                                 ${linkText} <i class="fas fa-external-link-alt"></i>
                             </a>
                         </div>
@@ -513,7 +513,7 @@ class MeriBotWidget {
                         <div class="source-tooltip-subtitle">
                             ${sources.title || ''}
                         </div>
-                        <a href="${url}" target="_blank" class="source-tooltip-link">
+                        <a href="${url}" target="_blank" class="source-tooltip-link" title="${url}">
                             ${linkText} <i class="fas fa-external-link-alt"></i>
                         </a>
                     </div>

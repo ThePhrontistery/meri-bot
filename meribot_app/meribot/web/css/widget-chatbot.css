@@ -80,6 +80,9 @@
     background: transparent !important;
     line-height: 1.4 !important;
     white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 220px !important;
 }
 
 .source-tooltip-link:hover {
