@@ -669,6 +669,16 @@ class MeriBotWidget {
         this.selectedDomains = [];
         this.updateFilterUI && this.updateFilterUI();
         this.updateSelectedFiltersDisplay && this.updateSelectedFiltersDisplay();
+        // Cerrar el dropdown de filtros si está abierto y reinicializar
+        const filterDropdown = document.getElementById('filterDropdown');
+        const filterButton = document.getElementById('filterButton');
+        if (filterDropdown && filterDropdown.classList.contains('active')) {
+            filterDropdown.classList.remove('active');
+        }
+        if (filterButton && filterButton.classList.contains('active')) {
+            filterButton.classList.remove('active');
+        }
+        this.initializeFilters && this.initializeFilters();
         setTimeout(() => {
             if (this.panelOverlay) this.panelOverlay.style.display = 'none';
         }, 300);
