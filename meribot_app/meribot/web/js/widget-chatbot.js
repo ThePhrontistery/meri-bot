@@ -741,6 +741,13 @@ class MeriBotWidget {
             this.widgetTrigger.classList.remove('active');
             this.widgetPanel.classList.remove('active');
             this.panelOverlay.classList.remove('active');
+            
+            // Limpiar el textarea y reajustar su altura
+            if (this.messageInput) {
+                this.messageInput.value = '';
+                this.messageInput.style.height = '';
+            }
+            
             setTimeout(() => {
                 this.panelOverlay.style.display = 'none';
             }, 300);
