@@ -174,9 +174,6 @@ class MeriBotWidget {
         // Inicializar filtros
         this.initializeFilters();
         
-        // Agregar mensaje de bienvenida
-        this.showWelcomeMessage();
-        
         // Hacer visible el widget trigger después de la inicialización
         this.widgetTrigger.style.opacity = '1';
     }
@@ -187,8 +184,14 @@ class MeriBotWidget {
             return;
         }
 
-        // Evento para abrir el panel
-        this.widgetTrigger.addEventListener('click', () => this.openPanel());
+        // Evento para toggle del panel
+        this.widgetTrigger.addEventListener('click', () => {
+            if (this.isOpen) {
+                this.closePanel();
+            } else {
+                this.openPanel();
+            }
+        });
 
         // Evento para cerrar el panel con el botón
         this.panelCloseButton.addEventListener('click', (e) => {
@@ -293,8 +296,14 @@ class MeriBotWidget {
             return;
         }
 
-        // Evento para abrir el panel
-        this.widgetTrigger.addEventListener('click', () => this.openPanel());
+        // Evento para toggle del panel
+        this.widgetTrigger.addEventListener('click', () => {
+            if (this.isOpen) {
+                this.closePanel();
+            } else {
+                this.openPanel();
+            }
+        });
 
         // Evento para cerrar el panel con el botón
         this.panelCloseButton.addEventListener('click', (e) => {
@@ -715,7 +724,6 @@ class MeriBotWidget {
             
             setTimeout(() => {
                 this.messageInput.focus();
-                this.showWelcomeMessage();
             }, 300);
         } else {
             this.closePanel();
@@ -730,7 +738,12 @@ class MeriBotWidget {
             this.initializeFilters();
             
             this.resetConversation(); // Reinicia el contenido del chat cada vez que se abre
-            this.widgetTrigger.classList.add('active'); // Añadir clase active al botón
+            
+            // Actualizar el botón flotante
+            this.widgetTrigger.classList.add('active');
+            this.widgetTrigger.querySelector('.widget-text').textContent = 'Cerrar chat';
+            this.widgetTrigger.setAttribute('aria-label', 'Cerrar chat de MeriBot');
+            
             this.widgetPanel.classList.add('active');
             this.panelOverlay.style.display = 'block';
             
@@ -746,7 +759,12 @@ class MeriBotWidget {
     closePanel() {
         if (this.isOpen && this.widgetPanel && this.panelOverlay) {
             this.isOpen = false;
+            
+            // Restaurar el botón flotante
             this.widgetTrigger.classList.remove('active');
+            this.widgetTrigger.querySelector('.widget-text').textContent = 'Pregunta a Meribot';
+            this.widgetTrigger.setAttribute('aria-label', 'Abrir chat de MeriBot');
+            
             this.widgetPanel.classList.remove('active');
             this.panelOverlay.classList.remove('active');
             
