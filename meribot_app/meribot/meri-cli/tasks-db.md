@@ -15,7 +15,7 @@
   - [x] 1.2 Registrar el subcomando `db` en `main.py` usando el framework CLI existente (por ejemplo, Click, Typer, argparse)
 - [ ] 2.0 Implementar la opción `list` para mostrar documentos almacenados y sus filtros, usando funciones públicas existentes
   - [x] 2.1 Implementar la función `list` en `db_commands.py` que obtenga y muestre la lista de documentos
-  - [ ] 2.2 Añadir soporte para filtros solo si están disponibles en las interfaces públicas del core
+  - [x] 2.2 Añadir soporte para filtros solo si están disponibles en las interfaces públicas del core
   - [ ] 2.3 Mostrar los chunks asociados si la opción es soportada
 - [ ] 3.0 Implementar la opción `delete --id <DOCUMENT_ID>` para eliminar documentos y sus fragmentos, usando funciones públicas existentes
   - [ ] 3.1 Implementar la función `delete` en `db_commands.py` que elimine el documento por ID
