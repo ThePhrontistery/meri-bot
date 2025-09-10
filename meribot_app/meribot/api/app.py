@@ -1,17 +1,24 @@
+
+# ======================= IMPORTS =======================
+import os
+import sys
+from typing import Optional, Dict, Any, List
 from fastapi import FastAPI, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
-from typing import Optional, Dict, Any, List
-import os
-import sys
 
 # Add the project root to the Python path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-
-# Import el core
+# Core y servicios
 from meribot.core.chatengine import ChatEngine
+from meribot.services.crawler_endpoint import router as crawler_router
+from meribot.services.complete_crawler_endpoint import router as complete_crawler_router
+from meribot.services.process_docs_endpoint import router as process_docs_router
+from meribot.utils.utils import load_config_from_yaml
+
+# ======================= FIN IMPORTS =======================
 
 app = FastAPI(
     title="MeriBot API",
@@ -20,9 +27,6 @@ app = FastAPI(
 )
 
 # Configuración de CORS
-from meribot.services.crawler_endpoint import router as crawler_router
-from meribot.services.complete_crawler_endpoint import router as complete_crawler_router
-from meribot.services.process_docs_endpoint import router as process_docs_router
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # En producción, especificar dominios permitidos
@@ -165,3 +169,25 @@ async def health_check():
             }
     """
     return {"status": "ok", "service": "meribot-api"}
+
+@app.get(
+    "/chatbot/allowed_domains",
+    summary="Obtener dominios permitidos",
+    description="Devuelve la lista de dominios permitidos según la configuración del crawler.",
+    response_description="Lista de dominios permitidos",
+    tags=["Chatbot"]
+)
+async def get_allowed_domains():
+    """
+    Obtiene la lista de dominios permitidos desde la configuración YAML del crawler.
+
+    Returns:
+        dict: Un diccionario con la lista de dominios permitidos.
+            {
+                "allowed_domains": [...]
+            }
+    """
+    allowed_domains = load_config_from_yaml("allowed_domains")
+    if allowed_domains is None:
+        raise HTTPException(status_code=404, detail="No se encontraron dominios permitidos en la configuración.")
+    return {"allowed_domains": allowed_domains}

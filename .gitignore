@@ -98,3 +98,5 @@ hash_db.json
 # Ignore data
 data/
 chroma.sqlite3
+
+.sfdx/

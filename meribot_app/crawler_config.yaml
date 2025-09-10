@@ -1,3 +1,8 @@
+SENSITIVE_KEYS:
+  - password
+  - api_key
+  - token
+  - secret
 # Ejemplo de configuración para el Crawler de Meri-bot
 # Puedes copiar este archivo como crawler_config.yaml en el directorio del módulo crawler
 
