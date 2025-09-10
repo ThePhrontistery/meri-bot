@@ -14,98 +14,6 @@ class MeriBotWidget {
             this.init();
         }
         
-        this.responses = {
-            // Respuestas por dominio
-            "talent": {
-                "carrera profesional": {
-                    text: "En C&CA tenemos definidos grados profesionales claros, competencias esperadas por nivel, planes de evolución, mentoring programs y oportunidades de movilidad interna. Tu EM puede ayudarte con el plan de desarrollo personalizado.",
-                    source: {
-                        url: "https://intranet.capgemini.com/cca/carrera-profesional",
-                        title: "Guía de Carrera Profesional CCA",
-                        type: "document"
-                    }
-                },
-                "contactos de rrhh": {
-                    text: "Para temas de RRHH en C&CA:<br><br><strong>hr_cca@capgemini.com</strong> - Consultas generales<br><strong>rrhh.practicas@capgemini.com</strong> - Prácticas profesionales<br><strong>development.es@capgemini.com</strong> - Desarrollo profesional",
-                    source: {
-                        url: "https://intranet.capgemini.com/cca/directorio-contactos",
-                        title: "Directorio de Contactos RRHH",
-                        type: "page"
-                    }
-                },
-                "beneficios": {
-                    text: "Como parte de C&CA tienes acceso a: seguro médico premium, flexible benefits, programa de bienestar, formación continua, días adicionales de vacaciones, y programas de reconocimiento. También participas en eventos y actividades de team building."
-                },
-                "default": {
-                    text: "En Talent puedo ayudarte con temas de desarrollo profesional, beneficios, contactos específicos, evaluaciones y procesos internos. ¿Qué necesitas saber?"
-                }
-            },
-            "onboarding": {
-                "primeros pasos": {
-                    text: "¡Bienvenido a C&CA! Tus primeros pasos incluyen: completar el perfil corporativo, realizar las formaciones mandatory, conocer a tu EM y equipo, acceder a las herramientas necesarias, y revisar la documentación de bienvenida.",
-                    source: {
-                        url: "https://intranet.capgemini.com/cca/onboarding-checklist",
-                        title: "Checklist de Onboarding CCA",
-                        type: "document"
-                    }
-                },
-                "formaciones mandatory": {
-                    text: "Las formaciones obligatorias incluyen: Compliance & Ethics, Data Protection, Information Security, Health & Safety, y módulos específicos de C&CA. Tienes 30 días para completarlas desde tu incorporación.",
-                    source: {
-                        url: "https://learning.capgemini.com/mandatory-training",
-                        title: "Portal de Formaciones Obligatorias",
-                        type: "platform"
-                    }
-                },
-                "herramientas acceso": {
-                    text: "Herramientas principales: Outlook corporativo, Teams, SharePoint, portal empleado, VPN, GitHub Enterprise, Azure DevOps. Tu EM te facilitará los accesos necesarios según tu rol."
-                },
-                "default": {
-                    text: "En Onboarding puedo ayudarte con el proceso de incorporación, primeros pasos, formaciones obligatorias y acceso a herramientas. ¿Qué necesitas saber?"
-                }
-            },
-            "formacion": {
-                "ac&cademy": {
-                    text: "AC&CAdemy son los itinerarios formativos especializados de la SDO. Incluyen formación en Cloud Computing, desarrollo ágil, arquitectura de software, DevOps, y tecnologías emergentes. Cada itinerario está diseñado para diferentes niveles de experiencia.",
-                    source: {
-                        url: "https://academy.capgemini.com/cca/programs",
-                        title: "Portal AC&CAdemy - Programas Formativos",
-                        type: "platform"
-                    }
-                },
-                "certificaciones": {
-                    text: "Ofrecemos apoyo para certificaciones en AWS, Azure, Google Cloud, Microsoft, Oracle, y tecnologías específicas. También tenemos un programa de incentivos para certificaciones alineadas con los objetivos de la práctica.",
-                    source: {
-                        url: "https://intranet.capgemini.com/cca/certification-program",
-                        title: "Programa de Certificaciones CCA",
-                        type: "document"
-                    }
-                },
-                "plataformas": {
-                    text: "Tienes acceso a múltiples plataformas: Pluralsight para tecnología, LinkedIn Learning para soft skills, Microsoft Learn, AWS Training, Google Cloud Skills Boost, y recursos internos de la SDO."
-                },
-                "default": {
-                    text: "En Formación puedo ayudarte con itinerarios formativos, certificaciones, plataformas de aprendizaje y planificación de carrera técnica. ¿Qué te interesa específicamente?"
-                }
-            },
-            "general": {
-                "cursos": {
-                    text: "En C&CA tenemos una amplia oferta formativa que incluye itinerarios técnicos especializados, certificaciones oficiales en las principales tecnologías cloud, formaciones en metodologías ágiles, y programas de desarrollo de soft skills. Todos los cursos están alineados con las necesidades de nuestros proyectos y clientes.",
-                    source: {
-                        url: "https://intranet.capgemini.com/cca/catalogo-formativo",
-                        title: "Catálogo Formativo C&CA 2025",
-                        type: "document"
-                    }
-                },
-                "¿qué es c&ca?": {
-                    text: "Cloud & Custom Applications es la práctica de Capgemini especializada en soluciones cloud nativas, desarrollo a medida e integraciones. Trabajamos con las últimas tecnologías para ofrecer soluciones innovadoras a nuestros clientes."
-                },
-                "default": {
-                    text: "Gracias por tu pregunta. Como asistente de C&CA, puedo ayudarte con información específica según el dominio que selecciones. Usa el filtro para obtener respuestas más precisas."
-                }
-            }
-        };
-        
         this.scrollToBottom = () => {
             if (this.chatContainer) {
                 // Aseguramos que el contenedor existe y tiene contenido
@@ -126,35 +34,20 @@ class MeriBotWidget {
 
     async loadDomainsConfig() {
         try {
-            // De momento usamos los dominios predefinidos
-            this.availableDomains = [
-                {
-                    id: "talent",
-                    name: "Talent",
-                    color: "#0070ad",
-                    description: "Gestión de talento, recursos humanos, carrera profesional"
-                },
-                {
-                    id: "onboarding",
-                    name: "Onboarding",
-                    color: "#12abdb",
-                    description: "Proceso de incorporación, primeros pasos, orientación inicial"
-                },
-                {
-                    id: "formacion",
-                    name: "Formación",
-                    color: "#272936",
-                    description: "Cursos, certificaciones, desarrollo profesional, AC&CAdemy"
-                }
-            ];
-            
-            this.initializeWidget();
+            const response = await fetch('./config/domains.json');
+            if (!response.ok) throw new Error('Network response was not ok');
+            const config = await response.json();
+            this.availableDomains = (config.allowed_domains || []).map(domain => ({
+                id: domain,
+                name: domain,
+                color: '#0070ad',
+                description: ''
+            }));
         } catch (error) {
             console.error('Error loading domains:', error);
-            // Usar dominios por defecto en caso de error
             this.availableDomains = [];
-            this.initializeWidget();
         }
+        this.initializeWidget();
     }
     
     initializeWidget() {
