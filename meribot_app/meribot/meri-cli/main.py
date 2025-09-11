@@ -246,15 +246,6 @@ def scrape(url: Optional[str], output: Optional[str], pdf_url: Optional[str]):
         except Exception as e:
             click.echo(f"[ERROR] Falló la descarga PDF: {e}")
 
-@cli.command()
-@click.option('--reset', is_flag=True, help='Reinicia la base de datos')
-def db(reset: bool):
-    """Gestiona la base de datos vectorial."""
-    if reset:
-        click.confirm('¿Está seguro que desea reiniciar la base de datos?', abort=True)
-        click.echo("Reiniciando base de datos...")
-    else:
-        click.echo("Estado de la base de datos: OK")
 
 # Registrar el grupo de comandos db de db_commands.py
 cli.add_command(db_commands.db)

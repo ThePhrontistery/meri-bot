@@ -2,11 +2,17 @@
 Endpoint FastAPI para lanzar el proceso completo de crawling y procesamiento de documentos.
 Reutiliza la lógica de test_hash_local_docs.py sin modificar ese archivo.
 """
+
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 import os
 import yaml
 import subprocess
+import hashlib
+# --- Utilidad para doc_id corto ---
+def short_doc_id(rel_path: str, length: int = 10) -> str:
+    """Genera un id alfanumérico corto y único a partir de la ruta relativa."""
+    return hashlib.sha1(rel_path.encode('utf-8')).hexdigest()[:length]
 
 # Importar funciones necesarias
 from meribot.crawler.document_loader import parse_document, chunk_text_with_langchain, process_and_classify_chunks
@@ -114,7 +120,7 @@ def crawl_and_process(request: CrawlerRequest):
     import re
     for fpath in archivos_encontrados:
         rel_path = os.path.relpath(fpath, DOCS_DIR)
-        doc_id = rel_path.replace(os.sep, '_')
+        doc_id = short_doc_id(rel_path)
         # Leer la URL de origen desde el archivo .url si existe
         url_path = fpath + ".url"
         url_origen = None
