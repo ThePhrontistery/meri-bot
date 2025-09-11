@@ -67,13 +67,13 @@ def list(show_chunks, filter):
                     cursor.execute("SELECT string_value FROM embedding_metadata WHERE key = ? AND string_value IS NOT NULL AND id IN (SELECT id FROM embedding_metadata WHERE key = 'id' AND string_value = ?)", (campo, doc_id))
                     resultado = cursor.fetchone()
                     valores[campo] = resultado[0] if resultado else ''
-                id_corto = valores['id'][-25:] if valores['id'] else ''
+                id_completo = valores['id'] if valores['id'] else ''
                 if show_chunks:
                     cursor.execute("SELECT COUNT(*) FROM embedding_metadata WHERE key = 'id' AND string_value = ?", (doc_id,))
                     num_chunks = cursor.fetchone()[0]
-                    rows.append([id_corto, valores['title'], valores['domain'], valores['date'], num_chunks])
+                    rows.append([id_completo, valores['title'], valores['domain'], valores['date'], num_chunks])
                 else:
-                    rows.append([id_corto, valores['title'], valores['domain'], valores['date']])
+                    rows.append([id_completo, valores['title'], valores['domain'], valores['date']])
             if use_tabulate:
                 click.echo(tabulate(rows, headers=headers, tablefmt="github"))
             else:
