@@ -1,5 +1,6 @@
 from typing import Dict, Optional
 from .conversation_context import ConversationContext
+from meribot.utils.logger import get_logger
 
 class ConversationManager:
     """
@@ -8,6 +9,7 @@ class ConversationManager:
     """
     def __init__(self):
         self.sessions: Dict[str, ConversationContext] = {}
+        self.logger = get_logger("meribot.conversation.manager")
 
     def get_or_create_session(self, conversation_id: str) -> ConversationContext:
         """
@@ -17,11 +19,14 @@ class ConversationManager:
         if not conversation_id or conversation_id.lower() == "anonymous":
             context = ConversationContext()
             self.sessions[context.conversation_id] = context
+            self.logger.info(f"Sesión anónima creada: {context.conversation_id}")
             return context
         if conversation_id in self.sessions:
+            self.logger.info(f"Sesión recuperada: {conversation_id}")
             return self.sessions[conversation_id]
         context = ConversationContext(conversation_id=conversation_id)
         self.sessions[context.conversation_id] = context
+        self.logger.info(f"Sesión creada con ID: {conversation_id}")
         return context
 
     def create_session(self, metadata: Optional[Dict] = None) -> ConversationContext:
@@ -32,6 +37,7 @@ class ConversationManager:
         """
         context = ConversationContext(metadata=metadata or {})
         self.sessions[context.conversation_id] = context
+        self.logger.info(f"Sesión creada con metadatos: {context.conversation_id}")
         return context
 
     def get_session(self, conversation_id: str) -> Optional[ConversationContext]:
@@ -50,7 +56,13 @@ class ConversationManager:
         """
         context = self.sessions.get(conversation_id)
         if context:
-            context.close()
+            try:
+                context.close()
+                self.logger.info(f"Sesión cerrada: {conversation_id}")
+            except RuntimeError as e:
+                self.logger.warning(f"Error al cerrar sesión {conversation_id}: {e}")
+                return False
             del self.sessions[conversation_id]
             return True
+        self.logger.warning(f"Intento de cerrar sesión inexistente: {conversation_id}")
         return False
