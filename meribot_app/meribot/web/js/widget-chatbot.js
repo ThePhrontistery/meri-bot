@@ -107,7 +107,7 @@ class MeriBotWidget {
      * @returns {void}
      */
     initializeBasicEvents() {
-        if (!this.widgetTrigger || !this.widgetPanel || !this.panelCloseButton || !this.panelOverlay || !this.messageInput || !this.sendButton) {
+        if (!this.widgetTrigger || !this.widgetPanel || !this.panelCloseButton || !this.messageInput || !this.sendButton) {
             console.error('Error: No se pudieron encontrar elementos básicos del DOM');
             return;
         }
@@ -141,7 +141,6 @@ class MeriBotWidget {
         // Limpiar listeners previos para evitar duplicidad
         this.widgetTrigger.replaceWith(this.widgetTrigger.cloneNode(true));
         this.panelCloseButton.replaceWith(this.panelCloseButton.cloneNode(true));
-        this.panelOverlay.replaceWith(this.panelOverlay.cloneNode(true));
         this.sendButton.replaceWith(this.sendButton.cloneNode(true));
         this.messageInput.replaceWith(this.messageInput.cloneNode(true));
         // Reasignar referencias tras clonar
@@ -150,7 +149,6 @@ class MeriBotWidget {
         // Asignar listeners únicos
         this.widgetTrigger.addEventListener('click', handleTogglePanel);
         this.panelCloseButton.addEventListener('click', handleClosePanel);
-        this.panelOverlay.addEventListener('click', handleClosePanel);
         this.widgetPanel.addEventListener('click', (e) => e.stopPropagation());
         this.sendButton.addEventListener('click', handleSendMessage);
         this.messageInput.addEventListener('keydown', handleKeyDown);
@@ -165,7 +163,6 @@ class MeriBotWidget {
         this.chatContainer = document.querySelector('.chat-container');
         this.widgetPanel = document.getElementById('widgetPanel');
         this.widgetTrigger = document.getElementById('widgetTrigger');
-        this.panelOverlay = document.getElementById('panelOverlay');
         this.panelCloseButton = document.getElementById('panelCloseButton');
         this.messageInput = document.getElementById('messageInput');
         this.sendButton = document.getElementById('sendButton');
@@ -173,7 +170,6 @@ class MeriBotWidget {
         this.chatMessages = document.getElementById('chatMessages');
         this.typingIndicator = document.getElementById('typingIndicator');
         this.selectedFiltersContainer = document.getElementById('selectedFilters');
-        
         if (!this.chatContainer || !this.widgetPanel || !this.widgetTrigger) {
             console.error('Error: No se pudieron encontrar elementos DOM requeridos');
             return;
@@ -516,12 +512,7 @@ class MeriBotWidget {
         if (this.isOpen) {
             this.resetConversation();
             this.widgetTrigger.classList.add('active');
-            this.panelOverlay.style.display = 'block';
-            // Forzar reflow para la animación
-            this.panelOverlay.offsetHeight;
-            this.panelOverlay.classList.add('active');
             this.widgetPanel.classList.add('active');
-            
             setTimeout(() => {
                 this.messageInput.focus();
             }, 300);
@@ -535,27 +526,17 @@ class MeriBotWidget {
      * @returns {void}
      */
     openPanel() {
-        if (!this.isOpen && this.widgetPanel && this.panelOverlay) {
+        if (!this.isOpen && this.widgetPanel) {
             this.isOpen = true;
-            
-            // Asegurar que los filtros estén inicializados antes de resetear
             this.initializeFilters();
-            
-            this.resetConversation(); // Reinicia el contenido del chat cada vez que se abre
-            
-            // Actualizar el botón flotante
+            this.resetConversation();
             this.widgetTrigger.classList.add('active');
             this.widgetTrigger.querySelector('.widget-text').textContent = 'Cerrar chat';
             this.widgetTrigger.setAttribute('aria-label', 'Cerrar chat de MeriBot');
-            
             this.widgetPanel.classList.add('active');
-            this.panelOverlay.style.display = 'block';
-            
             setTimeout(() => {
-                this.panelOverlay.classList.add('active');
-                // Forzar un scroll al fondo después de abrir
                 setTimeout(() => this.scrollToBottom(), 400);
-                this.showWelcomeMessage(); // Mostrar mensaje de bienvenida al abrir
+                this.showWelcomeMessage();
             }, 10);
         }
     }
@@ -565,26 +546,21 @@ class MeriBotWidget {
      * @returns {void}
      */
     closePanel() {
-        // Restaurar el botón flotante
         if (this.widgetTrigger) {
             this.widgetTrigger.classList.remove('active');
             if (this.widgetTrigger.querySelector('.widget-text')) {
-                this.widgetTrigger.querySelector('.widget-text').textContent = 'Pregunta a Meribot';
+                this.widgetTrigger.querySelector('.widget-text').textContent = 'Pregunta a MeriBot';
             }
             this.widgetTrigger.setAttribute('aria-label', 'Abrir chat de MeriBot');
         }
         if (this.widgetPanel) this.widgetPanel.classList.remove('active');
-        if (this.panelOverlay) this.panelOverlay.classList.remove('active');
-        // Limpiar el textarea y reajustar su altura
         if (this.messageInput) {
             this.messageInput.value = '';
             this.messageInput.style.height = '';
         }
-        // Limpiar dominios seleccionados y actualizar UI de filtros
         this.selectedDomains = [];
         this.updateFilterUI && this.updateFilterUI();
         this.updateSelectedFiltersDisplay && this.updateSelectedFiltersDisplay();
-        // Cerrar el dropdown de filtros si está abierto y reinicializar
         const filterDropdown = document.getElementById('filterDropdown');
         const filterButton = document.getElementById('filterButton');
         if (filterDropdown && filterDropdown.classList.contains('active')) {
@@ -594,9 +570,6 @@ class MeriBotWidget {
             filterButton.classList.remove('active');
         }
         this.initializeFilters && this.initializeFilters();
-        setTimeout(() => {
-            if (this.panelOverlay) this.panelOverlay.style.display = 'none';
-        }, 300);
         this.isOpen = false;
     }
 
@@ -901,7 +874,7 @@ class MeriBotWidget {
         this.initializeDOMReferences();
         
         // Solo continuar si las referencias DOM son válidas
-        if (!(this.widgetTrigger && this.widgetPanel && this.panelOverlay)) {
+        if (!(this.widgetTrigger && this.widgetPanel)) {
             console.error('Error: No se pudieron encontrar elementos DOM requeridos');
         }
     }

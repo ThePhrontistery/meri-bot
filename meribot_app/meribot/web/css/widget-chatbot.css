@@ -445,23 +445,6 @@ textarea {
     background: #f8f9fa;
 }
 
-/* Overlay */
-.panel-overlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0,0,0,0.5);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.panel-overlay.active {
-    opacity: 1;
-}
-
 /* Sistema de filtros */
 .filter-button {
     padding: 8px;
