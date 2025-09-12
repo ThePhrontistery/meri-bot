@@ -33,24 +33,6 @@ SPLITTER_CHUNK_OVERLAP_DOC = 50
 
 # Ruta por defecto para la base de datos de hashes (puedes cambiarla)
 HASH_DB_PATH = os.getenv('HASH_DB_PATH', './chroma_data/hash_db.json')
-
-import hashlib
-
-def generate_alphanumeric_id(text: str, length: int = 10) -> str:
-    """
-    Genera un identificador único alfanumérico de longitud fija a partir de un texto.
-    Utiliza SHA256 y codifica en base36 para compacidad.
-    """
-    hash_bytes = hashlib.sha256(text.encode('utf-8')).digest()
-    # Convertir los primeros bytes a un entero grande
-    num = int.from_bytes(hash_bytes[:8], 'big')
-    base36 = ''
-    chars = '0123456789abcdefghijklmnopqrstuvwxyz'
-    while num > 0 and len(base36) < length:
-        num, rem = divmod(num, 36)
-        base36 = chars[rem] + base36
-    # Rellenar si es necesario
-    return base36.rjust(length, '0')[:length]
 # Ejemplo de función para procesar y clasificar chunks según hash
 def process_and_classify_chunks(chunks: list, metadata_list: list, hash_db_path: str = HASH_DB_PATH):
     """
@@ -63,11 +45,7 @@ def process_and_classify_chunks(chunks: list, metadata_list: list, hash_db_path:
     hash_db = load_hash_db(hash_db_path)
     resultados = []
     for chunk, meta in zip(chunks, metadata_list):
-        # Generar ID alfanumérico de 10 dígitos a partir del texto original (url, title, o chunk)
-        base_text = meta.get('id') or meta.get('url') or meta.get('title') or chunk
-        alphanumeric_id = generate_alphanumeric_id(base_text, length=10)
-        meta['id'] = alphanumeric_id
-        chunk_id = alphanumeric_id
+        chunk_id = meta.get('id') or meta.get('url') or meta.get('title') or str(hash(chunk))
         chunk_hash = calculate_sha256(chunk)
         prev_hash = hash_db.get(chunk_id)
         if prev_hash is None:
