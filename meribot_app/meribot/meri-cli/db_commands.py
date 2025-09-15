@@ -1,7 +1,24 @@
-
 import click
 import os
 import sqlite3
+# Cargar variables de entorno desde .env automáticamente
+from dotenv import load_dotenv
+load_dotenv()
+
+# Importar VectorSearch para acceso a Chroma (robusto a cualquier modo de ejecución)
+try:
+    from meribot.core.vector_search import VectorSearch
+except ModuleNotFoundError:
+    import importlib.util
+    import sys, os
+    core_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../core'))
+    sys.path.append(core_path)
+    spec = importlib.util.find_spec("vector_search")
+    if spec is None:
+        raise ImportError("No se pudo encontrar vector_search.py en ../core/")
+    vector_search = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(vector_search)
+    VectorSearch = vector_search.VectorSearch
 
 
 # Un solo grupo db para todos los subcomandos
@@ -9,6 +26,43 @@ import sqlite3
 def db():
     """Comandos de administración de la base vectorial (db)"""
     pass
+
+
+# Comando para borrar un documento y sus chunks de Chroma
+@db.command()
+@click.option('--id', 'document_id', required=True, help="ID del documento a borrar. Es el identificador único asignado al documento en la base vectorial.")
+def delete(document_id):
+    """
+    Elimina un documento y todos sus fragmentos (chunks) y datos asociados de las tablas embedding* de la base vectorial (Chroma DB).
+    """
+    import os
+    import sqlite3
+    base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../chroma_data'))
+    db_path = os.path.join(base_dir, 'chroma.sqlite3')
+    if not os.path.exists(db_path):
+        click.echo(f"[ERROR] No se encontró la base de datos: {db_path}")
+        return
+    try:
+        conn = sqlite3.connect(db_path)
+        cursor = conn.cursor()
+        # Buscar todos los ids de fragmentos asociados al documento
+        cursor.execute("SELECT id FROM embedding_metadata WHERE key = 'id' AND string_value = ?", (document_id,))
+        chunk_ids = [row[0] for row in cursor.fetchall()]
+        if not chunk_ids:
+            click.echo(f"[ERROR] No se encontraron fragmentos asociados al documento con id: {document_id}")
+            conn.close()
+            return
+        # Eliminar de embedding_metadata
+        cursor.executemany("DELETE FROM embedding_metadata WHERE id = ?", [(cid,) for cid in chunk_ids])
+        # Eliminar de embeddings
+        cursor.executemany("DELETE FROM embeddings WHERE segment_id = ?", [(cid,) for cid in chunk_ids])
+        # Eliminar de otras tablas embedding* si existen (opcional, seguro)
+        # Puedes añadir más sentencias DELETE aquí si hay más tablas relacionadas
+        conn.commit()
+        click.echo(f"Se eliminaron {len(chunk_ids)} fragmentos y sus datos asociados del documento con id: {document_id}.")
+        conn.close()
+    except Exception as e:
+        click.echo(f"[ERROR] No se pudo eliminar el documento: {e}")
 
 @db.command()
 @click.option('--id', 'document_id', required=True, help="ID del documento a mostrar. Es el identificador único asignado al documento en la base vectorial.")
