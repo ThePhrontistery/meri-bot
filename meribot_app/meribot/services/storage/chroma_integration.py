@@ -258,20 +258,23 @@ def delete_document_by_id(
 def list_documents(
     collection_name: str = "meri_chunks",
     persist_dir: str = "chroma_data",
-    filters: dict = None
+    filters: dict = None,
+    show_chunks: bool = False
 ) -> list:
     """
     Lista todos los documentos únicos almacenados en la colección de ChromaDB.
     Agrupa por el campo 'id' y extrae los metadatos principales.
     Permite filtrar por cualquier campo presente en los metadatos.
+    Si show_chunks=True, añade el número de chunks asociados a cada documento.
 
     Args:
         collection_name (str): Nombre de la colección de ChromaDB.
         persist_dir (str): Directorio de persistencia de ChromaDB.
         filters (dict): Diccionario de filtros {campo: valor}.
+        show_chunks (bool): Si True, añade el número de chunks por documento.
 
     Returns:
-        list: Lista de diccionarios con los campos ["id", "title", "domain", "date"].
+        list: Lista de diccionarios con los campos ["id", "title", "domain", "date", "chunks"].
     """
     vectorstore, _ = get_chroma_collection_and_client(collection_name=collection_name, persist_dir=persist_dir)
     all_docs = vectorstore.get(include=["metadatas"])
@@ -284,7 +287,6 @@ def list_documents(
         doc_id = meta.get("id")
         if not doc_id:
             continue
-        # Solo tomar el primer chunk de cada documento para mostrar info principal
         if doc_id not in doc_map:
             doc_map[doc_id] = {
                 "id": doc_id,
@@ -292,12 +294,16 @@ def list_documents(
                 "domain": meta.get("domain", ""),
                 "date": meta.get("date") or meta.get("fecha_ingreso") or ""
             }
+            if show_chunks:
+                doc_map[doc_id]["chunks"] = 1
+        else:
+            if show_chunks:
+                doc_map[doc_id]["chunks"] += 1
     docs = list(doc_map.values())
     # Aplicar filtros si se proporcionan
     if filters:
         def match(doc):
             for k, v in filters.items():
-                # Permitir alias de campos
                 key = k.lower()
                 if key in ("nombre", "title"): key = "title"
                 if key in ("dominio", "domain"): key = "domain"
@@ -307,3 +313,28 @@ def list_documents(
             return True
         docs = [d for d in docs if match(d)]
     return docs
+
+def count_documents_and_chunks(
+    collection_name: str = "meri_chunks",
+    persist_dir: str = "chroma_data"
+) -> dict:
+    """
+    Cuenta el número total de documentos únicos y fragmentos (chunks) almacenados en la colección de ChromaDB.
+
+    Args:
+        collection_name (str): Nombre de la colección de ChromaDB.
+        persist_dir: str: Directorio de persistencia de ChromaDB.
+
+    Returns:
+        dict: Diccionario con las claves 'total_documents' y 'total_chunks'.
+    """
+    vectorstore, _ = get_chroma_collection_and_client(collection_name=collection_name, persist_dir=persist_dir)
+    all_docs = vectorstore.get(include=["metadatas"])
+    metadatas_list = all_docs.get("metadatas", [])
+    total_chunks = len(metadatas_list)
+    doc_ids = set()
+    for meta in metadatas_list:
+        if meta and meta.get("id"):
+            doc_ids.add(meta["id"])
+    total_documents = len(doc_ids)
+    return {"total_documents": total_documents, "total_chunks": total_chunks}

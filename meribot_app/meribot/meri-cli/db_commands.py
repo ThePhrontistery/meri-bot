@@ -15,7 +15,7 @@ except ModuleNotFoundError:
     core_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../core'))
     sys.path.append(core_path)
     spec = importlib.util.find_spec("vector_search")
-    if spec is None:
+    if (spec is None):
         raise ImportError("No se pudo encontrar vector_search.py en ../core/")
     vector_search = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(vector_search)
@@ -152,11 +152,13 @@ def show(document_id):
 
 @db.command()
 @click.option('--filter', 'filter_', default=None, help="Filtra la lista de documentos por <campo>:<valor> (ej: dominio:cca)")
-def list(filter_):
+@click.option('--show-chunks', is_flag=True, help="Muestra también el número de fragmentos (chunks) asociados a cada documento.")
+def list(filter_, show_chunks):
     """
     Lista todos los documentos almacenados en la base vectorial a través del endpoint del crawler.
     Muestra las columnas: ["ID", "Nombre", "Dominio", "Fecha ingreso"].
     Permite filtrar por campo usando --filter <campo>:<valor>.
+    Si se pasa --show-chunks, muestra también el número de fragmentos asociados a cada documento.
     """
     import requests
     import click
@@ -171,6 +173,8 @@ def list(filter_):
                 return
             campo, valor = filter_.split(':', 1)
             params[campo] = valor
+        if show_chunks:
+            params['show_chunks'] = 'true'
         response = requests.get(endpoint, params=params, timeout=30)
         if response.status_code == 200:
             docs = response.json().get("documents", [])
@@ -178,10 +182,15 @@ def list(filter_):
                 click.echo("No hay documentos almacenados en la base vectorial.")
                 return
             headers = ["ID", "Nombre", "Dominio", "Fecha ingreso"]
+            if show_chunks:
+                headers.append("Chunks")
             try:
                 from tabulate import tabulate
                 table = tabulate(
-                    [[d.get("id", ""), d.get("title", ""), d.get("domain", ""), d.get("date", "") ] for d in docs],
+                    [
+                        [d.get("id", ""), d.get("title", ""), d.get("domain", ""), d.get("date", "")] + ([d.get("chunks", "")] if show_chunks else [])
+                        for d in docs
+                    ],
                     headers=headers,
                     tablefmt="github"
                 )
@@ -189,7 +198,34 @@ def list(filter_):
             except ImportError:
                 click.echo("\t".join(headers))
                 for d in docs:
-                    click.echo(f"{d.get('id','')}\t{d.get('title','')}\t{d.get('domain','')}\t{d.get('date','')}")
+                    row = [d.get('id',''), d.get('title',''), d.get('domain',''), d.get('date','')]
+                    if show_chunks:
+                        row.append(str(d.get('chunks','')))
+                    click.echo("\t".join(row))
+        else:
+            click.echo(f"[ERROR] Falló la consulta: {response.status_code} {response.text}")
+    except Exception as e:
+        click.echo(f"[ERROR] No se pudo conectar al endpoint del crawler: {e}")
+
+
+@db.command()
+def count():
+    """
+    Muestra el número total de documentos únicos y fragmentos (chunks) almacenados en la base vectorial.
+    """
+    import requests
+    import click
+    import os
+    try:
+        CRAWLER_URL = os.getenv("MERIBOT_CRAWLER_URL", "http://localhost:8000")
+        endpoint = f"{CRAWLER_URL}/count-documents"
+        response = requests.get(endpoint, timeout=30)
+        if response.status_code == 200:
+            data = response.json()
+            total_docs = data.get("total_documents", 0)
+            total_chunks = data.get("total_chunks", 0)
+            click.echo(f"Total de documentos únicos: {total_docs}")
+            click.echo(f"Total de fragmentos (chunks): {total_chunks}")
         else:
             click.echo(f"[ERROR] Falló la consulta: {response.status_code} {response.text}")
     except Exception as e:

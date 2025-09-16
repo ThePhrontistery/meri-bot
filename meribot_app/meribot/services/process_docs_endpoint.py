@@ -118,11 +118,26 @@ def list_documents_endpoint(request: Request):
     """
     Endpoint para listar todos los documentos almacenados en la base vectorial (ChromaDB).
     Permite filtrar por cualquier campo usando parámetros de query string.
-    Devuelve una lista de documentos con los campos: ["id", "title", "domain", "date"].
+    Si se pasa show_chunks=true, incluye el número de chunks asociados a cada documento.
+    Devuelve una lista de documentos con los campos: ["id", "title", "domain", "date", "chunks"].
     """
     try:
         filters = dict(request.query_params)
-        docs = list_documents(filters=filters)
+        show_chunks = filters.pop("show_chunks", "false").lower() == "true"
+        docs = list_documents(filters=filters, show_chunks=show_chunks)
         return {"documents": docs}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al listar documentos: {e}")
+
+@router.get("/count-documents")
+def count_documents_endpoint():
+    """
+    Endpoint para obtener el número total de documentos únicos y fragmentos (chunks) almacenados en la base vectorial (ChromaDB).
+    Devuelve un diccionario con las claves: total_documents, total_chunks.
+    """
+    from meribot.services.storage.chroma_integration import count_documents_and_chunks
+    try:
+        stats = count_documents_and_chunks()
+        return stats
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al contar documentos y chunks: {e}")
