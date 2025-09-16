@@ -113,6 +113,42 @@ def delete_document(id: str = Query(..., description="ID del documento a borrar"
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al borrar en ChromaDB: {e}")
 
+@router.delete("/delete-document-by-url")
+def delete_document_by_url_endpoint(url: str = Query(..., description="URL o ruta fuente del documento a borrar")):
+    """
+    Elimina todos los chunks asociados a una URL (por ejemplo, en el campo 'source_path') en la base vectorial (ChromaDB).
+    Args:
+        url (str): URL o ruta fuente del documento a borrar
+    Returns:
+        dict: Mensaje de éxito o error
+    """
+    from meribot.services.storage.chroma_integration import delete_document_by_url
+    try:
+        num_deleted = delete_document_by_url(url)
+        return {"status": "success", "message": f"Se eliminaron {num_deleted} chunks asociados a la URL '{url}' en ChromaDB."}
+    except ValueError as ve:
+        raise HTTPException(status_code=404, detail=str(ve))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al borrar por URL en ChromaDB: {e}")
+
+@router.delete("/delete-document-by-source-path")
+def delete_document_by_source_path_endpoint(source_path: str = Query(..., description="source_path del documento a borrar")):
+    """
+    Elimina todos los chunks asociados a un source_path en la base vectorial (ChromaDB).
+    Args:
+        source_path (str): Ruta fuente del documento a borrar
+    Returns:
+        dict: Mensaje de éxito o error
+    """
+    from meribot.services.storage.chroma_integration import delete_document_by_source_path
+    try:
+        num_deleted = delete_document_by_source_path(source_path)
+        return {"status": "success", "message": f"Se eliminaron {num_deleted} chunks asociados a source_path '{source_path}' en ChromaDB."}
+    except ValueError as ve:
+        raise HTTPException(status_code=404, detail=str(ve))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al borrar por source_path en ChromaDB: {e}")
+
 @router.get("/list-documents")
 def list_documents_endpoint(request: Request):
     """

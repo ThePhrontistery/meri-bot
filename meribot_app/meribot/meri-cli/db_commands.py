@@ -31,25 +31,56 @@ def db():
 
 # Comando para borrar un documento y sus chunks de Chroma
 @db.command()
-@click.option('--id', 'document_id', required=True, help="ID del documento a borrar. Es el identificador único asignado al documento en la base vectorial.")
-def delete(document_id):
+@click.option('--id', 'document_id', required=False, help="ID del documento a borrar. Es el identificador único asignado al documento en la base vectorial.")
+@click.option('--url', 'document_url', required=False, help="URL o ruta fuente del documento a borrar. Borra todos los chunks asociados a esa URL.")
+@click.option('--source-path', 'document_source_path', required=False, help="source_path del documento a borrar. Borra todos los chunks asociados a ese source_path.")
+def delete(document_id, document_url, document_source_path):
     """
     Elimina un documento y todos sus chunks asociados usando el endpoint del crawler.
-    Realiza una petición HTTP DELETE a /delete-document.
+    Permite borrar por ID, por URL o por source_path.
     """
     import click
     import os
-    # URL base del crawler (ajustar si es necesario)
+    import requests
+    # Validación de exclusividad
+    options = [bool(document_id), bool(document_url), bool(document_source_path)]
+    if sum(options) == 0:
+        click.echo("[ERROR] Debe especificar --id, --url o --source-path para borrar un documento.")
+        return
+    if sum(options) > 1:
+        click.echo("[ERROR] No puede usar más de una opción (--id, --url, --source-path) al mismo tiempo. Elija solo una.")
+        return
     CRAWLER_URL = os.getenv("MERIBOT_CRAWLER_URL", "http://localhost:8000")
-    endpoint = f"{CRAWLER_URL}/delete-document"
-    try:
-        response = requests.delete(endpoint, params={"id": document_id}, timeout=30)
-        if response.status_code == 200:
-            click.echo(f"[SUCCESS] Documento y chunks asociados eliminados correctamente (id: {document_id})")
-        else:
-            click.echo(f"[ERROR] Falló el borrado: {response.status_code} {response.text}")
-    except Exception as e:
-        click.echo(f"[ERROR] No se pudo conectar al endpoint del crawler: {e}")
+    if document_id:
+        endpoint = f"{CRAWLER_URL}/delete-document"
+        try:
+            response = requests.delete(endpoint, params={"id": document_id}, timeout=30)
+            if response.status_code == 200:
+                click.echo(f"[SUCCESS] Documento y chunks asociados eliminados correctamente (id: {document_id})")
+            else:
+                click.echo(f"[ERROR] Falló el borrado: {response.status_code} {response.text}")
+        except Exception as e:
+            click.echo(f"[ERROR] No se pudo conectar al endpoint del crawler: {e}")
+    elif document_url:
+        endpoint = f"{CRAWLER_URL}/delete-document-by-url"
+        try:
+            response = requests.delete(endpoint, params={"url": document_url}, timeout=30)
+            if response.status_code == 200:
+                click.echo(f"[SUCCESS] Chunks asociados a la URL eliminados correctamente (url: {document_url})")
+            else:
+                click.echo(f"[ERROR] Falló el borrado por URL: {response.status_code} {response.text}")
+        except Exception as e:
+            click.echo(f"[ERROR] No se pudo conectar al endpoint del crawler: {e}")
+    elif document_source_path:
+        endpoint = f"{CRAWLER_URL}/delete-document-by-source-path"
+        try:
+            response = requests.delete(endpoint, params={"source_path": document_source_path}, timeout=30)
+            if response.status_code == 200:
+                click.echo(f"[SUCCESS] Chunks asociados al source_path eliminados correctamente (source_path: {document_source_path})")
+            else:
+                click.echo(f"[ERROR] Falló el borrado por source_path: {response.status_code} {response.text}")
+        except Exception as e:
+            click.echo(f"[ERROR] No se pudo conectar al endpoint del crawler: {e}")
 
 
 @db.command()

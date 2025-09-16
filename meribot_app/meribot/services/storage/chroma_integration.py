@@ -255,6 +255,75 @@ def delete_document_by_id(
     vectorstore.persist()
     return len(chunk_ids)
 
+def delete_document_by_url(
+    url: str,
+    collection_name: str = "meri_chunks",
+    persist_dir: str = "chroma_data"
+) -> int:
+    """
+    Elimina todos los chunks asociados a una URL (por ejemplo, en el campo 'source_path') en ChromaDB usando LangChain.
+    Args:
+        url (str): URL o ruta fuente del documento a borrar.
+        collection_name (str): Nombre de la colección de ChromaDB.
+        persist_dir (str): Directorio de persistencia de ChromaDB.
+    Returns:
+        int: Número de chunks eliminados.
+    Raises:
+        ValueError: Si no se encuentran chunks asociados a la URL.
+        Exception: Si ocurre un error durante el borrado.
+    """
+    vectorstore, _ = get_chroma_collection_and_client(collection_name=collection_name, persist_dir=persist_dir)
+    all_docs = vectorstore.get(include=["metadatas"])
+    chunk_ids = []
+    ids_list = all_docs.get("ids", [])
+    metadatas_list = all_docs.get("metadatas", [])
+    # Buscar coincidencias en todas las tablas/metadatos
+    for idx, meta in enumerate(metadatas_list):
+        if not meta:
+            continue
+        # Borrado por coincidencia exacta en 'source_path' o 'url'
+        if meta.get("source_path") == url or meta.get("url") == url:
+            chunk_ids.append(ids_list[idx])
+    if not chunk_ids:
+        raise ValueError(f"No se encontraron chunks asociados a la url: {url}")
+    vectorstore.delete(ids=chunk_ids)
+    vectorstore.persist()
+    return len(chunk_ids)
+
+def delete_document_by_source_path(
+    source_path: str,
+    collection_name: str = "meri_chunks",
+    persist_dir: str = "chroma_data"
+) -> int:
+    """
+    Elimina todos los chunks asociados a un source_path en ChromaDB usando LangChain.
+    Args:
+        source_path (str): Ruta fuente del documento a borrar.
+        collection_name (str): Nombre de la colección de ChromaDB.
+        persist_dir: str: Directorio de persistencia de ChromaDB.
+    Returns:
+        int: Número de chunks eliminados.
+    Raises:
+        ValueError: Si no se encuentran chunks asociados al source_path.
+        Exception: Si ocurre un error durante el borrado.
+    """
+    vectorstore, _ = get_chroma_collection_and_client(collection_name=collection_name, persist_dir=persist_dir)
+    all_docs = vectorstore.get(include=["metadatas"])
+    chunk_ids = []
+    ids_list = all_docs.get("ids", [])
+    metadatas_list = all_docs.get("metadatas", [])
+    # Buscar coincidencias en todas las tablas/metadatos
+    for idx, meta in enumerate(metadatas_list):
+        if not meta:
+            continue
+        if meta.get("source_path") == source_path:
+            chunk_ids.append(ids_list[idx])
+    if not chunk_ids:
+        raise ValueError(f"No se encontraron chunks asociados a source_path: {source_path}")
+    vectorstore.delete(ids=chunk_ids)
+    vectorstore.persist()
+    return len(chunk_ids)
+
 def list_documents(
     collection_name: str = "meri_chunks",
     persist_dir: str = "chroma_data",
@@ -269,7 +338,7 @@ def list_documents(
 
     Args:
         collection_name (str): Nombre de la colección de ChromaDB.
-        persist_dir (str): Directorio de persistencia de ChromaDB.
+        persist_dir: str: Directorio de persistencia de ChromaDB.
         filters (dict): Diccionario de filtros {campo: valor}.
         show_chunks (bool): Si True, añade el número de chunks por documento.
 
