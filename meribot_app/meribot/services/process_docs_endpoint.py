@@ -3,7 +3,7 @@ Endpoint FastAPI para lanzar el procesamiento y chunking de documentos descargad
 Reutiliza la lógica de test_hash_local_docs.py sin modificar ese archivo.
 """
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Request
 from pydantic import BaseModel
 import os
 import yaml
@@ -14,6 +14,7 @@ def short_doc_id(rel_path: str, length: int = 10) -> str:
 
 from meribot.crawler.document_loader import parse_document, chunk_text_with_langchain, process_and_classify_chunks
 from meribot.services.storage.chroma_integration import upsert_chunks_to_chroma, get_chroma_collection_and_client, delete_document_by_id
+from meribot.services.storage.chroma_integration import list_documents
 
 router = APIRouter()
 
@@ -111,3 +112,17 @@ def delete_document(id: str = Query(..., description="ID del documento a borrar"
         raise HTTPException(status_code=404, detail=str(ve))
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al borrar en ChromaDB: {e}")
+
+@router.get("/list-documents")
+def list_documents_endpoint(request: Request):
+    """
+    Endpoint para listar todos los documentos almacenados en la base vectorial (ChromaDB).
+    Permite filtrar por cualquier campo usando parámetros de query string.
+    Devuelve una lista de documentos con los campos: ["id", "title", "domain", "date"].
+    """
+    try:
+        filters = dict(request.query_params)
+        docs = list_documents(filters=filters)
+        return {"documents": docs}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al listar documentos: {e}")

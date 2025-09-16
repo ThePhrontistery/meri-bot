@@ -254,3 +254,56 @@ def delete_document_by_id(
     vectorstore.delete(ids=chunk_ids)
     vectorstore.persist()
     return len(chunk_ids)
+
+def list_documents(
+    collection_name: str = "meri_chunks",
+    persist_dir: str = "chroma_data",
+    filters: dict = None
+) -> list:
+    """
+    Lista todos los documentos únicos almacenados en la colección de ChromaDB.
+    Agrupa por el campo 'id' y extrae los metadatos principales.
+    Permite filtrar por cualquier campo presente en los metadatos.
+
+    Args:
+        collection_name (str): Nombre de la colección de ChromaDB.
+        persist_dir (str): Directorio de persistencia de ChromaDB.
+        filters (dict): Diccionario de filtros {campo: valor}.
+
+    Returns:
+        list: Lista de diccionarios con los campos ["id", "title", "domain", "date"].
+    """
+    vectorstore, _ = get_chroma_collection_and_client(collection_name=collection_name, persist_dir=persist_dir)
+    all_docs = vectorstore.get(include=["metadatas"])
+    ids_list = all_docs.get("ids", [])
+    metadatas_list = all_docs.get("metadatas", [])
+    doc_map = {}
+    for idx, meta in enumerate(metadatas_list):
+        if not meta:
+            continue
+        doc_id = meta.get("id")
+        if not doc_id:
+            continue
+        # Solo tomar el primer chunk de cada documento para mostrar info principal
+        if doc_id not in doc_map:
+            doc_map[doc_id] = {
+                "id": doc_id,
+                "title": meta.get("title") or meta.get("nombre") or "",
+                "domain": meta.get("domain", ""),
+                "date": meta.get("date") or meta.get("fecha_ingreso") or ""
+            }
+    docs = list(doc_map.values())
+    # Aplicar filtros si se proporcionan
+    if filters:
+        def match(doc):
+            for k, v in filters.items():
+                # Permitir alias de campos
+                key = k.lower()
+                if key in ("nombre", "title"): key = "title"
+                if key in ("dominio", "domain"): key = "domain"
+                if key in ("fecha", "date", "fecha_ingreso"): key = "date"
+                if str(doc.get(key, "")).lower() != str(v).lower():
+                    return False
+            return True
+        docs = [d for d in docs if match(d)]
+    return docs
