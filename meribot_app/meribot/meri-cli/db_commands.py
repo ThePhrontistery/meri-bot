@@ -1,7 +1,7 @@
-
 import click
 import os
 import sqlite3
+import requests
 # Cargar variables de entorno desde .env automáticamente
 from dotenv import load_dotenv
 load_dotenv()
@@ -34,24 +34,23 @@ def db():
 @click.option('--id', 'document_id', required=True, help="ID del documento a borrar. Es el identificador único asignado al documento en la base vectorial.")
 def delete(document_id):
     """
-    Elimina un documento y todos sus chunks asociados de la base vectorial (Chroma DB).
+    Elimina un documento y todos sus chunks asociados usando el endpoint del crawler.
+    Realiza una petición HTTP DELETE a /delete-document.
     """
+    import click
+    import os
+    # URL base del crawler (ajustar si es necesario)
+    CRAWLER_URL = os.getenv("MERIBOT_CRAWLER_URL", "http://localhost:8000")
+    endpoint = f"{CRAWLER_URL}/delete-document"
     try:
-        vs = VectorSearch()
-        # Buscar todos los ids de chunks asociados a ese documento
-        chroma = vs.chroma_connector.store
-        collection = chroma.get(where={"id": document_id})
-        ids_to_delete = []
-        for i, metadata in enumerate(collection["metadatas"]):
-            if metadata.get("id") == document_id:
-                ids_to_delete.append(collection["ids"][i])
-        if not ids_to_delete:
-            click.echo(f"[ERROR] No se encontraron chunks/documentos con id: {document_id}")
-            return
-        chroma.delete(ids=ids_to_delete)
-        click.echo(f"Se eliminaron {len(ids_to_delete)} chunks/documentos con id: {document_id} de Chroma DB.")
+        response = requests.delete(endpoint, params={"id": document_id}, timeout=30)
+        if response.status_code == 200:
+            click.echo(f"[SUCCESS] Documento y chunks asociados eliminados correctamente (id: {document_id})")
+        else:
+            click.echo(f"[ERROR] Falló el borrado: {response.status_code} {response.text}")
     except Exception as e:
-        click.echo(f"[ERROR] No se pudo eliminar el documento: {e}")
+        click.echo(f"[ERROR] No se pudo conectar al endpoint del crawler: {e}")
+
 
 @db.command()
 @click.option('--id', 'document_id', required=True, help="ID del documento a mostrar. Es el identificador único asignado al documento en la base vectorial.")

@@ -3,7 +3,7 @@ Endpoint FastAPI para lanzar el procesamiento y chunking de documentos descargad
 Reutiliza la lógica de test_hash_local_docs.py sin modificar ese archivo.
 """
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel
 import os
 import yaml
@@ -13,7 +13,7 @@ def short_doc_id(rel_path: str, length: int = 10) -> str:
     return hashlib.sha1(rel_path.encode('utf-8')).hexdigest()[:length]
 
 from meribot.crawler.document_loader import parse_document, chunk_text_with_langchain, process_and_classify_chunks
-from meribot.services.storage.chroma_integration import upsert_chunks_to_chroma
+from meribot.services.storage.chroma_integration import upsert_chunks_to_chroma, get_chroma_collection_and_client, delete_document_by_id
 
 router = APIRouter()
 
@@ -94,3 +94,20 @@ def process_docs(request: ProcessDocsRequest):
         else:
             resultados.append({"file": rel_path, "error": "Falló el almacenamiento en ChromaDB"})
     return {"resultados": resultados}
+
+@router.delete("/delete-document")
+def delete_document(id: str = Query(..., description="ID del documento a borrar")):
+    """
+    Elimina un documento y todos sus chunks asociados de la base vectorial (ChromaDB) usando el motor Chroma/LangChain.
+    Args:
+        id (str): ID del documento a borrar
+    Returns:
+        dict: Mensaje de éxito o error
+    """
+    try:
+        num_deleted = delete_document_by_id(id)
+        return {"status": "success", "message": f"Se eliminaron {num_deleted} chunks asociados al documento '{id}' en ChromaDB."}
+    except ValueError as ve:
+        raise HTTPException(status_code=404, detail=str(ve))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al borrar en ChromaDB: {e}")

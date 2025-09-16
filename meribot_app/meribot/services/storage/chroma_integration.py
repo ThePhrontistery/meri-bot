@@ -128,7 +128,7 @@ def upsert_chunks_to_chroma(
         
         vectorstore, _ = get_chroma_collection_and_client(collection_name, persist_dir=persist_dir)
         print(f"[DEBUG] Upserting {len(chunks)} chunks en ChromaDB usando LangChain...")
-    # ...existing code...
+        
         # LangChain se encarga de generar los embeddings automáticamente
         vectorstore.add_texts(
             texts=chunks,
@@ -219,3 +219,38 @@ def get_collection_stats(
     except Exception as e:
         print(f"[ERROR] Error obteniendo estadísticas: {str(e)}")
         return None
+
+def delete_document_by_id(
+    document_id: str,
+    collection_name: str = "meri_chunks",
+    persist_dir: str = "chroma_data"
+) -> int:
+    """
+    Elimina todos los chunks asociados a un documento por su ID en ChromaDB usando LangChain.
+
+    Args:
+        document_id (str): ID del documento a borrar.
+        collection_name (str): Nombre de la colección de ChromaDB.
+        persist_dir (str): Directorio de persistencia de ChromaDB.
+
+    Returns:
+        int: Número de chunks eliminados.
+
+    Raises:
+        ValueError: Si no se encuentran chunks asociados al documento.
+        Exception: Si ocurre un error durante el borrado.
+    """
+    vectorstore, _ = get_chroma_collection_and_client(collection_name=collection_name, persist_dir=persist_dir)
+    # Solo se puede incluir metadatas, no ids
+    all_docs = vectorstore.get(include=["metadatas"])
+    chunk_ids = []
+    ids_list = all_docs.get("ids", [])
+    metadatas_list = all_docs.get("metadatas", [])
+    for idx, meta in enumerate(metadatas_list):
+        if meta and meta.get("id") == document_id:
+            chunk_ids.append(ids_list[idx])
+    if not chunk_ids:
+        raise ValueError(f"No se encontraron chunks asociados al documento con id: {document_id}")
+    vectorstore.delete(ids=chunk_ids)
+    vectorstore.persist()
+    return len(chunk_ids)
