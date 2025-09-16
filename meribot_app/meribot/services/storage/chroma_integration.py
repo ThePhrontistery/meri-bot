@@ -338,3 +338,40 @@ def count_documents_and_chunks(
             doc_ids.add(meta["id"])
     total_documents = len(doc_ids)
     return {"total_documents": total_documents, "total_chunks": total_chunks}
+
+def get_document_with_chunks(
+    document_id: str,
+    collection_name: str = "meri_chunks",
+    persist_dir: str = "chroma_data"
+) -> dict | None:
+    """
+    Recupera los metadatos principales y todos los fragmentos (chunks) asociados a un documento por su ID.
+    Args:
+        document_id (str): ID del documento.
+        collection_name (str): Nombre de la colección de ChromaDB.
+        persist_dir (str): Directorio de persistencia de ChromaDB.
+    Returns:
+        dict: {
+            "metadata": metadatos principales del documento,
+            "chunks": [ {"id": ..., "chunk_idx": ..., "text": ...}, ... ]
+        } o None si no existe.
+    """
+    vectorstore, _ = get_chroma_collection_and_client(collection_name=collection_name, persist_dir=persist_dir)
+    all_docs = vectorstore.get(include=["metadatas", "documents"])
+    ids_list = all_docs.get("ids", [])
+    metadatas_list = all_docs.get("metadatas", [])
+    documents_list = all_docs.get("documents", [])
+    # Buscar todos los chunks con ese document_id
+    chunks = []
+    for idx, meta in enumerate(metadatas_list):
+        if meta and meta.get("id") == document_id:
+            chunks.append({
+                "id": ids_list[idx],
+                "chunk_idx": meta.get("chunk_idx", idx),
+                "text": documents_list[idx] if idx < len(documents_list) else ""
+            })
+    if not chunks:
+        return None
+    # Metadatos principales del primer chunk
+    main_meta = {k: v for k, v in metadatas_list[ids_list.index(chunks[0]["id"])].items() if k != "chunk_idx"}
+    return {"metadata": main_meta, "chunks": chunks}

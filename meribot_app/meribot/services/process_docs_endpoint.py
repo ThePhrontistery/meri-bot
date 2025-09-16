@@ -141,3 +141,15 @@ def count_documents_endpoint():
         return stats
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al contar documentos y chunks: {e}")
+
+@router.get("/show-document")
+def show_document_endpoint(id: str = Query(..., description="ID del documento a mostrar")):
+    """
+    Endpoint para mostrar los metadatos y fragmentos asociados a un documento por su ID.
+    Devuelve un dict con 'metadata' y 'chunks'.
+    """
+    from meribot.services.storage.chroma_integration import get_document_with_chunks
+    result = get_document_with_chunks(id)
+    if not result:
+        raise HTTPException(status_code=404, detail=f"No existe un documento con id: {id}")
+    return result
