@@ -261,9 +261,9 @@ def delete_document_by_url(
     persist_dir: str = "chroma_data"
 ) -> int:
     """
-    Elimina todos los chunks asociados a una URL (por ejemplo, en el campo 'source_path') en ChromaDB usando LangChain.
+    Elimina todos los chunks asociados a una URL (en el campo 'url') en ChromaDB usando LangChain.
     Args:
-        url (str): URL o ruta fuente del documento a borrar.
+        url (str): URL del documento a borrar.
         collection_name (str): Nombre de la colección de ChromaDB.
         persist_dir (str): Directorio de persistencia de ChromaDB.
     Returns:
@@ -277,12 +277,11 @@ def delete_document_by_url(
     chunk_ids = []
     ids_list = all_docs.get("ids", [])
     metadatas_list = all_docs.get("metadatas", [])
-    # Buscar coincidencias en todas las tablas/metadatos
+    # Buscar coincidencias SOLO en el campo 'url'
     for idx, meta in enumerate(metadatas_list):
         if not meta:
             continue
-        # Borrado por coincidencia exacta en 'source_path' o 'url'
-        if meta.get("source_path") == url or meta.get("url") == url:
+        if meta.get("url") == url:
             chunk_ids.append(ids_list[idx])
     if not chunk_ids:
         raise ValueError(f"No se encontraron chunks asociados a la url: {url}")
