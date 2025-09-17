@@ -4,17 +4,21 @@ Coordinador principal del CORE de MeriBot. Orquesta plugins, vector search y LLM
 Proporciona una interfaz asíncrona y extensible para la API y otros módulos.
 """
 
+import os
+
 from typing import Any, Dict, List, Optional, AsyncGenerator
 from meribot.core.plugins.plugin_manager import PluginManager
-from meribot.core.db.vector_search import VectorSearch
  
 from meribot.core.llm.llm_engine import LLMEngine
 from meribot.core.conversation import ConversationManager
-from meribot.core.logging import log_generation_failure
+from meribot.core.db.chromadb_connector import ChromaDBConnector
+from meribot.utils.logger import get_logger, log_generation_failure
 from meribot.core.validation import ChatEngineRequest
 
 # Importar la función utilitaria desde utils
 from meribot.utils.utils import load_system_prompt
+
+logger = get_logger("meribot.core", log_file=os.getenv("MERIBOT_LOG_FILE"))
 
 class ChatEngine:
     """
@@ -24,12 +28,12 @@ class ChatEngine:
     def __init__(
         self,
         plugin_manager: Optional[PluginManager] = None,
-        vector_search: Optional[VectorSearch] = None,
+        chromadb_connector: Optional[ChromaDBConnector] = None,
         llm_engine: Optional[LLMEngine] = None,
         conversation_manager: Optional[ConversationManager] = None,
     ):
         self.plugin_manager = plugin_manager or PluginManager()
-        self.vector_search = vector_search or VectorSearch()
+        self.chroma_connector = chromadb_connector or ChromaDBConnector()
         self.llm_engine = llm_engine or LLMEngine()
         self.conversation_manager = conversation_manager or ConversationManager()
 
@@ -66,8 +70,8 @@ class ChatEngine:
         session = self.conversation_manager.get_or_create_session(conversation_id)
         conversation_history = session.get_history()
 
-    # Buscar en la base vectorial
-        relevant_chunks = self.vector_search.search(message, domains=domains)
+        # Buscar en la base vectorial
+        relevant_chunks = self.chroma_connector.similarity_search(query_text=message, domains=domains)
         citations = []
         seen = set()
         if relevant_chunks:
@@ -109,7 +113,7 @@ class ChatEngine:
                 metadata=llm_metadata
             )
         except Exception as e:
-            log_generation_failure(conversation_id, message, str(e))
+            log_generation_failure(logger, conversation_id, message, str(e))
             response = "[Error al generar respuesta]"
 
     # Actualizar historial de la conversación
@@ -155,7 +159,7 @@ class ChatEngine:
         conversation_history = session.get_history()
 
         # 3. Buscar en la base vectorial (usando todos los dominios recibidos)
-        relevant_chunks = self.vector_search.search(message, domains=domains)
+        relevant_chunks = self.chroma_connector.similarity_search(query_text=message, domains=domains)
         citations = []
         seen = set()
         if relevant_chunks:
@@ -189,7 +193,7 @@ class ChatEngine:
             ):
                 yield token
         except Exception as e:
-            log_generation_failure(conversation_id, message, str(e))
+            log_generation_failure(logger, conversation_id, message, str(e))
             yield "[Error al generar respuesta]"
 
     def close_session(self, conversation_id: str):

@@ -1,23 +1,9 @@
 import os
 from typing import Any, Dict, List, Optional, AsyncGenerator
-from meribot.core.logging import log_generation_failure
-from meribot.core import logging as logging_mod
 from .llm_provider import LLMProvider
+from meribot.utils.logger import get_logger
 
 class LLMEngine:
-    def _build_full_prompt(self, system_prompt: str, conversation_history: List[Dict], user_prompt: str = None, vector_db_texts: List[str] = None) -> str:
-        """
-        Construye el prompt compuesto para el LLM a partir del prompt de sistema, historial, mensaje de usuario y textos vectoriales.
-        """
-        prompt_parts = [system_prompt.strip()]
-        if vector_db_texts:
-            prompt_parts.append("\n\nContexto relevante extraído de documentos internos:\n" + "\n---\n".join(vector_db_texts))
-        if conversation_history:
-            for msg in conversation_history:
-                prompt_parts.append(f"[{msg['role']}] {msg['content']}")
-        if user_prompt is not None:
-            prompt_parts.append(f"[user] {user_prompt}")
-        return "\n".join(prompt_parts)
     """
     Motor principal para generación de respuestas con LLM y Langchain.
     Permite configuración dinámica, streaming, citación y manejo de errores.
@@ -33,7 +19,21 @@ class LLMEngine:
         }
         self.provider = provider or LLMProvider(self.model, self.params)
         # Permite inyectar logger para testabilidad
-        self.logger = logger or logging_mod
+        self.logger = logger or get_logger("meribot.llm.engine", log_file=os.getenv("MERIBOT_LOG_FILE"))
+
+    def _build_full_prompt(self, system_prompt: str, conversation_history: List[Dict], user_prompt: str = None, vector_db_texts: List[str] = None) -> str:
+        """
+        Construye el prompt compuesto para el LLM a partir del prompt de sistema, historial, mensaje de usuario y textos vectoriales.
+        """
+        prompt_parts = [system_prompt.strip()]
+        if vector_db_texts:
+            prompt_parts.append("\n\nContexto relevante extraído de documentos internos:\n" + "\n---\n".join(vector_db_texts))
+        if conversation_history:
+            for msg in conversation_history:
+                prompt_parts.append(f"[{msg['role']}] {msg['content']}")
+        if user_prompt is not None:
+            prompt_parts.append(f"[user] {user_prompt}")
+        return "\n".join(prompt_parts)
 
     async def generate_response(self, system_prompt: str, conversation_history: List[Dict], user_prompt: str, vector_db_texts: List[str], metadata: Dict[str, Any] = None) -> str:
         """
@@ -46,11 +46,14 @@ class LLMEngine:
         :return: Respuesta generada o mensaje de error
         """
         full_prompt = self._build_full_prompt(system_prompt, conversation_history, user_prompt, vector_db_texts)
+        self.logger.info("Generando respuesta LLM")
         try:
             response = await self.provider.generate(full_prompt, user_prompt)
+            self.logger.info("Respuesta LLM generada correctamente.")
             return response
         except Exception as e:
-            log_generation_failure(metadata.get("user_id", "unknown") if metadata else "unknown", user_prompt, str(e))
+            self.logger.error(f"Error al generar respuesta LLM: {e}")
+            self.logger.log_generation_failure(metadata.get("user_id", "unknown") if metadata else "unknown", user_prompt, str(e))
             return "[Error al generar respuesta]"
 
     async def stream_response(self, system_prompt: str, conversation_history: List[Dict], user_prompt: str, vector_db_texts: List[str], metadata: Dict[str, Any] = None) -> AsyncGenerator[str, None]:
@@ -64,15 +67,18 @@ class LLMEngine:
         :yield: Fragmentos de la respuesta
         """
         full_prompt = self._build_full_prompt(system_prompt, conversation_history, user_prompt, vector_db_texts)
+        self.logger.info("Generando respuesta LLM en streaming")
         try:
             any_token = False
             async for token in self.provider.stream(full_prompt):
                 any_token = True
                 yield token
             if not any_token:
+                self.logger.warning("LLM no generó tokens en streaming.")
                 yield "[Error: LLM no generó tokens]"
             # Si se requiere citar fuentes, aquí se puede añadir lógica dinámica
         except Exception as e:
+            self.logger.error(f"Error en streaming LLM: {e}")
             self.logger.log_generation_failure(
                 metadata.get("user_id") if metadata else None,
                 user_prompt,

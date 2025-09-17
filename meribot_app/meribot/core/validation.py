@@ -7,13 +7,16 @@ import os
 from meribot.utils.utils import load_config_from_yaml
 from typing import List, Optional
 from pydantic import BaseModel, Field, validator
+from meribot.utils.logger import get_logger
 
 # Configuración global: se carga una sola vez al importar el módulo
 CRAWLER_CONFIG_PATH = os.path.abspath(os.getenv('CRAWLER_CONFIG_PATH', 'crawler_config.yaml'))
+logger = get_logger("meribot.validation", log_file=os.getenv("MERIBOT_LOG_FILE"))
 
 # Cargar configuración global y asegurar valores por defecto usando la función genérica
 ALLOWED_DOMAINS = load_config_from_yaml('allowed_domains')
 if not ALLOWED_DOMAINS:
+    logger.error("No se pudo cargar la lista de dominios permitidos desde crawler_config.yaml. Revisa la ruta y el contenido del archivo.")
     raise RuntimeError("No se pudo cargar la lista de dominios permitidos desde crawler_config.yaml. Revisa la ruta y el contenido del archivo.")
 ALLOWED_DOMAINS = [d.strip().lower() for d in ALLOWED_DOMAINS if isinstance(d, str) and d.strip()]
 MAX_MESSAGE_LENGTH = load_config_from_yaml('max_message_length')
@@ -46,41 +49,46 @@ class ChatEngineRequest(BaseModel):
     @validator('conversation_id')
     def validate_conversation_id(cls, v):
         if not v or not v.strip():
+            logger.warning("conversation_id no puede estar vacío")
             raise ValueError("conversation_id no puede estar vacío")
         return v.strip()
 
     @validator('message')
     def validate_message(cls, v):
         if not v or not v.strip():
+            logger.warning("El mensaje no puede estar vacío")
             raise ValueError("El mensaje no puede estar vacío")
         message = v.strip()
         # Detectar patrones peligrosos
         message_lower = message.lower()
         for pattern in DANGEROUS_PATTERNS:
             if pattern in message_lower:
+                logger.error(f"El mensaje contiene patrones potencialmente peligrosos: {pattern}")
                 raise ValueError(f"El mensaje contiene patrones potencialmente peligrosos: {pattern}")
         if len(message) > MAX_MESSAGE_LENGTH:
+            logger.warning(f"El mensaje excede la longitud máxima permitida ({MAX_MESSAGE_LENGTH} caracteres)")
             raise ValueError(f"El mensaje excede la longitud máxima permitida ({MAX_MESSAGE_LENGTH} caracteres)")
         if not message.replace(' ', '').replace('\n', '').replace('\t', ''):
+            logger.warning("El mensaje no puede contener solo espacios en blanco")
             raise ValueError("El mensaje no puede contener solo espacios en blanco")
         return message
 
     @validator('domains')
     def validate_domains(cls, v):
         if v is None:
-            return v
-        if not isinstance(v, list):
-            raise ValueError("domains debe ser una lista")
-        if not ALLOWED_DOMAINS:
+            logger.error("No se pudo cargar la lista de dominios permitidos desde crawler_config.yaml")
             raise ValueError("No se pudo cargar la lista de dominios permitidos desde crawler_config.yaml")
         # Validar cada dominio
         for domain in v:
             if not isinstance(domain, str):
+                logger.warning("Cada dominio debe ser una cadena de texto")
                 raise ValueError("Cada dominio debe ser una cadena de texto")
             domain = domain.strip().lower()
             if not domain:
+                logger.warning("Los dominios no pueden estar vacíos")
                 raise ValueError("Los dominios no pueden estar vacíos")
             if domain not in ALLOWED_DOMAINS:
+                logger.error(f"Dominio no permitido: '{domain}'. Dominios permitidos: {', '.join(ALLOWED_DOMAINS)}")
                 raise ValueError(f"Dominio no permitido: '{domain}'. Dominios permitidos: {', '.join(ALLOWED_DOMAINS)}")
         # Normalizar y eliminar duplicados manteniendo el orden
         normalized_domains = [domain.strip().lower() for domain in v]
@@ -89,12 +97,3 @@ class ChatEngineRequest(BaseModel):
             if domain not in unique_domains:
                 unique_domains.append(domain)
         return unique_domains
-
-    class Config:
-        str_strip_whitespace = True
-        validate_assignment = True
-        extra = 'forbid'
-
-
-
-
