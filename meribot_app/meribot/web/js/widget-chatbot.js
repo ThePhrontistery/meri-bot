@@ -823,7 +823,7 @@ class MeriBotWidget {
         const payload = {
             question: message,
             conversation_id: this.conversationId || null,
-            domains: this.selectedDomains.length > 0 ? this.selectedDomains : undefined
+            domains: this.selectedDomains
         };
 
         fetch('http://localhost:8000/chatbot/query', {
