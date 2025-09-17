@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Widget MeriBot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .test-info {
+            background: #e7f3ff;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 4px solid #2196F3;
+        }
+        .status {
+            margin: 20px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .status.loading {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+        }
+        .status.success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .status.error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🤖 Test Widget MeriBot</h1>
+        
+        <div class="test-info">
+            <h3>Información de la Prueba</h3>
+            <p><strong>Servidor API:</strong> http://127.0.0.1:8001</p>
+            <p><strong>Arquitectura:</strong> Nueva estructura meribot/core/api/</p>
+            <p><strong>Objetivo:</strong> Verificar que el widget funciona correctamente después de la refactorización</p>
+        </div>
+
+        <div id="test-status" class="status loading">
+            🔄 Inicializando test del widget...
+        </div>
+
+        <div id="test-results" style="margin-top: 20px;"></div>
+
+        <!-- Aquí se cargará el widget -->
+        <div id="meribot-widget-container" style="margin-top: 30px;">
+            <h3>Widget MeriBot:</h3>
+        </div>
+    </div>
+
+    <!-- Cargamos el widget con puerto modificado -->
+    <script>
+        // Modificamos temporalmente las URLs del widget para usar puerto 8001
+        const originalFetch = window.fetch;
+        window.fetch = function(url, options) {
+            if (typeof url === 'string' && url.includes('localhost:8000')) {
+                url = url.replace('localhost:8000', 'localhost:8001');
+                console.log('🔄 Redirigiendo a:', url);
+            }
+            return originalFetch(url, options);
+        };
+
+        // Test de conectividad antes de cargar el widget
+        async function testConnectivity() {
+            const statusEl = document.getElementById('test-status');
+            const resultsEl = document.getElementById('test-results');
+            
+            try {
+                statusEl.textContent = '🔄 Probando conectividad con la API...';
+                
+                // Test 1: Health check
+                const healthResponse = await fetch('http://127.0.0.1:8001/chatbot/health');
+                const healthData = await healthResponse.json();
+                
+                // Test 2: Allowed domains
+                const domainsResponse = await fetch('http://127.0.0.1:8001/chatbot/allowed_domains');
+                const domainsData = await domainsResponse.json();
+                
+                resultsEl.innerHTML = `
+                    <h4>✅ Resultados de Conectividad:</h4>
+                    <p><strong>Health Check:</strong> ${JSON.stringify(healthData)}</p>
+                    <p><strong>Dominios Permitidos:</strong> ${JSON.stringify(domainsData)}</p>
+                `;
+                
+                statusEl.className = 'status success';
+                statusEl.textContent = '✅ API funcionando correctamente. Cargando widget...';
+                
+                // Cargar el widget después de confirmar conectividad
+                loadWidget();
+                
+            } catch (error) {
+                statusEl.className = 'status error';
+                statusEl.textContent = `❌ Error de conectividad: ${error.message}`;
+                resultsEl.innerHTML = `
+                    <h4>❌ Error:</h4>
+                    <p>No se pudo conectar con la API en http://127.0.0.1:8001</p>
+                    <p><strong>Detalles:</strong> ${error.message}</p>
+                `;
+            }
+        }
+
+        function loadWidget() {
+            // Crear script tag para cargar el widget
+            const script = document.createElement('script');
+            script.src = '../meribot/web/js/widget-chatbot.js';
+            script.onload = function() {
+                document.getElementById('test-status').textContent = '✅ Widget cargado exitosamente';
+            };
+            script.onerror = function() {
+                document.getElementById('test-status').className = 'status error';
+                document.getElementById('test-status').textContent = '❌ Error cargando el widget';
+            };
+            document.head.appendChild(script);
+        }
+
+        // Iniciar test al cargar la página
+        document.addEventListener('DOMContentLoaded', testConnectivity);
+    </script>
+</body>
+</html>
