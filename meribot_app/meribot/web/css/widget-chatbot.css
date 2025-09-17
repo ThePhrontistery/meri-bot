@@ -5,8 +5,13 @@
     --capgemini-vibrant-blue: #12abdb;
     --color-text-dark: #333333;
     --color-text-light: #666666;
-    --border-card: 12px;
+    --border-card: 18px;
     --capgemini-cool-grey: #f8f9fa;
+}
+
+h1, h2, h3, h4, .widget-title, .widget-header .info h3 {
+    font-family: 'Montserrat', Ubuntu, Arial, sans-serif;
+    font-weight: 700;
 }
 
 .source-tooltip {
@@ -438,23 +443,6 @@ textarea {
 
 .panel-close-button:hover {
     background: #f8f9fa;
-}
-
-/* Overlay */
-.panel-overlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0,0,0,0.5);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.panel-overlay.active {
-    opacity: 1;
 }
 
 /* Sistema de filtros */

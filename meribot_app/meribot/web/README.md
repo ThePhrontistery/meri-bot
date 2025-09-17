@@ -1,193 +1,94 @@
-# MeriBot Widget UI - Prototipo de Asistente Virtual Conversacional
+# MeriBot Widget Web
 
-## 📋 Descripción del Proyecto
+## 📋 Descripción
 
-Este repositorio contiene el prototipo del **Widget MeriBot**, un asistente virtual conversacional desarrollado para la intranet corporativa de **Cloud & Custom Applications (C&CA)** de Capgemini.
+Este módulo contiene el **widget conversacional MeriBot** para la práctica Cloud & Custom Applications (C&CA) de Capgemini. Permite integrar un asistente virtual accesible, moderno y personalizable en cualquier web corporativa, siguiendo la identidad visual y los estándares de accesibilidad de la compañía.
 
-El prototipo demuestra la integración de un chatbot de IA en la página principal de CCA, manteniendo la identidad visual corporativa y ofreciendo una experiencia de usuario fluida y profesional.
+## 🚀 Características principales
 
-## 🎯 Objetivo
+- **Widget flotante**: Acceso rápido desde cualquier página, con animaciones suaves y diseño responsivo.
+- **Interfaz conversacional**: Chat tipo messenger, historial de sesión, indicador de escritura y notificaciones.
+- **Sistema de filtros**: Permite filtrar dominios temáticos para personalizar las respuestas.
+- **Indicadores de fuente**: Muestra la procedencia de la información con tooltips accesibles y enlaces directos.
+- **Accesibilidad**: Navegación por teclado, roles ARIA, contraste adecuado y soporte móvil.
+- **Integración backend**: Comunicación asíncrona con la API de MeriBot.
+- **Extensible y modular**: Fácil de adaptar a nuevos dominios, fuentes y estilos.
 
-Crear un prototipo funcional del Widget-ChatBot conversacional MeriBot para presentar al cliente, mostrando:
+## 🗂️ Estructura de carpetas
 
-- Integración natural en la aplicación CCA existente
-- Interfaz conversacional intuitiva y accesible
-- Respuestas contextuales sobre la práctica C&CA
-- Diseño que respeta la identidad visual corporativa
-- Experiencia de usuario optimizada para profesionales
-
-## 🚀 Características Principales
-
-### 🎨 Diseño y UX
-- **Widget flotante** posicionado discretamente en la esquina inferior derecha
-- **Identidad visual coherente** con los colores y tipografías de Capgemini/CCA
-- **Animaciones suaves** para transiciones y interacciones
-- **Diseño responsivo** que se adapta a dispositivos móviles
-- **Indicadores visuales** de estado (en línea, escribiendo, notificaciones)
-
-### 💬 Funcionalidades Conversacionales
-- **Chat interactivo** con interfaz tipo messenger
-- **Sugerencias rápidas** contextuales para guiar la conversación
-- **Respuestas inteligentes** sobre temas relevantes de C&CA
-- **Indicador de escritura** que simula la respuesta en tiempo real
-- **Historial de conversación** durante la sesión
-
-### 🧠 Conocimiento Especializado
-- Información sobre la práctica Cloud & Custom Applications
-- Detalles de formaciones disponibles (AC&CAdemy, Mandatory, etc.)
-- Contactos corporativos relevantes (RRHH, Group IT, Formación)
-- Guías de carrera profesional y competencias
-- Información sobre iniciativas como IDEAS4ALL
-
-### 🔧 Características Técnicas
-- **HTML5/CSS3/JavaScript** vanilla para máxima compatibilidad
-- **Arquitectura modular** fácilmente integrable
-- **Gestión de estado** del widget y conversaciones
-- **Sistema de respuestas** configurable y extensible
-- **Optimización de rendimiento** con lazy loading
-
-## 📁 Estructura del Proyecto
-
-```
-MeriBot_Widget_UI/
-├── widget-chatbot.html          # Widget standalone para demostración
-├── cca-with-meribot-widget.html # Página CCA completa con widget integrado
-├── CCA Home Page/               # Recursos originales de la aplicación CCA
-│   ├── Cloud & Custom Applications.html
-│   └── Cloud & Custom Applications_files/
-│       ├── *.png, *.svg         # Imágenes y logos corporativos
-│       ├── *.css                # Estilos originales
-│       └── *.js                 # Scripts originales
-└── README.md                    # Este archivo de documentación
+```text
+meribot_app/
+└── meribot/
+    └── web/
+        ├── css/
+        │   └── widget-chatbot.css      # Estilos principales del widget
+        ├── js/
+        │   └── widget-chatbot.js       # Lógica y eventos del widget
+        ├── img/
+        │   └── Icono_Widget.png        # Icono corporativo del widget
+        ├── widget-chatbot.html         # Demo standalone del widget
+        ├── marked-cdn.html             # Integración de marked.js para Markdown
+        ├── FUENTES_INFO.md             # Documentación de indicadores de fuente
+        └── README.md                   # Este archivo
 ```
 
-## 🛠️ Instalación y Uso
+## ⚙️ Instalación y uso
 
-### Opción 1: Visualización Directa
-1. Abrir `cca-with-meribot-widget.html` en un navegador web moderno
-2. El prototipo se carga inmediatamente mostrando la integración completa
+### 1. Visualización directa (demo)
 
-### Opción 2: Servidor Local
-```bash
-# Navegar al directorio del proyecto
-cd MeriBot_Widget_UI
+Abre `widget-chatbot.html` en tu navegador. El widget se carga automáticamente y puedes probar todas sus funcionalidades.
 
-# Iniciar servidor local (Python 3)
-python -m http.server 8000
+### 2. Integración en tu web
 
-# O usar Node.js
-npx http-server
+1. Copia los archivos de `css/`, `js/`, `img/` y el snippet de HTML del widget a tu proyecto.
+2. Incluye en tu HTML principal:
 
-# Acceder a http://localhost:8000/cca-with-meribot-widget.html
+   ```html
+   <link rel="stylesheet" href="css/widget-chatbot.css">
+   <script src="js/widget-chatbot.js" defer></script>
+   ```
+
+3. Añade el contenedor del widget donde desees (ver ejemplo en `widget-chatbot.html`).
+
+### 3. Servidor local para pruebas
+
+Desde la carpeta `web/`:
+
+```powershell
+python -m http.server 3000
 ```
 
-## 🎮 Guía de Uso del Prototipo
+Accede a [http://localhost:3000/widget-chatbot.html](http://localhost:3000/widget-chatbot.html)
 
-### 1. Activación del Widget
-- **Clic en el botón flotante azul** en la esquina inferior derecha
-- El widget se expande con una animación suave
-- Aparece la interfaz de chat con mensaje de bienvenida
+## 🎨 Personalización
 
-### 2. Interacción Conversacional
-- **Escribir preguntas** en el campo de texto
-- **Usar sugerencias rápidas** haciendo clic en los chips
-- **Enviar mensajes** con Enter o el botón de envío
-- Observar las **respuestas contextuales** del asistente
+- **Colores y fuentes**: Edita las variables CSS en `widget-chatbot.css` para adaptar la identidad visual.
+- **Iconos**: Sustituye `img/Icono_Widget.png` por tu logotipo si lo deseas.
+- **Fuentes de información**: Consulta y amplía la lógica de indicadores en el JS y la documentación en `FUENTES_INFO.md`.
 
-### 3. Navegación y Funciones
-- **Cerrar el widget** haciendo clic en el botón flotante nuevamente
-- **Scroll automático** para seguir la conversación
-- **Notificaciones** visuales para nuevos mensajes
+## 🧑‍💻 Desarrollo
 
-## 🎯 Casos de Uso Demostrados
+- **JS moderno**: Código en ES2020+, sin frameworks, modular y documentado con JSDoc.
+- **Accesibilidad**: Cumple WCAG 2.1 AA, roles ARIA y navegación por teclado.
+- **Estilo**: Sigue BEM y buenas prácticas CSS, con soporte para dark mode y responsive.
+- **Extensión**: Añade nuevos filtros, fuentes o eventos editando `widget-chatbot.js` y los assets relacionados.
 
-### Información Corporativa
-- "¿Qué es C&CA?"
-- "Ver organigrama"
-- "Servicios que ofrecemos"
+## 🛡️ Seguridad
 
-### Formaciones y Desarrollo
-- "Formaciones disponibles"
-- "AC&CAdemy"
-- "Carrera profesional"
+- Sanitización de entradas de usuario.
+- Manejo robusto de errores y mensajes amigables.
+- No almacena datos sensibles en el frontend.
 
-### Contactos y Soporte
-- "Contactos de RRHH"
-- "Group IT"
-- "Formación interna"
+## 📚 Documentación adicional
 
-### Iniciativas Especiales
-- "IDEAS4ALL"
-- "Proponer idea"
-- "Cátedra UV"
+- [FUENTES_INFO.md](./FUENTES_INFO.md): Detalles sobre el sistema de indicadores de fuente.
+- [../docs/setup.md](../../docs/setup.md): Guía de instalación y estructura global del proyecto.
+- [../.github/copilot-instructions.md](../../.github/copilot-instructions.md): Convenciones de desarrollo y estándares.
 
-## 🎨 Paleta de Colores Corporativa
+## 📝 Licencia
 
-```css
---capgemini-blue: #0070ad        /* Azul corporativo principal */
---capgemini-vibrant-blue: #12abdb /* Azul vibrante para acentos */
---capgemini-dark-grey: #272936    /* Gris oscuro para textos */
---capgemini-cool-grey: #f6f6f6    /* Gris claro para fondos */
---capgemini-white: #ffffff        /* Blanco corporativo */
-```
-
-## ⚡ Características Técnicas Destacadas
-
-### Responsive Design
-- Adaptación automática a pantallas móviles
-- Reposicionamiento del widget en dispositivos pequeños
-- Tipografías escalables y legibles
-
-### Accesibilidad
-- Contrastes apropiados según estándares WCAG
-- Navegación por teclado habilitada
-- Indicadores visuales claros para el estado del sistema
-
-### Performance
-- Carga diferida de recursos no críticos
-- Animaciones optimizadas con CSS3
-- Gestión eficiente del DOM y eventos
-
-### Extensibilidad
-- Sistema de respuestas fácilmente configurable
-- Arquitectura modular para nuevas funcionalidades
-- API de integración preparada para servicios backend
-
-## 🚀 Siguientes Pasos Recomendados
-
-### Fase 1: Validación del Prototipo
-- [ ] Presentación al cliente y stakeholders
-- [ ] Recopilación de feedback y ajustes
-- [ ] Validación de la experiencia de usuario
-
-### Fase 2: Desarrollo Backend
-- [ ] Integración con servicios de IA conversacional
-- [ ] Conexión con bases de datos corporativas
-- [ ] Sistema de autenticación y personalización
-
-### Fase 3: Funcionalidades Avanzadas
-- [ ] Búsqueda semántica en documentación
-- [ ] Integración con calendarios y reservas
-- [ ] Notificaciones push y seguimiento
-
-### Fase 4: Despliegue y Monitorización
-- [ ] Integración en la intranet de producción
-- [ ] Analytics y métricas de uso
-- [ ] Mejora continua basada en datos
-
-## 🤝 Contribuciones y Colaboración
-
-Este prototipo ha sido desarrollado como demostración para el proyecto MeriBot Widget UI. Para contribuciones o consultas sobre el desarrollo:
-
-- **Contacto técnico**: Equipo de desarrollo C&CA
-- **Repositorio**: Espacio de trabajo colaborativo
-- **Documentación**: Disponible en el directorio del proyecto
-
-## 📄 Licencia y Derechos
-
-© 2025 Capgemini - Cloud & Custom Applications
-Proyecto interno de desarrollo y prototipado para cliente corporativo.
+© 2025 Capgemini - Cloud & Custom Applications. Proyecto interno para demostración y desarrollo corporativo.
 
 ---
 
-**MeriBot Widget UI** - Transformando la experiencia de usuario en la intranet corporativa con IA conversacional.
+**MeriBot Widget Web** - Transformando la experiencia de usuario en la web corporativa con IA conversacional.

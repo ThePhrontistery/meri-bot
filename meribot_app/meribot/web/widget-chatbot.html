@@ -11,12 +11,15 @@
     <!-- Estilos propios -->
     <link rel="stylesheet" href="./css/widget-chatbot.css">
     
+    <!-- Montserrat para títulos -->
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700&display=swap" rel="stylesheet">
+    
     <!-- Marked.js para procesar Markdown -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body>
-    <!-- Main content con Hero de CCA -->
-    <main style="padding: 50px 6%; display: flex; flex-direction: column; row-gap: 250px; background-image: url('./img/CCA_Hero.png'); background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: fixed; flex: 1; min-width: 900px; position: relative; min-height: 100vh;">
+    <!-- Main content sin fondo hero -->
+    <main style="padding: 50px 6%; display: flex; flex-direction: column; row-gap: 250px; flex: 1; min-width: 900px; position: relative; min-height: 100vh;">
         
         <!-- Overlay para mejorar legibilidad -->
         <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255, 255, 255, 0.1); z-index: 1;"></div>
@@ -105,13 +108,10 @@
         <!-- Botón flotante trigger -->
         <button class="widget-trigger" id="widgetTrigger" aria-label="Abrir chat de MeriBot">
             <div class="widget-icon"></div>
-            <span class="widget-text">Pregunta a Meribot</span>
+            <span class="widget-text">Pregunta a MeriBot</span>
             <div class="notification-badge"></div>
         </button>
     </div>
-
-    <!-- Overlay para cuando el panel esté centrado -->
-    <div class="panel-overlay" id="panelOverlay"></div>
 
     <!-- Script principal -->
     <script src="./js/widget-chatbot.js"></script>
