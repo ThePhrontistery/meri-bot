@@ -3,6 +3,8 @@
 ## Descripción
 Este módulo implementa la capa de servicio web que expone los endpoints de la API REST para el chatbot MeriBot. Utiliza FastAPI para proporcionar una interfaz de alto rendimiento y fácil de usar.
 
+**NOTA:** Este módulo ha sido movido dentro de `core/` para mejorar la cohesión arquitectónica, ya que los endpoints están íntimamente ligados al ChatEngine y otras funcionalidades del core.
+
 ## Características Principales
 - Endpoint `/chatbot/query` para procesar consultas
 - Integración con LangChain para el procesamiento de lenguaje natural
@@ -13,22 +15,17 @@ Este módulo implementa la capa de servicio web que expone los endpoints de la A
 
 ## Estructura del Módulo
 ```
-api/
+core/api/
 ├── __init__.py
 ├── app.py              # Aplicación principal de FastAPI
-├── routes/             # Definición de rutas
-│   └── chat.py         # Rutas relacionadas con el chat
-├── models/             # Modelos de datos para la API
-│   └── messages.py     # Modelos de solicitud/respuesta
-└── services/           # Lógica de negocio
-    └── chat_service.py # Servicio de procesamiento de chat
+└── endpoints/          # Definición de rutas adicionales (vacía por ahora)
 ```
 
 ## Uso
 
 ### Iniciar el servidor
 ```bash
-uvicorn meribot.api.app:app --reload
+uvicorn meribot.core.api.app:app --reload
 ```
 
 ### Realizar una consulta

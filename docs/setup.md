@@ -151,7 +151,7 @@ Abre tu navegador y navega a:
   pip install -r requirements.txt
 
   # Ejecutar el servidor de desarrollo
-  uvicorn meribot.api.app:app --reload
+  uvicorn meribot.core.api.app:app --reload
   ```
 
 ### CLI de Administración

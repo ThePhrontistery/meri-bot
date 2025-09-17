@@ -96,7 +96,7 @@ docker-compose logs -f
 pip install -r requirements-dev.txt
 
 # Ejecutar el servidor de desarrollo
-uvicorn meribot.api.app:app --reload
+uvicorn meribot.core.api.app:app --reload
 ```
 
 ### Frontend (Widget)

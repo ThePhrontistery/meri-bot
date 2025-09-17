@@ -16,8 +16,9 @@ logger = get_logger("meribot.validation", log_file=os.getenv("MERIBOT_LOG_FILE")
 # Cargar configuración global y asegurar valores por defecto usando la función genérica
 ALLOWED_DOMAINS = load_config_from_yaml('allowed_domains')
 if not ALLOWED_DOMAINS:
-    logger.error("No se pudo cargar la lista de dominios permitidos desde crawler_config.yaml. Revisa la ruta y el contenido del archivo.")
-    raise RuntimeError("No se pudo cargar la lista de dominios permitidos desde crawler_config.yaml. Revisa la ruta y el contenido del archivo.")
+    print("⚠️ No se pudo cargar la lista de dominios permitidos desde crawler_config.yaml. Usando valores por defecto.")
+    logger.warning("No se pudo cargar la lista de dominios permitidos desde crawler_config.yaml. Usando valores por defecto.")
+    ALLOWED_DOMAINS = ["onboarding", "training", "cca", "sdo"]  # Valores por defecto
 ALLOWED_DOMAINS = [d.strip().lower() for d in ALLOWED_DOMAINS if isinstance(d, str) and d.strip()]
 MAX_MESSAGE_LENGTH = load_config_from_yaml('max_message_length')
 MAX_MESSAGE_LENGTH = int(MAX_MESSAGE_LENGTH) if MAX_MESSAGE_LENGTH is not None else 4000
@@ -75,9 +76,16 @@ class ChatEngineRequest(BaseModel):
 
     @validator('domains')
     def validate_domains(cls, v):
+        # Si domains es None (opcional), retornar None sin error
         if v is None:
+            logger.info("No se especificaron dominios. Se usarán todos los dominios disponibles.")
+            return None
+            
+        # Si no hay dominios permitidos disponibles, fallar
+        if not ALLOWED_DOMAINS:
             logger.error("No se pudo cargar la lista de dominios permitidos desde crawler_config.yaml")
             raise ValueError("No se pudo cargar la lista de dominios permitidos desde crawler_config.yaml")
+            
         # Validar cada dominio
         for domain in v:
             if not isinstance(domain, str):

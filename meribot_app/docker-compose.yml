@@ -11,7 +11,7 @@ services:
       - ENV=development
     depends_on:
       - chromadb
-    command: uvicorn meribot.api.app:app --host 0.0.0.0 --port 8000 --reload
+    command: uvicorn meribot.core.api.app:app --host 0.0.0.0 --port 8000 --reload
 
   chromadb:
     image: chromadb/chroma:latest

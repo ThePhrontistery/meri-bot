@@ -18,4 +18,4 @@ COPY . .
 EXPOSE 8000
 
 # Comando por defecto para ejecutar la API
-CMD ["uvicorn", "meribot.api.app:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "meribot.core.api.app:app", "--host", "0.0.0.0", "--port", "8000"]

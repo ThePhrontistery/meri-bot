@@ -6,20 +6,7 @@ import requests
 from dotenv import load_dotenv
 load_dotenv()
 
-# Importar VectorSearch para acceso a Chroma (robusto a cualquier modo de ejecución)
-try:
-    from meribot.core.vector_search import VectorSearch
-except ModuleNotFoundError:
-    import importlib.util
-    import sys, os
-    core_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../core'))
-    sys.path.append(core_path)
-    spec = importlib.util.find_spec("vector_search")
-    if (spec is None):
-        raise ImportError("No se pudo encontrar vector_search.py en ../core/")
-    vector_search = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(vector_search)
-    VectorSearch = vector_search.VectorSearch
+
 
 
 # Un solo grupo db para todos los subcomandos

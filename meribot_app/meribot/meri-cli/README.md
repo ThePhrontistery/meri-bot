@@ -153,7 +153,7 @@ meri-cli crawl --url "https://example.com" --dominio "example"
 ### Error de conexión con FastAPI
 Verifica que el servidor esté ejecutándose:
 ```bash
-python -m meribot.api.app
+python -m meribot.core.api.app
 ```
 
 ### Dominio no permitido
