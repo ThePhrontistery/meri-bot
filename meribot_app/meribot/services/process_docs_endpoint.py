@@ -2,13 +2,19 @@
 Endpoint FastAPI para lanzar el procesamiento y chunking de documentos descargados.
 Reutiliza la lógica de test_hash_local_docs.py sin modificar ese archivo.
 """
-from fastapi import APIRouter, HTTPException
+
+from fastapi import APIRouter, HTTPException, Query, Request
 from pydantic import BaseModel
 import os
 import yaml
+import hashlib
+def short_doc_id(rel_path: str, length: int = 10) -> str:
+    """Genera un id alfanumérico corto y único a partir de la ruta relativa."""
+    return hashlib.sha1(rel_path.encode('utf-8')).hexdigest()[:length]
 
 from meribot.crawler.document_loader import parse_document, chunk_text_with_langchain, process_and_classify_chunks
-from meribot.services.storage.chroma_integration import upsert_chunks_to_chroma
+from meribot.services.storage.chroma_integration import upsert_chunks_to_chroma, get_chroma_collection_and_client, delete_document_by_id
+from meribot.services.storage.chroma_integration import list_documents
 
 router = APIRouter()
 
@@ -50,7 +56,7 @@ def process_docs(request: ProcessDocsRequest):
     resultados = []
     for fpath in archivos_encontrados:
         rel_path = os.path.relpath(fpath, DOCS_DIR)
-        doc_id = rel_path.replace(os.sep, '_')
+        doc_id = short_doc_id(rel_path)
         try:
             doc = parse_document(fpath, url=rel_path)
         except Exception as e:
@@ -89,3 +95,97 @@ def process_docs(request: ProcessDocsRequest):
         else:
             resultados.append({"file": rel_path, "error": "Falló el almacenamiento en ChromaDB"})
     return {"resultados": resultados}
+
+@router.delete("/delete-document")
+def delete_document(id: str = Query(..., description="ID del documento a borrar")):
+    """
+    Elimina un documento y todos sus chunks asociados de la base vectorial (ChromaDB) usando el motor Chroma/LangChain.
+    Args:
+        id (str): ID del documento a borrar
+    Returns:
+        dict: Mensaje de éxito o error
+    """
+    try:
+        num_deleted = delete_document_by_id(id)
+        return {"status": "success", "message": f"Se eliminaron {num_deleted} chunks asociados al documento '{id}' en ChromaDB."}
+    except ValueError as ve:
+        raise HTTPException(status_code=404, detail=str(ve))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al borrar en ChromaDB: {e}")
+
+@router.delete("/delete-document-by-url")
+def delete_document_by_url_endpoint(url: str = Query(..., description="URL o ruta fuente del documento a borrar")):
+    """
+    Elimina todos los chunks asociados a una URL (por ejemplo, en el campo 'source_path') en la base vectorial (ChromaDB).
+    Args:
+        url (str): URL o ruta fuente del documento a borrar
+    Returns:
+        dict: Mensaje de éxito o error
+    """
+    from meribot.services.storage.chroma_integration import delete_document_by_url
+    try:
+        num_deleted = delete_document_by_url(url)
+        return {"status": "success", "message": f"Se eliminaron {num_deleted} chunks asociados a la URL '{url}' en ChromaDB."}
+    except ValueError as ve:
+        raise HTTPException(status_code=404, detail=str(ve))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al borrar por URL en ChromaDB: {e}")
+
+@router.delete("/delete-document-by-source-path")
+def delete_document_by_source_path_endpoint(source_path: str = Query(..., description="source_path del documento a borrar")):
+    """
+    Elimina todos los chunks asociados a un source_path en la base vectorial (ChromaDB).
+    Args:
+        source_path (str): Ruta fuente del documento a borrar
+    Returns:
+        dict: Mensaje de éxito o error
+    """
+    from meribot.services.storage.chroma_integration import delete_document_by_source_path
+    try:
+        num_deleted = delete_document_by_source_path(source_path)
+        return {"status": "success", "message": f"Se eliminaron {num_deleted} chunks asociados a source_path '{source_path}' en ChromaDB."}
+    except ValueError as ve:
+        raise HTTPException(status_code=404, detail=str(ve))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al borrar por source_path en ChromaDB: {e}")
+
+@router.get("/list-documents")
+def list_documents_endpoint(request: Request):
+    """
+    Endpoint para listar todos los documentos almacenados en la base vectorial (ChromaDB).
+    Permite filtrar por cualquier campo usando parámetros de query string.
+    Si se pasa show_chunks=true, incluye el número de chunks asociados a cada documento.
+    Devuelve una lista de documentos con los campos: ["id", "title", "domain", "date", "chunks"].
+    """
+    try:
+        filters = dict(request.query_params)
+        show_chunks = filters.pop("show_chunks", "false").lower() == "true"
+        docs = list_documents(filters=filters, show_chunks=show_chunks)
+        return {"documents": docs}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al listar documentos: {e}")
+
+@router.get("/count-documents")
+def count_documents_endpoint():
+    """
+    Endpoint para obtener el número total de documentos únicos y fragmentos (chunks) almacenados en la base vectorial (ChromaDB).
+    Devuelve un diccionario con las claves: total_documents, total_chunks.
+    """
+    from meribot.services.storage.chroma_integration import count_documents_and_chunks
+    try:
+        stats = count_documents_and_chunks()
+        return stats
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al contar documentos y chunks: {e}")
+
+@router.get("/show-document")
+def show_document_endpoint(id: str = Query(..., description="ID del documento a mostrar")):
+    """
+    Endpoint para mostrar los metadatos y fragmentos asociados a un documento por su ID.
+    Devuelve un dict con 'metadata' y 'chunks'.
+    """
+    from meribot.services.storage.chroma_integration import get_document_with_chunks
+    result = get_document_with_chunks(id)
+    if not result:
+        raise HTTPException(status_code=404, detail=f"No existe un documento con id: {id}")
+    return result
