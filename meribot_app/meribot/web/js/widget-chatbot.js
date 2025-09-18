@@ -61,7 +61,7 @@ class MeriBotWidget {
      */
     async loadDomainsConfig() {
         try {
-            const response = await fetch('http://localhost:8000/chatbot/allowed_domains');
+            const response = await fetch('/chatbot/allowed_domains');
             if (!response.ok) throw new Error('Network response was not ok');
             const config = await response.json();
             this.availableDomains = (config.allowed_domains || []).map(domain => ({
@@ -780,7 +780,7 @@ class MeriBotWidget {
         setTimeout(() => {
             const welcomeContent = `
                 <div style="text-align: center; padding: 15px 10px 8px; color: #666;">
-                    <div style="width: 60px; height: 60px; background: var(--capgemini-white); background-image: url('./img/Icono_Widget.png'); background-size: 80%; background-repeat: no-repeat; background-position: center; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; border: 3px solid var(--capgemini-vibrant-blue);"></div>
+                    <div style="width: 60px; height: 60px; background: var(--capgemini-white); background-image: url('/img/Icono_Widget.png'); background-size: 80%; background-repeat: no-repeat; background-position: center; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; border: 3px solid var(--capgemini-vibrant-blue);"></div>
                     <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 8px; color: var(--color-text-dark);">¡Hola! Soy MeriBot</h4>
                     <p style="font-size: 14px; line-height: 1.4; margin-bottom: 12px;">Tu asistente virtual de Cloud & Custom Applications. Estoy aquí para ayudarte con información sobre la práctica, formaciones, contactos y más.</p>
                     <p>¿En qué puedo ayudarte hoy?</p>
@@ -826,7 +826,7 @@ class MeriBotWidget {
             domains: this.selectedDomains
         };
 
-        fetch('http://localhost:8000/chatbot/query', {
+        fetch('/chatbot/query', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

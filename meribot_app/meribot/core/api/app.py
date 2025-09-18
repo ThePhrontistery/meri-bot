@@ -1,10 +1,12 @@
 # ======================= IMPORTS =======================
 import os
 import sys
+from pathlib import Path
 from typing import Optional, Dict, Any, List
 from fastapi import FastAPI, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 # Imports del core (ahora relativos ya que estamos dentro de core/)
@@ -31,6 +33,16 @@ app.add_middleware(
     allow_headers=["*"],
     expose_headers=["*"],
 )
+
+# Configuración de archivos estáticos para servir el frontend
+web_directory = Path(__file__).parent.parent.parent / "web"
+if web_directory.exists():
+    # Montar cada subdirectorio individualmente para que coincida con las rutas del HTML
+    app.mount("/css", StaticFiles(directory=str(web_directory / "css")), name="css")
+    app.mount("/js", StaticFiles(directory=str(web_directory / "js")), name="js")
+    app.mount("/img", StaticFiles(directory=str(web_directory / "img")), name="img")
+    # Mantener también el montaje general como backup
+    app.mount("/static", StaticFiles(directory=str(web_directory)), name="static")
 
 class QueryRequest(BaseModel):
     """Modelo para las peticiones de consulta al chatbot."""
@@ -187,3 +199,22 @@ async def get_allowed_domains():
     if allowed_domains is None:
         raise HTTPException(status_code=404, detail="No se encontraron dominios permitidos en la configuración.")
     return {"allowed_domains": allowed_domains}
+
+# ======================= FRONTEND ROUTES =======================
+@app.get("/", include_in_schema=False)
+async def read_index():
+    """Servir la página principal del widget"""
+    widget_file = web_directory / "widget-chatbot.html"
+    if widget_file.exists():
+        return FileResponse(str(widget_file))
+    else:
+        return {"message": "MeriBot API funcionando correctamente", "docs": "/docs"}
+
+@app.get("/widget", include_in_schema=False)
+async def read_widget():
+    """Servir la página del widget chatbot"""
+    widget_file = web_directory / "widget-chatbot.html"
+    if widget_file.exists():
+        return FileResponse(str(widget_file))
+    else:
+        raise HTTPException(status_code=404, detail="Widget no encontrado")
