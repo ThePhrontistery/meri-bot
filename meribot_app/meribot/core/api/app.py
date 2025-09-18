@@ -11,9 +11,7 @@ from pydantic import BaseModel
 
 # Imports del core (ahora relativos ya que estamos dentro de core/)
 from meribot.core.chatengine import ChatEngine
-from meribot.services.crawler_endpoint import router as crawler_router
-from meribot.services.complete_crawler_endpoint import router as complete_crawler_router
-from meribot.services.process_docs_endpoint import router as process_docs_router
+from meribot.crawler.api import router as crawler_router
 from meribot.utils.utils import load_config_from_yaml
 
 # ======================= FIN IMPORTS =======================
@@ -62,8 +60,6 @@ async def options_chatbot():
     return JSONResponse(content={"status": "ok"}, headers=headers)
 
 app.include_router(crawler_router)
-app.include_router(complete_crawler_router)
-app.include_router(process_docs_router)
 
 
 # Inicializar el core

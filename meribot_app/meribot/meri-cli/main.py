@@ -107,7 +107,7 @@ def crawl(url: str, dominio: str, max_depth: int, max_pages: Optional[int], incl
     }
     
     # Endpoint del crawler
-    endpoint = f"{api_host}/crawl-and-process"
+    endpoint = f"{api_host}/crawler/crawl-and-process"
     
     try:
         click.echo(f"\nConectando con el servicio de crawling: {endpoint}")
