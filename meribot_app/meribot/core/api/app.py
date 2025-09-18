@@ -12,7 +12,7 @@ from pydantic import BaseModel
 # Imports del core (ahora relativos ya que estamos dentro de core/)
 from meribot.core.chatengine import ChatEngine
 from meribot.crawler.api import router as crawler_router
-from meribot.utils.utils import load_config_from_yaml
+from meribot.core.config import load_config_from_yaml
 
 # ======================= FIN IMPORTS =======================
 

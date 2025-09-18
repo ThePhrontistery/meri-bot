@@ -10,8 +10,8 @@ import logging.handlers
 from datetime import datetime
 from typing import Any, Dict
 from dotenv import load_dotenv
-from meribot.utils.json_formatter import JsonFormatter
-from meribot.utils.utils import load_config_from_yaml
+from meribot.core.json_formatter import JsonFormatter
+from meribot.core.config import load_config_from_yaml
 
 # === CONFIGURATION ===
 load_dotenv()
@@ -53,7 +53,7 @@ def get_logger(module_name: str = "meribot", log_file: str = None) -> logging.Lo
 
     return logger
 
-## Use shared config loader from utils
+## Use shared config loader from core
 
 # === SENSITIVE KEYS ===
 try:

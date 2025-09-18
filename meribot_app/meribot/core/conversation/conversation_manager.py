@@ -1,6 +1,6 @@
 from typing import Dict, Optional
 from .conversation_context import ConversationContext
-from meribot.utils.logger import get_logger
+from meribot.core.logger import get_logger
 
 class ConversationManager:
     """

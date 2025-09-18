@@ -25,7 +25,7 @@ import json
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 # --- Utilidades de hash y persistencia ---
-from meribot.utils.hash_utils import calculate_sha256, load_hash_db, save_hash_db
+from meribot.crawler.hash_utils import calculate_sha256, load_hash_db, save_hash_db
 
 # --- Configuración del splitter ---
 SPLITTER_CHUNK_SIZE_DOC = 2000

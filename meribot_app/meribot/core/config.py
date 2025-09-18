@@ -1,10 +1,11 @@
 """
-utils.py
-Funciones utilitarias generales para MeriBot.
+core/config.py
+Funciones de configuración centralizadas para el core de MeriBot.
 """
 
 import yaml
 import os
+
 
 def load_config_from_yaml(param: str):
     """
@@ -21,6 +22,7 @@ def load_config_from_yaml(param: str):
         return value
     except Exception:
         return None
+
 
 def load_system_prompt():
     """

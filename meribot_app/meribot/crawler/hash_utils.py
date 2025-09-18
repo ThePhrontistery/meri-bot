@@ -1,9 +1,11 @@
 """
-utils/hash_utils.py
-Funciones utilitarias para el cálculo de hash de contenido.
+crawler/hash_utils.py
+Funciones utilitarias para el cálculo de hash de contenido - específicas del crawler.
 """
 import hashlib
-from typing import Union
+import json
+import os
+from typing import Union, Dict
 
 
 def calculate_sha256(text: Union[str, bytes]) -> str:
@@ -16,11 +18,6 @@ def calculate_sha256(text: Union[str, bytes]) -> str:
         text = text.encode('utf-8')
     return hashlib.sha256(text).hexdigest()
 
-
-# --- Persistencia de hashes en JSON ---
-import json
-import os
-from typing import Dict
 
 def load_hash_db(json_path: str) -> Dict[str, str]:
     """
@@ -35,6 +32,7 @@ def load_hash_db(json_path: str) -> Dict[str, str]:
             return json.load(f)
         except Exception:
             return {}
+
 
 def save_hash_db(hash_db: Dict[str, str], json_path: str):
     """

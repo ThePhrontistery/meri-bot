@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 from typing import List, Dict, Optional
 import uuid, os
 from datetime import datetime
-from meribot.utils.logger import get_logger
+from meribot.core.logger import get_logger
 
 @dataclass
 class ConversationContext:

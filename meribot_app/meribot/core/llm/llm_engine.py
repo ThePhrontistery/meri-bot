@@ -1,7 +1,7 @@
 import os
 from typing import Any, Dict, List, Optional, AsyncGenerator
 from .llm_provider import LLMProvider
-from meribot.utils.logger import get_logger
+from meribot.core.logger import get_logger
 
 class LLMEngine:
     """

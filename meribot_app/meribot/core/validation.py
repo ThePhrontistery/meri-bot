@@ -4,10 +4,10 @@ validation.py
 Valida y sanitiza los datos de entrada para el CORE de MeriBot usando Pydantic.
 """
 import os
-from meribot.utils.utils import load_config_from_yaml
+from meribot.core.config import load_config_from_yaml
 from typing import List, Optional
 from pydantic import BaseModel, Field, validator
-from meribot.utils.logger import get_logger
+from meribot.core.logger import get_logger
 
 # Configuración global: se carga una sola vez al importar el módulo
 CRAWLER_CONFIG_PATH = os.path.abspath(os.getenv('CRAWLER_CONFIG_PATH', 'crawler_config.yaml'))
