@@ -1,15 +1,6 @@
-#!/usr/bin/env pyt# Importar uvicorn
-try:
-    import uvicorn
-    
-    print("🚀 Iniciando servidor MeriBot API + Frontend...")
-    print(f"📁 Directorio de trabajo: {current_dir}")
-    print(f"🐍 Python path: {sys.path[0]}")
-    print("🌐 Servidor disponible en:")
-    print("   📡 API: http://localhost:8000")
-    print("   🖥️  Frontend: http://localhost:8000/")
-    print("   🤖 Widget: http://localhost:8000/widget")
-    print("   📚 Docs: http://localhost:8000/docs")ript de arranque para el servidor MeriBot API
+#!/usr/bin/env python
+"""
+sript de arranque para el servidor MeriBot API
 Resuelve los problemas de imports configurando el PYTHONPATH correctamente
 """
 import os
