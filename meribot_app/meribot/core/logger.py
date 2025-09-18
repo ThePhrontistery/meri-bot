@@ -90,9 +90,10 @@ def log_guardrail_rejection(logger, user_id: str, input_text: str, reason: str, 
 def log_guardrail_event(logger, event_type: str, user_input: str, extra: dict = None) -> None:
     """Log a guardrail event (input blocked, forbidden pattern, etc)."""
     import html
+    from datetime import timezone
     sanitized_input = html.escape(str(user_input))[:256]
     log_data = {
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z'),
         "event": "guardrail_reject",
         "type": event_type,
         "input": sanitized_input,

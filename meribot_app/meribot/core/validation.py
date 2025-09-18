@@ -1,12 +1,12 @@
 
 """
 validation.py
-Valida y sanitiza los datos de entrada para el CORE de MeriBot usando Pydantic.
+Valida y sanitiza los datos de entrada para el CORE de MeriBot usando Pydantic v2.
 """
 import os
 from meribot.core.config import load_config_from_yaml
 from typing import List, Optional
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator, ConfigDict
 from meribot.core.logger import get_logger
 
 # Configuración global: se carga una sola vez al importar el módulo
@@ -34,6 +34,8 @@ class ChatEngineRequest(BaseModel):
     """
     Valida los datos de entrada del ChatEngine: conversation_id, message y domains.
     """
+    model_config = ConfigDict(str_strip_whitespace=True)
+    
     conversation_id: str = Field(
         ..., description="ID de la conversación para mantener el contexto",
         min_length=1, max_length=MAX_CONVERSATION_ID_LENGTH
@@ -44,17 +46,19 @@ class ChatEngineRequest(BaseModel):
     )
     domains: Optional[List[str]] = Field(
         None, description="Lista de dominios para filtrar la búsqueda",
-        max_items=MAX_DOMAINS_COUNT
+        max_length=MAX_DOMAINS_COUNT
     )
 
-    @validator('conversation_id')
+    @field_validator('conversation_id')
+    @classmethod
     def validate_conversation_id(cls, v):
         if not v or not v.strip():
             logger.warning("conversation_id no puede estar vacío")
             raise ValueError("conversation_id no puede estar vacío")
         return v.strip()
 
-    @validator('message')
+    @field_validator('message')
+    @classmethod
     def validate_message(cls, v):
         if not v or not v.strip():
             logger.warning("El mensaje no puede estar vacío")
@@ -74,7 +78,8 @@ class ChatEngineRequest(BaseModel):
             raise ValueError("El mensaje no puede contener solo espacios en blanco")
         return message
 
-    @validator('domains')
+    @field_validator('domains')
+    @classmethod
     def validate_domains(cls, v):
         # Si domains es None (opcional), retornar None sin error
         if v is None:
