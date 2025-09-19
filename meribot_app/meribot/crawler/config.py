@@ -8,13 +8,15 @@ Provee acceso centralizado a la configuración.
 import os
 import yaml
 from typing import Any, Dict, List, Optional
-from pydantic import BaseModel, Field, ValidationError
+from pydantic import BaseModel, Field, ValidationError, ConfigDict
 
 CONFIG_PATH_YAML = os.environ.get("CRAWLER_CONFIG_YAML", os.path.join(os.path.dirname(__file__), "crawler_config.yaml"))
 
 
-# Esquema formal de configuración usando Pydantic
+# Esquema formal de configuración usando Pydantic v2
 class CrawlerConfig(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    
     seeds: List[str] = Field(..., description="Lista de URLs semilla")
     allowed_domains: List[str] = Field(..., description="Dominios permitidos para el crawler")
     user_agent: str = Field(..., description="Agente de usuario HTTP")
@@ -25,9 +27,6 @@ class CrawlerConfig(BaseModel):
     embedding_model: str = Field(..., description="Modelo de embeddings a usar")
     max_depth: Optional[int] = Field(3, description="Profundidad máxima de crawling")
     file_types: Optional[List[str]] = Field(default_factory=lambda: ["html", "pdf", "docx", "xlsx"], description="Tipos de archivo soportados")
-
-    class Config:
-        extra = "forbid"
 
 
 class ConfigError(Exception):
