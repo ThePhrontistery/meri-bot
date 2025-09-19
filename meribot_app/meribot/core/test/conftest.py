@@ -16,7 +16,7 @@ from pathlib import Path
 # Configurar variables de entorno para tests
 os.environ.update({
     'MERIBOT_LOG_FILE': 'test_meribot.log',
-    'CHROMA_PERSIST_DIRECTORY': 'test_chroma_data',
+    'CHROMA_PERSIST_DIRECTORY': 'meribot/core/test/test_chroma_data',
     'CHROMA_COLLECTION_NAME': 'test_collection',
     'AZURE_OPENAI_API_KEY': 'test_api_key',
     'AZURE_OPENAI_ENDPOINT': 'https://test.openai.azure.com',
@@ -253,8 +253,8 @@ def setup_test_environment():
     # Asegurar que estamos en modo test
     os.environ['TESTING'] = 'true'
     
-    # Crear directorios temporales si no existen
-    test_dirs = ['test_chroma_data', 'test_logs']
+    # Crear directorios temporales si no existen (dentro del directorio test)
+    test_dirs = ['meribot/core/test/test_chroma_data', 'meribot/core/test/test_logs']
     for dir_name in test_dirs:
         os.makedirs(dir_name, exist_ok=True)
     

@@ -3,7 +3,7 @@ import asyncio
 import requests
 import json
 from typing import Any, Dict, AsyncGenerator
-from meribot.core.logger import get_logger
+from meribot.utils.logging import get_logger
 
 class LLMProvider:
     def __init__(self, model: str, params: Dict[str, Any]):

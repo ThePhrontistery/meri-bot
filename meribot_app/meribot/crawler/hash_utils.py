@@ -14,6 +14,8 @@ def calculate_sha256(text: Union[str, bytes]) -> str:
     :param text: Texto o bytes a hashear
     :return: Hash hexadecimal SHA-256
     """
+    if text is None:
+        raise AttributeError("Cannot calculate hash of None value")
     if isinstance(text, str):
         text = text.encode('utf-8')
     return hashlib.sha256(text).hexdigest()

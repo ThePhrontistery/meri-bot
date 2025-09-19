@@ -12,7 +12,7 @@ from meribot.core.plugins.plugin_manager import PluginManager
 from meribot.core.llm.llm_engine import LLMEngine
 from meribot.core.conversation import ConversationManager
 from meribot.core.db.chromadb_connector import ChromaDBConnector
-from meribot.core.logger import get_logger, log_generation_failure
+from meribot.utils.logging import get_logger, log_generation_failure
 from meribot.core.validation import ChatEngineRequest
 
 # Importar la función utilitaria desde config

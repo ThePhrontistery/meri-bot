@@ -1,5 +1,5 @@
 """
-Tests unitarios para meribot.core.json_formatter
+Tests unitarios para meribot.utils.logging.formatters
 """
 
 import json
@@ -8,7 +8,7 @@ from datetime import datetime
 from unittest.mock import patch, MagicMock
 import pytest
 
-from meribot.core.json_formatter import JsonFormatter
+from meribot.utils.logging.formatters import JsonFormatter
 
 
 class TestJsonFormatter:
@@ -96,7 +96,7 @@ class TestJsonFormatter:
         record.module = "test"
         record.funcName = "test"
         
-        with patch('meribot.core.json_formatter.datetime') as mock_datetime:
+        with patch('meribot.utils.logging.formatters.datetime') as mock_datetime:
             # Mock datetime.now para timestamp predecible
             mock_now = datetime(2024, 1, 15, 10, 30, 45, 123456, timezone.utc)
             mock_datetime.now.return_value = mock_now
@@ -500,7 +500,7 @@ class TestJsonFormatterEdgeCases:
         with pytest.raises(TypeError):
             formatter.format(record)
     
-    @patch('meribot.core.json_formatter.datetime')
+    @patch('meribot.utils.logging.formatters.datetime')
     def test_json_formatter_datetime_error(self, mock_datetime):
         """Test manejo de error en datetime"""
         # Mock datetime.now en lugar de utcnow

@@ -1,5 +1,5 @@
 """
-Tests unitarios para meribot.core.logger
+Tests unitarios para meribot.utils.logging
 """
 
 import os
@@ -9,7 +9,7 @@ import logging
 from unittest.mock import patch, MagicMock, mock_open
 import pytest
 
-from meribot.core.logger import (
+from meribot.utils.logging import (
     get_logger,
     sanitize,
     log_critical_event,
@@ -79,7 +79,7 @@ class TestGetLogger:
 class TestSanitize:
     """Tests para la función sanitize"""
     
-    @patch('meribot.core.logger.SENSITIVE_KEYS', {'password', 'api_key', 'secret'})
+    @patch('meribot.utils.logging.config.get_sensitive_keys')
     def test_sanitize_sensitive_keys(self):
         """Test que sanitiza claves sensibles correctamente"""
         data = {
@@ -211,20 +211,20 @@ class TestIntegration:
                 assert log_data["level"] == "INFO"
                 assert log_data["message"] == "Test message"
     
-    @patch('meribot.core.logger.load_config_from_yaml')
+    @patch('meribot.utils.logging.config.load_config_from_yaml')
     def test_sensitive_keys_loading(self, mock_load_config):
         """Test carga de SENSITIVE_KEYS desde configuración"""
         mock_load_config.return_value = ["password", "token", "secret"]
         
         # Reimport para trigger config loading
         import importlib
-        import meribot.core.logger
-        importlib.reload(meribot.core.logger)
+        import meribot.utils.logging
+        importlib.reload(meribot.utils.logging)
         
         # Test sanitization with loaded keys - patch SENSITIVE_KEYS directamente
-        with patch('meribot.core.logger.SENSITIVE_KEYS', {"password", "token", "secret"}):
+        with patch('meribot.utils.logging.utils.get_sensitive_keys', return_value={"password", "token", "secret"}):
             data = {"password": "secret", "username": "user"}
-            result = meribot.core.logger.sanitize(data)
+            result = meribot.utils.logging.sanitize(data)
             
             assert result["password"] == "***"
             assert result["username"] == "user"
@@ -272,7 +272,7 @@ class TestEdgeCases:
         with pytest.raises(AttributeError):
             log_error(None, "test message")
     
-    @patch('meribot.core.logger.JsonFormatter')
+    @patch('meribot.utils.logging.formatters.JsonFormatter')
     def test_formatter_error_handling(self, mock_formatter, temp_directory):
         """Test manejo de errores en formatter"""
         mock_formatter.side_effect = Exception("Formatter error")

@@ -2,7 +2,7 @@ import os
 
 from typing import Any, Dict
 from .base_plugin import BasePlugin
-from meribot.core.logger import get_logger
+from meribot.utils.logging import get_logger
 
 class PluginManager:
     """

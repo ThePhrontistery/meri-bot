@@ -9,7 +9,7 @@ from urllib.parse import urljoin, urlparse
 import requests
 from bs4 import BeautifulSoup
 from .config import get_config, load_yaml_config, validate_config, ConfigError
-from .logger import get_logger
+from meribot.utils.logging import get_logger
 
 
 class WebScraper:

@@ -7,7 +7,7 @@ import os
 from meribot.core.config import load_config_from_yaml
 from typing import List, Optional
 from pydantic import BaseModel, Field, field_validator, ConfigDict
-from meribot.core.logger import get_logger
+from meribot.utils.logging import get_logger
 
 # Configuración global: se carga una sola vez al importar el módulo
 CRAWLER_CONFIG_PATH = os.path.abspath(os.getenv('CRAWLER_CONFIG_PATH', 'crawler_config.yaml'))

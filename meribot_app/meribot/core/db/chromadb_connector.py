@@ -2,7 +2,7 @@ import os
 from typing import Optional
 from langchain_chroma import Chroma
 from langchain_openai import AzureOpenAIEmbeddings
-from meribot.core.logger import get_logger
+from meribot.utils.logging import get_logger
 
 class ChromaDBConnector:
     """
