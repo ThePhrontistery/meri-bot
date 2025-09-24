@@ -6,51 +6,49 @@ Está dirigido a desarrolladores, DevOps, administradores técnicos, analistas f
 ============================================================
 ```
 📁 raíz del proyecto
-│       ├──.github/                         # Módulo de GitHub
-│           ├── copilot-instructions.md     # Instrucciones para GitHub Copilot
-│       ├── docs/                           # Documentation (Markdown files)
-│       ├── Local_C&CA_host_web/            # Web del portal anfitrión en local
-│       ├── meribot_app/
-│         ├── meribot/  
-│             ├── api/                        # Módulo de la API FastAPI
-│             │   ├── __init__.py
-│             │   └── app.py                  # Aplicación principal de FastAPI
-│             │
-│             ├── meri-cli/                   # Herramientas de línea de comandos
-│             │   ├── __init__.py
-│             │   └── main.py                 # Comandos CLI principales
-│             │
-│             ├── core/                       # Lógica principal del chatbot
-│             │   └── __init__.py
-│             │
-│             ├── crawler/                    # Módulo de web scraping
-│             │   └── __init__.py
-│             │
-│             ├── models/                     # Modelos de datos
-│             │   └── __init__.py
-│             │
-│             ├── services/                   # Servicios de negocio
-│             │   └── __init__.py
-│             │
-│             ├── utils/                      # Utilidades y helpers
-│             │   └── __init__.py
-│             │
-│             ├── __init__.py
-│             ├── __main__.py                 # Punto de entrada principal
-│             │
-│         ├── web/                          # Interfaz web del widget
-│             ├── static/
-│             │   ├── css/
-│             │   │   └── styles.css
-│             │   ├── js/#
-│             │   │   └── chat.js
-│             │   └── index.html
-│         ├── requirements.txt          # Dependencias de Python
-│       ├──.env                      # Variables de entorno
-│       ├──.gitignore                # indica a Git qué archivos/carpetas deben ser ignorados
-│       ├── README.md                 # Estructura de Carpetas y enlaces a Documentos/instrucciones
-│       ├── tests/                    # Unit and integration tests
-│       ├── logs/                     # Server and application logs
+├── .github/                         # Configuración de GitHub
+│   └── copilot-instructions.md      # Instrucciones para GitHub Copilot
+├── docs/                           # Documentación completa del proyecto
+│   ├── Functional_requirements/    # Requisitos funcionales
+│   ├── Guides/                     # Guías y buenas prácticas
+│   ├── Manual_Usuario/             # Manuales de usuario
+│   ├── RFP/                        # Requisitos del cliente
+│   └── *.md                        # Documentos técnicos
+├── logs/                           # Logs del sistema
+│   └── meribot_core.log
+├── meribot_app/                    # 🔸 APLICACIÓN PRINCIPAL
+│   ├── meribot/                    # Módulos core del chatbot
+│   │   ├── core/                   # 🧠 Lógica principal y API
+│   │   │   ├── api/                # FastAPI endpoints
+│   │   │   │   ├── app.py          # Aplicación FastAPI principal
+│   │   │   │   └── endpoints/      # Endpoints organizados
+│   │   │   ├── conversation/       # Gestión de conversaciones
+│   │   │   ├── db/                 # Acceso a base de datos
+│   │   │   ├── llm/               # Integración con LLM
+│   │   │   ├── templates/          # Plantillas de respuesta
+│   │   │   └── chatengine.py       # Motor de conversación
+│   │   ├── crawler/                # 🕷️ Web scraping y extracción
+│   │   │   ├── api/                # API del crawler
+│   │   │   ├── storage/            # Almacenamiento de datos
+│   │   │   └── scraper.py          # Motor de scraping
+│   │   ├── meri-cli/              # ⚙️ Herramientas CLI
+│   │   │   ├── main.py             # Comandos principales
+│   │   │   └── db_commands.py      # Comandos de BD
+│   │   ├── utils/                  # Utilidades comunes
+│   │   ├── web/                    # 🌐 Interfaz web
+│   │   │   ├── css/                # Estilos del widget
+│   │   │   ├── js/                 # JavaScript del chatbot
+│   │   │   └── *.html              # Páginas del widget
+│   │   ├── __init__.py
+│   │   └── __main__.py             # Punto de entrada principal
+│   ├── chroma_data/               # 🗄️ Base de datos vectorial
+│   ├── data/                      # Datos extraídos por el scraper
+│   │   └── scraped/
+│   ├── logs/                      # Logs de la aplicación
+│   ├── requirements.txt           # Dependencias Python
+│   └── *.py                       # Scripts auxiliares
+├── requirements.txt               # Dependencias del proyecto
+└── README.md                      # Documentación principal
 ```
 
 ## 📤 Instalación y Configuración
@@ -75,15 +73,18 @@ Está dirigido a desarrolladores, DevOps, administradores técnicos, analistas f
 
 ### Pasos Iniciales
 
-#### 1. Clona el repositorio y entra en la carpeta del proyecto
+#### 1. Clona el repositorio y navega a la carpeta del proyecto
 
    ```bash
-   git clone [URL_DEL_REPOSITORIO]
-        siendo [URL_DEL_REPOSITORIO]:
-        para meri-bot: https://github.com/ThePhrontistery/meri-bot
-        para mari-bot: https://github.com/ThePhrontistery/mari-bot
+   # Clonar el repositorio
+   git clone https://github.com/ThePhrontistery/meri-bot
+   cd meri-bot
+
+   # Navegar a la aplicación principal
    cd meribot_app
    ```
+
+   **Nota**: La aplicación principal se encuentra en la carpeta `meribot_app/` dentro del repositorio.
 #### 2. Configura las Variables de entorno
 Las variables de entorno (por ejemplo, puertos, modo desarrollo/producción, etc.) se gestionan en un archivo `.env`.
 
@@ -93,78 +94,119 @@ Copia el archivo de variables de entorno de ejemplo y edítalo según tus necesi
    cp .env.example .env
    ```
 
-Estas variables se cargarán automáticamente al arrancar la app, gracias a `python-dotenv` (ver `app/__init__.py`).
+Estas variables se cargarán automáticamente al arrancar la app, gracias a `python-dotenv`.
+
 #### 3. Instala dependencias
 
-- Instala las dependencias de Python:
-   ```bash
-   pip install -r requirements.txt
-   ```
-   
-- Instala automáticamente todas las dependencias, crea el entorno virtual y el archivo de lock.
+**Opción A: Con pip (método tradicional)**
+```bash
+pip install -r requirements.txt
+```
 
-    ```bash
-    uv sync
-    ```
-El comando `uv sync` lee el archivo **pyproject.toml**, instala todas las dependencias necesarias, crea un entorno virtual aislado, y guarda el estado en **uv.lock**
+**Opción B: Con uv (recomendado para desarrollo moderno)**
 
-- Cómo añadir o actualizar dependencias
-Cuando necesites nuevas librerías o quieras actualizar alguna existente, utiliza:
+uv es una herramienta moderna que gestiona entornos y dependencias de forma más eficiente:
 
-    ```bash
-    uv add nombre_paquete@latest    # Añade y bloquea la versión más reciente
-    uv sync                        # Sincroniza el entorno con el lockfile
-    ```
+```bash
+# Instala todas las dependencias y crea entorno virtual
+uv sync
+```
+
+El comando `uv sync` lee el archivo **pyproject.toml** (si existe) o **requirements.txt**, instala todas las dependencias necesarias, crea un entorno virtual aislado, y guarda el estado en **uv.lock**.
+
+**Gestión de dependencias con uv:**
+```bash
+# Añadir nueva dependencia
+uv add nombre_paquete@latest    # Añade y bloquea la versión más reciente
+
+# Actualizar dependencias
+uv sync                        # Sincroniza el entorno con el lockfile
+
+# Ejecutar comandos en el entorno virtual
+uv run python -m meribot       # Ejecuta directamente en el entorno uv
+```
 
 Esto asegura que todo el equipo utilice exactamente las mismas versiones.
 
-## 📚 Ejecución en desarrollo
+## � Ejecución en desarrollo
 ============================================================
-### Frontend (Widget)
 
-  ```bash
-  cd web
-  python -m http.server 3000
-```
-
-Abre tu navegador y navega a:
-- Interfaz del widget: http://localhost:3000
-- Documentación de la API: http://localhost:8000/docs
-
-
-(NO VALE):
-- Inicia el servidor con recarga automática (hot reload)
-  ```bash
-  uv run -- uvicorn app.__main__:app --reload
-    ```
-
-### Frontend (C&CA en local con Widget embebido)- Interfaz Web
-
-  ```bash
-  
-  ```
-
-### Backend (FastAPI)
-
-  ```bash
-  # Instalar dependencias
-  pip install -r requirements.txt
-
-  # Ejecutar el servidor de desarrollo
-  uvicorn meribot.core.api.app:app --reload
-  ```
-
-### CLI de Administración
+### 🎯 Inicio Rápido - Servidor Completo
 
 ```bash
-# Ver ayuda
-python -m meribot --help
+# Desde la carpeta meribot_app/
+python -m meribot
 
-# Ejecutar scraping manual
-python -m meribot scrape --url [URL]
+# O alternativamente
+uvicorn meribot.core.api.app:app --reload --host 0.0.0.0 --port 8000
+```
 
-# Gestionar la base de datos
-python -m meribot db [--reset]
+**URLs disponibles:**
+- **Widget del Chatbot**: http://localhost:8000/ o http://localhost:8000/widget
+- **Documentación API**: http://localhost:8000/docs
+- **Health Check**: http://localhost:8000/chatbot/health
+
+### 🌐 Frontend - Widget Independiente
+
+Si quieres servir solo el frontend del widget:
+
+```bash
+# Desde meribot_app/meribot/web/
+python -m http.server 3000
+```
+
+- **Interfaz del widget**: http://localhost:3000/widget-chatbot.html
+
+### 🔧 Backend - Solo API FastAPI
+
+Para ejecutar únicamente la API sin el frontend:
+
+```bash
+# Desde meribot_app/
+uvicorn meribot.core.api.app:app --reload --port 8000
+```
+
+### ⚙️ CLI de Administración - meri-cli
+
+```bash
+# Ver todos los comandos disponibles
+python -m meribot.meri-cli --help
+
+# Ejecutar scraping manual de una URL específica
+python -m meribot.meri-cli scrape --url https://ejemplo.com
+
+# Gestionar la base de datos vectorial
+python -m meribot.meri-cli db --reset    # Reiniciar BD
+python -m meribot.meri-cli db --status   # Estado de la BD
+python -m meribot.meri-cli db --optimize # Optimizar índices
+
+# Ver logs del sistema
+python -m meribot.meri-cli logs --tail 50
+```
+
+### 🕷️ Crawler - Extracción de Datos
+
+```bash
+# Ejecutar scraping programado
+python -m meribot.crawler.api
+
+# Scraping con configuración personalizada
+python -m meribot.crawler.api --config custom_config.yaml
+```
+
+### 🐳 Ejecución con Docker (Opcional)
+
+Si prefieres usar Docker:
+
+```bash
+# Construir la imagen
+docker build -t meribot .
+
+# Ejecutar el contenedor
+docker run -p 8000:8000 meribot
+
+# Con Docker Compose (si está disponible)
+docker-compose up -d
 ```
 
 ## Instrucciones personalizadas para GitHub Copilot
