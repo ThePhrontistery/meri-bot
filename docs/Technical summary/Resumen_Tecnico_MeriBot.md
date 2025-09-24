@@ -5,6 +5,8 @@
 - [flujo tecnico](#flujo-tecnico)
   - [meri-cli scraper y carga de documentos](#meri-cli-scraper-y-carga-de-documentos)
   - [meribot motor conversacional y presentacion](#meribot-motor-conversacional-y-presentacion)
+    - [detalles sobre la consulta y generación de respuestas](#detalles-sobre-la-consulta-y-generación-de-respuestas)
+    - [mejoras-recomendación](#mejoras-recomendación)
 
 ---
 
@@ -46,7 +48,21 @@
 - Se aplica filtro por dominio e idioma según la consulta.
 - FastAPI recibe la petición y consulta la base vectorial.
 - LangChain procesa la consulta y genera una respuesta relevante.
-- Meribot muestra la respuesta en el panel conversacional, incluyendo enlaces a los documentos fuente para trazabilidad.
+
+#### detalles sobre la consulta y generación de respuestas
+
+Cuando el usuario envía una consulta desde el panel web, FastAPI actúa como intermediario, recibiendo la petición y gestionando la comunicación con la base vectorial (ChromaDB). Utiliza LangChain para realizar una búsqueda semántica de los fragmentos más relevantes y generar la respuesta final.
+
+**Comportamiento observado en la búsqueda semántica y generación de citas:**
+
+- El método `similarity_search` de LangChain sobre ChromaDB devuelve los documentos más similares según el embedding, pero no filtra por un umbral de similitud (score). Por defecto, se devuelven los `top_k` resultados, aunque algunos puedan ser poco relevantes para la consulta.
+- Esto puede provocar que en la respuesta se incluyan más citas de las necesarias, o que aparezcan documentos que no contienen literalmente el término buscado, sino que son "similares" semánticamente. Este es un comportamiento típico de los modelos de embeddings: la similitud no garantiza coincidencia exacta, sino proximidad conceptual.
+- Para mejorar la precisión y relevancia de las citas mostradas al usuario, es recomendable aplicar un filtrado adicional tras la búsqueda, descartando aquellos fragmentos cuyo score de similitud esté por debajo de un umbral definido. Así se evita mostrar referencias poco útiles o irrelevantes.
+- Además, se pueden implementar tratamientos post-búsqueda, como la validación de la presencia literal de términos clave en los fragmentos recuperados, o el ajuste dinámico de `top_k` según la calidad de los resultados.
+
+#### mejoras-recomendación
+
+- Revisar y ajustar los parámetros de la función de búsqueda (`top_k`, umbral de score) y aplicar filtros adicionales tras la consulta a la base vectorial para garantizar que las citas y documentos referenciados sean realmente relevantes para la pregunta del usuario.
 
 ---
 
