@@ -15,7 +15,7 @@ CONFIG_PATH_YAML = os.environ.get("CRAWLER_CONFIG_YAML", os.path.join(os.path.di
 
 # Esquema formal de configuración usando Pydantic v2
 class CrawlerConfig(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="allow")  # Cambiar a "allow" para permitir campos adicionales
     
     seeds: List[str] = Field(..., description="Lista de URLs semilla")
     allowed_domains: List[str] = Field(..., description="Dominios permitidos para el crawler")
@@ -27,6 +27,22 @@ class CrawlerConfig(BaseModel):
     embedding_model: str = Field(..., description="Modelo de embeddings a usar")
     max_depth: Optional[int] = Field(3, description="Profundidad máxima de crawling")
     file_types: Optional[List[str]] = Field(default_factory=lambda: ["html", "pdf", "docx", "xlsx"], description="Tipos de archivo soportados")
+    
+    # Campos específicos para SPA support
+    spa_support: Optional[bool] = Field(False, description="Habilitar soporte para SPAs con Selenium")
+    selenium_timeout: Optional[int] = Field(10, description="Timeout en segundos para Selenium")
+    headless: Optional[bool] = Field(True, description="Ejecutar navegador en modo headless")
+    selenium_delay: Optional[int] = Field(3, description="Tiempo de espera adicional para contenido dinámico")
+    
+    # Campos adicionales existentes
+    max_message_length: Optional[int] = Field(4000, description="Longitud máxima de mensaje")
+    max_conversation_id_length: Optional[int] = Field(100, description="Longitud máxima de ID de conversación")
+    max_domains_count: Optional[int] = Field(5, description="Número máximo de dominios")
+    dangerous_patterns: Optional[List[str]] = Field(default_factory=list, description="Patrones peligrosos a detectar")
+    SENSITIVE_KEYS: Optional[List[str]] = Field(default_factory=list, description="Claves sensibles para logging")
+    
+    # Configuración de autenticación automática
+    auto_login: Optional[Dict] = Field(default_factory=dict, description="Configuración de login automático")
 
 
 class ConfigError(Exception):

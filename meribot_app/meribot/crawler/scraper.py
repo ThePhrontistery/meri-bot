@@ -11,6 +11,13 @@ from bs4 import BeautifulSoup
 from .config import get_config, load_yaml_config, validate_config, ConfigError
 from meribot.utils.logging import get_logger
 
+# Importar SPAWebScraper para compatibilidad
+try:
+    from .spa_scraper import SPAWebScraper
+    SPA_AVAILABLE = True
+except ImportError:
+    SPA_AVAILABLE = False
+
 
 class WebScraper:
     def _get_local_path(self, url, ext):
@@ -80,13 +87,13 @@ class WebScraper:
         self.config = config
         self.logger = logger or get_logger("WebScraper")
         self.allowed_domains = set(self.config["allowed_domains"])
-        self.max_depth = self.config.get("max_depth", 2)
+        self.max_depth = self.config.get("max_depth", 4)
         self.file_types = set(self.config.get("file_types", ["html", "pdf", "docx", "xlsx"]))
         self.visited = set()
         self.delay = float(self.config.get("delay", 1.0))
         self.user_agent = self.config.get("user_agent", "MeriBot/1.0")
 
-    def crawl_url(self, url, depth=0):
+    def crawl_url(self, url, depth=4):
         """
         Realiza el crawling recursivo sobre una URL, respetando la profundidad máxima y dominios permitidos.
         Detecta y procesa enlaces a documentos soportados y HTML.
@@ -157,6 +164,29 @@ class WebScraper:
         return links
 
 
+def create_scraper(config, logger=None):
+    """
+    Factory function para crear el scraper apropiado basado en la configuración.
+    
+    Args:
+        config (dict): Configuración del crawler
+        logger (Logger, opcional): Logger estructurado
+        
+    Returns:
+        WebScraper o SPAWebScraper: Instancia del scraper apropiado
+    """
+    # Verificar si el soporte SPA está habilitado y disponible
+    if config.get("spa_support", False) and SPA_AVAILABLE:
+        logger_msg = logger or get_logger("ScraperFactory")
+        logger_msg.info("Usando SPAWebScraper con soporte para SPAs")
+        return SPAWebScraper(config, logger)
+    else:
+        if config.get("spa_support", False) and not SPA_AVAILABLE:
+            logger_msg = logger or get_logger("ScraperFactory")
+            logger_msg.warning("SPA soporte solicitado pero no disponible. Usando WebScraper estándar")
+        return WebScraper(config, logger)
+
+
 
 
 
@@ -185,7 +215,16 @@ if __name__ == "__main__":
     if not seeds:
         logger.error("No se encontraron URLs en 'seeds' para iniciar el crawling.")
         exit(1)
-    scraper = WebScraper(config, logger=logger)
-    for url in seeds:
-        scraper.crawl_url(url, depth=0)
+        
+    # Usar la factory function para crear el scraper apropiado
+    scraper = create_scraper(config, logger=logger)
+    logger.info(f"Scraper creado: {type(scraper).__name__}")
+    try:
+        for url in seeds:
+            scraper.crawl_url(url, depth=4)
+    finally:
+        # Cerrar recursos si es necesario (para SPAWebScraper)
+        if hasattr(scraper, '_close_selenium_driver'):
+            scraper._close_selenium_driver()
+            
     logger.info("Crawling web finalizado. Verifica los logs para el resultado del descubrimiento de enlaces y documentos.")

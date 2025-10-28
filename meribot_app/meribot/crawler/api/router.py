@@ -30,6 +30,11 @@ router = APIRouter(prefix="/crawler", tags=["crawler"])
 
 # ==================== MODELOS PYDANTIC ====================
 
+class Credentials(BaseModel):
+    """Modelo para credenciales de autenticación."""
+    username: str
+    password: str
+
 class ScrapeRequest(BaseModel):
     """Modelo para requests de scraping básico."""
     url: str
@@ -39,6 +44,7 @@ class CrawlerRequest(BaseModel):
     """Modelo para requests de crawling completo."""
     url: str
     domain: str
+    credentials: Optional[Credentials] = None
 
 class ProcessDocsRequest(BaseModel):
     """Modelo para requests de procesamiento de documentos."""
@@ -110,19 +116,73 @@ def find_supported_files(docs_dir: str):
     
     return archivos_encontrados
 
-def execute_scraping(url: str, docs_dir: str):
-    """Ejecuta el comando de scraping usando meri-cli."""
-    result = subprocess.run([
-        "python", "-m", "meribot.meri-cli.main", "scrape",
-        "--url", url,
-        "--output", docs_dir
-    ], cwd=os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../')), 
-       capture_output=True, text=True)
+def execute_scraping(url: str, docs_dir: str, credentials: Optional[Credentials] = None):
+    """Ejecuta el scraping usando el nuevo sistema SPAWebScraper."""
+    # Importar el sistema de scraping mejorado
+    from ..config import load_yaml_config, validate_config
+    from ..scraper import create_scraper
+    from meribot.utils.logging import get_logger
     
-    if result.returncode != 0:
-        raise HTTPException(status_code=500, detail=f"Error en scraping: {result.stderr}")
-    
-    return result
+    try:
+        # Cargar configuración
+        config_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../crawler_config.yaml'))
+        config = load_yaml_config(config_path)
+        validate_config(config)
+        
+        # Configurar para la URL específica
+        config["seeds"] = [url]
+        config["output_dir"] = docs_dir
+        config["max_depth"] = 4  # Solo la página inicial para este endpoint
+        
+        # Extraer dominio de la URL para los dominios permitidos
+        from urllib.parse import urlparse
+        parsed_url = urlparse(url)
+        domain = parsed_url.netloc
+        
+        # Asegurar que el dominio esté permitido
+        if domain not in config.get("allowed_domains", []):
+            config["allowed_domains"] = config.get("allowed_domains", []) + [domain]
+        
+        # Crear logger
+        logger = get_logger("APIScrapingService")
+        
+        # Agregar credenciales a la configuración si se proporcionan
+        if credentials:
+            # Habilitar autenticación en la configuración
+            if 'auto_login' not in config:
+                config['auto_login'] = {}
+            config['auto_login']['enabled'] = True
+            config['auto_login']['username'] = credentials.username
+            config['auto_login']['password'] = credentials.password
+            logger.info(f"Autenticación habilitada para usuario: {credentials.username}")
+        
+        # Crear scraper usando factory function (automáticamente usa SPA si está disponible)
+        scraper = create_scraper(config, logger=logger)
+        
+        logger.info(f"Iniciando scraping con {type(scraper).__name__} para: {url}")
+        
+        # Ejecutar crawling
+        scraper.crawl_url(url, depth=4)
+        
+        # Cerrar recursos si es necesario
+        if hasattr(scraper, '_close_selenium_driver'):
+            scraper._close_selenium_driver()
+        
+        logger.info(f"Scraping completado exitosamente. URLs visitadas: {len(scraper.visited)}")
+        
+        # Simular el objeto result para compatibilidad
+        class MockResult:
+            def __init__(self):
+                self.returncode = 0
+                self.stdout = f"Scraping completado con {type(scraper).__name__}. URLs procesadas: {len(scraper.visited)}"
+                self.stderr = ""
+        
+        return MockResult()
+        
+    except Exception as e:
+        logger = get_logger("APIScrapingService")
+        logger.error(f"Error en scraping mejorado: {e}")
+        raise HTTPException(status_code=500, detail=f"Error en scraping mejorado: {e}")
 
 def get_url_from_file(fpath: str):
     """Obtiene la URL de origen desde el archivo .url asociado."""
@@ -160,17 +220,25 @@ def get_url_from_file(fpath: str):
 
 def process_single_document(fpath: str, docs_dir: str, domain: str):
     """Procesa un documento individual y devuelve el resultado."""
+    print(f"[DEBUG] process_single_document fpath: {fpath}")
+    print(f"[DEBUG] process_single_document docs_dir: {docs_dir}")
     rel_path = os.path.relpath(fpath, docs_dir)
+    print(f"[DEBUG] process_single_document rel_path: {rel_path}")
     doc_id = short_doc_id(rel_path)
     
     # Obtener URL de origen
     url_origen = get_url_from_file(fpath)
+    print(f"[DEBUG] process_single_document url_origen: {url_origen}")
     
     try:
         doc = parse_document(fpath, url=url_origen or rel_path)
+        print(f"[DEBUG] process_single_document doc: {doc}")
     except Exception as e:
         return {"file": rel_path, "error": f"Extracción fallida: {e}"}
     
+    print(f"[DEBUG] process_single_document doc.get('error'): {doc.get('error')}")
+    print(f"[DEBUG] process_single_document doc.get('text'): {doc.get('text')}")
+
     if doc.get('error') or not doc.get('text'):
         return {"file": rel_path, "error": doc.get('error', 'Sin texto extraído')}
     
@@ -277,7 +345,7 @@ def crawl_and_process(request: CrawlerRequest):
     
     if not archivos_encontrados:
         # Ejecutar scraping si no hay archivos
-        execute_scraping(url, docs_dir)
+        execute_scraping(url, docs_dir, request.credentials)
         
         print("[DEBUG] Archivos presentes en DOCS_DIR tras scraping:")
         for root, dirs, files in os.walk(docs_dir):

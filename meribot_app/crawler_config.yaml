@@ -9,6 +9,7 @@ SENSITIVE_KEYS:
 seeds:
   - "https://cca.capgemini.com/web/home"
 allowed_domains:
+  - "cca.capgemini.com"
   - "onboarding"
   - "training"
   - "cca"
@@ -25,6 +26,24 @@ file_types:
   - "pdf"
   - "docx"
   - "xlsx"
+
+# Configuración para soporte de SPAs (Single Page Applications)
+spa_support: true          # Habilitar detección automática de SPAs
+selenium_timeout: 15       # Timeout en segundos para cargar páginas con Selenium
+headless: true            # Ejecutar navegador en modo headless (sin interfaz gráfica)
+selenium_delay: 3         # Tiempo de espera adicional para contenido dinámico (segundos)
+
+# Configuración de autenticación automática
+auto_login:
+  enabled: true           # Habilitar login automático
+  login_url: "https://cca.capgemini.com/web/home"  # URL de la página de login
+  username_field: "input[name='username'], input[type='email'], #username, #email"  # Selectores CSS para campo de usuario
+  password_field: "input[name='password'], input[type='password'], #password"       # Selectores CSS para campo de contraseña
+  submit_button: "button[type='submit'], input[type='submit'], .login-btn, button:contains('Acceder'), button:contains('Login')"  # Selectores para botón de envío
+  success_indicators: [".dashboard", ".home", "nav", ".menu"]  # Elementos que indican login exitoso
+  # Credenciales (usar variables de entorno por seguridad)
+  username: "${MERIBOT_USERNAME}"  # Variable de entorno MERIBOT_USERNAME
+  password: "${MERIBOT_PASSWORD}"  # Variable de entorno MERIBOT_PASSWORD
 max_message_length: 4000
 max_conversation_id_length: 100
 max_domains_count: 5

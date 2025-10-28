@@ -32,9 +32,12 @@ def cli():
 @click.option('--dry-run', is_flag=True, help='Simular crawling sin descargar')
 @click.option('--manual', help='Lista de URLs separadas por comas para procesar manualmente')
 @click.option('--api-host', default='http://localhost:8000', help='Host del API de MeriBot (default: http://localhost:8000)')
+@click.option('--username', help='Usuario para autenticación automática')
+@click.option('--password', help='Contraseña para autenticación automática')
 def crawl(url: str, dominio: str, max_depth: int, max_pages: Optional[int], include: Optional[str], 
           exclude: Optional[str], formats: str, output: Optional[str], 
-          update_only: bool, dry_run: bool, manual: Optional[str], api_host: str):
+          update_only: bool, dry_run: bool, manual: Optional[str], api_host: str,
+          username: Optional[str], password: Optional[str]):
     """
     Lanza el proceso completo de crawling y procesamiento de documentos.
     Se comunica con el endpoint /crawl-and-process del componente crawler.
@@ -105,6 +108,14 @@ def crawl(url: str, dominio: str, max_depth: int, max_pages: Optional[int], incl
         "url": url,
         "domain": domain
     }
+    
+    # Agregar credenciales si se proporcionan
+    if username and password:
+        payload["credentials"] = {
+            "username": username,
+            "password": password
+        }
+        click.echo(f"[INFO] Usando autenticación para usuario: {username}")
     
     # Endpoint del crawler
     endpoint = f"{api_host}/crawler/crawl-and-process"
