@@ -246,6 +246,7 @@ def parse_xlsx(path: str, url: str = None) -> Dict[str, Any]:
 
 
 # PDF
+'''
 try:
     import fitz  # PyMuPDF
     PDF_AVAILABLE = True
@@ -271,6 +272,48 @@ def parse_pdf(path: str, url: str = None) -> Dict[str, Any]:
         return {"error": "PyMuPDF (fitz) no está instalado", "text": None, "metadata": None}
     try:
         doc = fitz.open(path)
+'''
+
+try:
+    import pymupdf as fitz  # PyMuPDF moderno (v1.24+)
+    PDF_AVAILABLE = True
+except ImportError:
+    try:
+        import fitz  # PyMuPDF versión anterior
+        PDF_AVAILABLE = True
+    except ImportError:
+        PDF_AVAILABLE = False
+ 
+# Forcibly re-check after install
+import importlib
+if not PDF_AVAILABLE:
+    try:
+        fitz = importlib.import_module('pymupdf')
+        PDF_AVAILABLE = True
+    except ImportError:
+        try:
+            fitz = importlib.import_module('fitz')
+            PDF_AVAILABLE = True
+        except ImportError:
+            PDF_AVAILABLE = False
+ 
+def parse_pdf(path: str, url: str = None) -> Dict[str, Any]:
+    """
+    Extrae texto de un archivo PDF usando PyMuPDF.
+    :param path: ruta al archivo PDF
+    :return: dict con 'text' y 'metadata'
+    """
+    if not PDF_AVAILABLE:
+        return {"error": "PyMuPDF (fitz) no está instalado", "text": None, "metadata": None}
+    try:
+        # Intentar diferentes métodos según la versión de PyMuPDF
+        if hasattr(fitz, 'open'):
+            doc = fitz.open(path)  # API antigua
+        elif hasattr(fitz, 'Document'):
+            doc = fitz.Document(path)  # API nueva
+        else:
+            # Como último recurso, intentar instanciar directamente
+            doc = fitz(path)
         text = "\n".join(page.get_text() for page in doc)
         # Normalizar el texto extraído para limpiar espacios y caracteres de control
         text = normalize_text(text) if text else ""

@@ -209,7 +209,26 @@ def scrape(url: Optional[str], output: Optional[str], pdf_url: Optional[str]):
     scraper = WebScraper(config)
     # Descargar HTML principal
     html_path = None
+    '''
     if url:
+        try:
+            scraper.save_html(url, requests.get(url, timeout=10, verify=False).text)
+            html_path = scraper._get_local_path(url, "html")
+            click.echo(f"[SUCCESS] HTML guardado en {html_path}")
+        except Exception as e:
+            click.echo(f"[ERROR] Falló la descarga HTML: {e}")
+
+    '''
+
+    if url.lower().endswith('.pdf'):
+        # Es un PDF, descargarlo directamente
+        try:
+            scraper.download_file(url)
+            click.echo(f"[SUCCESS] PDF descargado directamente: {url}")
+        except Exception as e:
+            click.echo(f"[ERROR] Falló la descarga del PDF: {e}")
+    else:
+        # Es HTML, procesarlo normalmente
         try:
             scraper.save_html(url, requests.get(url, timeout=10, verify=False).text)
             html_path = scraper._get_local_path(url, "html")
