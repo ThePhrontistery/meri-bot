@@ -1,4 +1,3 @@
-
 import click
 from typing import Optional
 import yaml
@@ -277,6 +276,103 @@ def scrape(url: Optional[str], output: Optional[str], pdf_url: Optional[str]):
             click.echo(f"[ERROR] Falló la descarga PDF: {e}")
 
 
+@cli.command(name='load')
+@click.option('--path', required=True, help='Ruta local de la carpeta o archivo con documentos a procesar (obligatorio)')
+@click.option('--dominio', required=True, help='Dominio al que se asociarán los documentos (obligatorio)')
+@click.option('--api-host', default='http://localhost:8000', help='Host del API de MeriBot (default: http://localhost:8000)')
+def load(path: str, dominio: str, api_host: str):
+    """
+    Procesa todos los documentos soportados en la carpeta indicada por 'path', o el archivo indicado si es un archivo.
+    Se comunica con el endpoint /crawler/load-local-docs.
+
+    Ejemplo de uso en PowerShell:
+        python -m meribot.meri-cli.main load --path "C:\\documentos" --dominio "midominio.com"
+        python -m meribot.meri-cli.main load --path "C:\\documentos\\archivo.pdf" --dominio "midominio.com"
+    """
+    # Validar path (acepta archivo o directorio)
+    if not os.path.exists(path) or (not os.path.isdir(path) and not os.path.isfile(path)):
+        click.echo(f"Error: La ruta indicada no existe o no es un archivo/directorio: {path}", err=True)
+        raise click.Abort()
+
+    # Cargar configuración para dominios permitidos
+    config_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../crawler_config.yaml'))
+    config = {}
+    if os.path.exists(config_path):
+        try:
+            with open(config_path, 'r', encoding='utf-8') as f:
+                config = yaml.safe_load(f)
+        except Exception as e:
+            click.echo(f"Advertencia: Error al leer configuración: {e}")
+    allowed_domains = config.get('allowed_domains', [])
+    domain_valid = False
+    for allowed in allowed_domains:
+        if allowed.lower() in dominio.lower() or dominio.lower() in allowed.lower():
+            domain_valid = True
+            break
+    if not domain_valid:
+        click.echo(f"Error: Dominio '{dominio}' no está en la lista de dominios permitidos: {allowed_domains}", err=True)
+        raise click.Abort()
+
+    click.echo("Iniciando procesamiento de documentos locales...")
+    click.echo(f"Path: {path}")
+    click.echo(f"Dominio: {dominio}")
+
+    # Preparar payload para el endpoint
+    payload = {
+        "input_path": path,
+        "domain": dominio.strip().lower()
+    }
+    endpoint = f"{api_host}/crawler/load-local-docs"
+    try:
+        click.echo(f"\nConectando con el servicio: {endpoint}")
+        response = requests.post(
+            endpoint,
+            json=payload,
+            headers={'Content-Type': 'application/json'},
+            timeout=300
+        )
+        if response.status_code == 200:
+            result = response.json()
+            click.echo("Procesamiento completado exitosamente!")
+            resultados = result.get('resultados', [])
+            success_count = 0
+            error_count = 0
+            warning_count = 0
+            click.echo(f"\nResultados del procesamiento ({len(resultados)} archivos):")
+            for resultado in resultados:
+                file_name = resultado.get('file', 'N/A')
+                if 'status' in resultado:
+                    click.echo(f"  {file_name}: {resultado['status']}")
+                    success_count += 1
+                elif 'error' in resultado:
+                    click.echo(f"  {file_name}: {resultado['error']}")
+                    error_count += 1
+                elif 'warning' in resultado:
+                    click.echo(f"  {file_name}: {resultado['warning']}")
+                    warning_count += 1
+            click.echo(f"\n📈 Resumen:")
+            click.echo(f"  ✅ Exitosos: {success_count}")
+            click.echo(f"  ❌ Errores: {error_count}")
+            click.echo(f"  ⚠️  Advertencias: {warning_count}")
+        else:
+            error_detail = "Error desconocido"
+            try:
+                error_response = response.json()
+                error_detail = error_response.get('detail', error_detail)
+            except:
+                error_detail = response.text
+            click.echo(f"Error en el procesamiento (HTTP {response.status_code}): {error_detail}", err=True)
+            raise click.Abort()
+    except requests.exceptions.ConnectionError:
+        click.echo(f"Error: No se pudo conectar con el servicio en {api_host}", err=True)
+        click.echo("Asegúrate de que el servidor FastAPI esté ejecutándose", err=True)
+        raise click.Abort()
+    except requests.exceptions.Timeout:
+        click.echo("Error: Timeout en la operación de procesamiento", err=True)
+        raise click.Abort()
+    except Exception as e:
+        click.echo(f"Error inesperado: {e}", err=True)
+        raise click.Abort()
 # Registrar el grupo de comandos db de db_commands.py
 cli.add_command(db_commands.db)
 
