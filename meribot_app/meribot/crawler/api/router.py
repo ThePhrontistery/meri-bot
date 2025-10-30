@@ -51,6 +51,11 @@ class ProcessDocsRequest(BaseModel):
     url: str
     domain: str
 
+class LoadLocalDocsRequest(BaseModel):
+    """Modelo para requests de carga de documentos locales."""
+    input_path: str
+    domain: str
+
 # ==================== UTILIDADES ====================
 
 def short_doc_id(rel_path: str, length: int = 10) -> str:
@@ -221,6 +226,14 @@ def get_url_from_file(fpath: str):
     
     return url_origen
 
+def filter_metadata_for_chroma(metadata: dict) -> dict:
+    """Convierte valores complejos en los metadatos a string para compatibilidad con ChromaDB."""
+    def convert_value(val):
+        if isinstance(val, (list, dict)):
+            return str(val)
+        return val
+    return {k: convert_value(v) for k, v in metadata.items()}
+
 def process_single_document(fpath: str, docs_dir: str, domain: str):
     """Procesa un documento individual y devuelve el resultado."""
     print(f"[DEBUG] process_single_document fpath: {fpath}")
@@ -261,6 +274,8 @@ def process_single_document(fpath: str, docs_dir: str, domain: str):
     metadata['source_path'] = rel_path
     metadata['domain'] = domain
     metadata['url'] = url_origen or metadata.get('url')
+    # Filtrar metadatos para ChromaDB
+    metadata = filter_metadata_for_chroma(metadata)
     
     try:
         chunks = chunk_text_with_langchain(text, chunk_size=800, chunk_overlap=50)
@@ -400,6 +415,41 @@ def process_docs(request: ProcessDocsRequest):
         resultado = process_single_document(fpath, docs_dir, domain)
         resultados.append(resultado)
     
+    return {"resultados": resultados}
+
+@router.post("/load-local-docs")
+def load_local_docs(request: LoadLocalDocsRequest):
+    """
+    Endpoint para cargar y procesar documentos desde una ruta local personalizada.
+    Procesa todos los documentos soportados en la carpeta indicada por input_path, o el archivo indicado si es un archivo.
+    """
+    input_path = request.input_path.strip()
+    domain = request.domain.strip()
+
+    if not input_path:
+        raise HTTPException(status_code=400, detail="El parámetro input_path es obligatorio.")
+    if not domain:
+        raise HTTPException(status_code=400, detail="El parámetro domain es obligatorio.")
+    if not os.path.exists(input_path) or (not os.path.isdir(input_path) and not os.path.isfile(input_path)):
+        raise HTTPException(status_code=400, detail=f"La ruta indicada no existe o no es un archivo/directorio: {input_path}")
+    if not validate_domain(domain):
+        config = get_crawler_config()
+        allowed_domains = config.get('allowed_domains', [])
+        raise HTTPException(status_code=400, detail=f"domain no válido: {domain}. Allowed: {allowed_domains}")
+
+    resultados = []
+    if os.path.isdir(input_path):
+        archivos_encontrados = find_supported_files(input_path)
+        if not archivos_encontrados:
+            EXTS = {'.pdf', '.html', '.htm', '.docx', '.xlsx'}
+            raise HTTPException(status_code=404, detail=f"No se encontraron archivos soportados ({EXTS}) en {input_path}.")
+        for fpath in archivos_encontrados:
+            resultado = process_single_document(fpath, input_path, domain)
+            resultados.append(resultado)
+    elif os.path.isfile(input_path):
+        resultado = process_single_document(input_path, os.path.dirname(input_path), domain)
+        resultados.append(resultado)
+
     return {"resultados": resultados}
 
 # ==================== ENDPOINTS DE GESTIÓN DE DOCUMENTOS ====================
