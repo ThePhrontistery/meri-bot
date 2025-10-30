@@ -80,7 +80,8 @@ class ChatEngine:
                 title = meta.get("title")
                 url = meta.get("url")
                 key = (title, url)
-                if key not in seen:
+                # Solo añadir si la url no empieza por 'NO_URL_ORIGINAL'
+                if key not in seen and not (url or "").startswith("NO_URL_ORIGINAL"):
                     seen.add(key)
                     citations.append({"title": title, "url": url})
         vector_db_texts = [chunk.get("document") for chunk in relevant_chunks] if relevant_chunks else []
