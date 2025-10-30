@@ -7,7 +7,7 @@ SENSITIVE_KEYS:
 # Puedes copiar este archivo como crawler_config.yaml en el directorio del módulo crawler
 
 seeds:
-  - "https://cca.capgemini.com/web/home"
+  - ""
 allowed_domains:
   - "cca.capgemini.com"
   - "onboarding"
@@ -36,7 +36,8 @@ selenium_delay: 3         # Tiempo de espera adicional para contenido dinámico 
 # Configuración de autenticación automática
 auto_login:
   enabled: true           # Habilitar login automático
-  login_url: "https://cca.capgemini.com/web/home"  # URL de la página de login
+  # login_url se establece automáticamente igual a la URL del crawl cuando se proporcionan credenciales
+  # Por ejemplo: crawl --url "https://sway.cloud.microsoft/my" --> login_url será "https://sway.cloud.microsoft/my"
   username_field: "input[name='username'], input[type='email'], #username, #email"  # Selectores CSS para campo de usuario
   password_field: "input[name='password'], input[type='password'], #password"       # Selectores CSS para campo de contraseña
   submit_button: "button[type='submit'], input[type='submit'], .login-btn, button:contains('Acceder'), button:contains('Login')"  # Selectores para botón de envío

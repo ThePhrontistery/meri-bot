@@ -74,7 +74,7 @@ def validate_domain(domain: str) -> bool:
 
 def get_docs_directory():
     """Obtiene el directorio base para documentos scraped."""
-    return os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../data/scraped/cca.capgemini.com'))
+    return os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../data/scraped'))
 
 def clean_docs_directory(docs_dir: str):
     """Limpia completamente el directorio de documentos."""
@@ -154,7 +154,10 @@ def execute_scraping(url: str, docs_dir: str, credentials: Optional[Credentials]
             config['auto_login']['enabled'] = True
             config['auto_login']['username'] = credentials.username
             config['auto_login']['password'] = credentials.password
+            # Establecer login_url igual a la URL del crawl
+            config['auto_login']['login_url'] = url
             logger.info(f"Autenticación habilitada para usuario: {credentials.username}")
+            logger.info(f"URL de login establecida igual a URL del crawl: {url}")
         
         # Crear scraper usando factory function (automáticamente usa SPA si está disponible)
         scraper = create_scraper(config, logger=logger)

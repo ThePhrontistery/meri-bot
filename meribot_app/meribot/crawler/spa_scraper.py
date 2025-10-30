@@ -38,7 +38,21 @@ class SPAWebScraper:
         self.logger = logger or get_logger("SPAWebScraper")
         self.allowed_domains = set(self.config["allowed_domains"])
         self.max_depth = self.config.get("max_depth", 4)
-        self.file_types = set(self.config.get("file_types", ["html", "pdf", "docx", "xlsx"]))
+        
+        # Validación robusta para file_types
+        file_types_raw = self.config.get("file_types", ["html", "pdf", "docx", "xlsx"])
+        if isinstance(file_types_raw, (list, tuple)):
+            self.file_types = set(file_types_raw)
+        elif isinstance(file_types_raw, str):
+            # Si es string, separar por comas
+            self.file_types = set([ft.strip() for ft in file_types_raw.split(",")])
+        else:
+            # Fallback a tipos por defecto
+            self.logger.warning(f"file_types inválido ({type(file_types_raw)}), usando valores por defecto")
+            self.file_types = set(["html", "pdf", "docx", "xlsx"])
+        
+        self.logger.info(f"file_types configurado: {self.file_types} (tipo: {type(self.file_types)})")
+        
         self.visited = set()
         self.delay = float(self.config.get("delay", 1.0))
         self.user_agent = self.config.get("user_agent", "MeriBot/1.0")
@@ -197,16 +211,24 @@ class SPAWebScraper:
             'react', 'reactDOM',                 # React
             'vue', 'v-app',                      # Vue.js
             # Indicadores de contenido dinámico
-            'loading', 'spinner',
-            # Contenido mínimo típico de SPAs
-            len(html_content.strip()) < 5000 and 'script' in html_content.lower()
+            'loading', 'spinner'
         ]
         
+        # Verificación separada para contenido mínimo típico de SPAs
+        is_minimal_with_scripts = len(html_content.strip()) < 5000 and 'script' in html_content.lower()
+        
         html_lower = html_content.lower()
+        
+        # Verificar indicadores de cadena
         for indicator in spa_indicators:
             if indicator in html_lower:
                 self.logger.info(f"SPA detectada en {url} - Indicador: {indicator}")
                 return True
+        
+        # Verificar si es una página mínima con scripts (típico de SPAs)
+        if is_minimal_with_scripts:
+            self.logger.info(f"SPA detectada en {url} - Indicador: contenido mínimo con scripts")
+            return True
                 
         return False
 
@@ -339,7 +361,14 @@ class SPAWebScraper:
             # Primero intentar con requests tradicional
             resp = requests.get(url, headers=headers, timeout=10, verify=False)
             resp.raise_for_status()
-            content_type = resp.headers.get("Content-Type", "").lower()
+            content_type = resp.headers.get("Content-Type", "")
+            
+            # Asegurar que content_type es una cadena
+            if not isinstance(content_type, str):
+                self.logger.warning(f"content_type no es string: {type(content_type)} = {content_type}")
+                content_type = str(content_type) if content_type else ""
+            
+            content_type = content_type.lower()
             
             if "html" in content_type:
                 initial_html = resp.text
@@ -373,13 +402,13 @@ class SPAWebScraper:
                     if ext == "html":
                         time.sleep(self.delay)
                         self.crawl_url(abs_url, depth + 1)
-                    elif ext in self.file_types:
+                    elif ext and isinstance(self.file_types, set) and ext in self.file_types:
                         self.logger.info(f"Documento detectado: {abs_url} (tipo: {ext})")
                         self.download_file(abs_url)
             else:
                 # Documento soportado
-                ext = url.split(".")[-1].lower()
-                if ext in self.file_types:
+                ext = url.split(".")[-1].lower() if "." in url else ""
+                if ext and isinstance(self.file_types, set) and ext in self.file_types:
                     self.logger.info(f"Documento detectado: {url} (tipo: {ext})")
                     self.download_file(url)
                     
@@ -405,7 +434,7 @@ class SPAWebScraper:
                 
             ext = href.split(".")[-1].lower() if "." in href.split("/")[-1] else ""
             
-            if ext in self.file_types:
+            if ext and isinstance(self.file_types, set) and ext in self.file_types:
                 links.append((href, ext))
             elif ext == "html" or not ext:
                 links.append((href, "html"))
