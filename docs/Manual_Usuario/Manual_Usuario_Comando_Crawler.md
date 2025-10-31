@@ -66,10 +66,10 @@ Esto iniciará:
 ```yaml
 # Dominios permitidos para crawling
 allowed_domains:
-  - "capgemini.com"
-  - "cca.capgemini.com"
-  - "intranet.capgemini.com"
-  - "ejemplo.com"
+  - "onboarding"
+  - "training"
+  - "cca"
+  - "sdo"
 
 # Configuración de ChromaDB
 chroma:
@@ -245,12 +245,12 @@ python -m meribot.meri-cli.main db delete --source-path "/documents/policy.pdf"
 
 ### Obtener Información de Documento
 ```powershell
-python -m meribot.meri-cli.main db info --id "documento_123"
+python -m meribot.meri-cli.main db show --id "documento_123"
 ```
 
 ### Obtener Estadísticas de la Base
 ```powershell
-python -m meribot.meri-cli.main db stats
+python -m meribot.meri-cli.main db count
 ```
 
 ---
@@ -372,7 +372,7 @@ python start_server_direct.py
 ### Comandos de Monitoreo
 ```powershell
 # Ver estadísticas de la base
-python -m meribot.meri-cli.main db stats
+python -m meribot.meri-cli.main db count
 
 # Listar documentos recientes
 python -m meribot.meri-cli.main db list-documents | head -20
