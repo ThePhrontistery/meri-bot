@@ -11,6 +11,7 @@
 - [Comandos disponibles](#comandos-disponibles)
 - [Comando crawl - extraccion y procesamiento](#comando-crawl---extraccion-y-procesamiento)
 - [Ejemplos practicos de crawling](#ejemplos-practicos-de-crawling)
+- [Comando: load - carga de documentos locales en la base vectorial](#comando-load---carga-de-documentos-locales-en-la-base-vectorial)
 - [Comando db - gestion de base de datos](#comando-db---gestion-de-base-de-datos)
 - [Configuracion avanzada](#configuracion-avanzada)
 - [Interpretacion de resultados](#interpretacion-de-resultados)
@@ -99,6 +100,12 @@ meri-cli --help
 
 ## Comandos disponibles
 
+La CLI de MeriBot permite ejecutar las siguientes acciones principales:
+
+- `crawl`   : Realiza scraping y procesamiento de documentos desde una URL o dominio.
+- `load`    : Ingresa documentos locales (archivos o carpetas) en la base de datos vectorial.
+- `db`      : Gestiona la base de datos vectorial (reset, status, optimize).
+
 ### Vista General de Comandos
 ```powershell
 # Ver ayuda principal
@@ -106,7 +113,8 @@ python main.py --help
 
 # Comandos principales disponibles:
 python main.py crawl      # Crawling y procesamiento de documentos
-python main.py db         # Gestión de base de datos vectorial
+python main.py load      # Carga de documentos locales (archivo o carpeta)
+python main.py db        # Gestión de base de datos vectorial
 ```
 
 ---
@@ -196,6 +204,39 @@ python main.py crawl \
 
 ---
 
+## Comando: load - carga de documentos locales en la base vectorial
+
+El comando `load` permite cargar documentos locales (archivos individuales o carpetas completas) en la base de datos vectorial de MeriBot para su posterior consulta y procesamiento.
+
+**Sintaxis:**
+
+```powershell
+python main.py load --path <ruta_al_archivo_o_carpeta> --dominio <dominio_tematico>
+```
+
+**Parámetros:**
+- `--path` (obligatorio): Ruta absoluta o relativa al archivo o carpeta que se desea cargar.
+- `--dominio` (obligatorio): Dominio temático al que pertenece la información (ejemplo: RRHH, IT, Procesos).
+
+**Ejemplos de uso:**
+
+- Cargar un archivo PDF en el dominio RRHH:
+  ```powershell
+  python main.py load --path docs/Manual_Usuario/Manual_Usuario_Chatbot_MeriBot.pdf --dominio RRHH
+  ```
+
+- Cargar todos los documentos de una carpeta en el dominio IT:
+  ```powershell
+  python main.py load --path docs/Manual_Usuario/ --dominio IT
+  ```
+
+**Notas:**
+- El sistema detecta automáticamente si la ruta corresponde a un archivo o carpeta.
+- El parámetro `--dominio` es obligatorio y permite organizar los documentos por área temática.
+- Los documentos cargados se indexan y quedan disponibles para consultas en el chatbot.
+
+---
+
 ## Comando db - gestion de base de datos
 
 ### Subcomandos Disponibles
@@ -204,9 +245,9 @@ python main.py db --help    # Ver ayuda de comandos DB
 
 # Subcomandos principales:
 python main.py db list      # Listar documentos
-python main.py db delete    # Eliminar documentos  
-python main.py db info      # Información detallada
-python main.py db stats     # Estadísticas generales
+python main.py db delete    # Eliminar documentos
+python main.py db show      # Información detallada
+python main.py db count     # Estadísticas generales
 ```
 
 ### 1. Listar Documentos (`db list`)
@@ -222,6 +263,15 @@ python main.py db list --show-chunks
 
 # Combinar filtro y chunks
 python main.py db list --filter dominio:IT --show-chunks
+
+# Filtrar por nombre de documento
+python main.py db list --filter nombre:manual_onboarding.html
+
+# Filtrar por fecha de ingreso
+python main.py db list --filter fecha:2025-09-21
+
+# Filtrar por varios criterios
+python main.py db list --filter "dominio:RRHH,nombre:política_vacaciones.pdf"
 ```
 
 **Salida típica:**
@@ -233,30 +283,26 @@ python main.py db list --filter dominio:IT --show-chunks
 | doc_003  | guía_desarrollo.docx      | IT      | 2025-09-22    | 23     |
 ```
 
-### 2. Información Detallada (`db info`)
+### 2. Información Detallada (`db show`)
 ```powershell
-# Ver detalles completos de un documento
-python main.py db info --id "doc_001"
+# Ver detalles completos de un documento por ID
+python main.py db show --id "doc_001"
 ```
 
 **Salida típica:**
 ```
 Detalles del documento: doc_001
-----------------------------------------
-id             : doc_001
-title          : política_vacaciones.pdf
-domain         : RRHH
-url            : https://intranet.capgemini.com/hr/vacation-policy.pdf
-created_date   : 2025-09-20 14:30:15
-size           : 2.4 MB
-chunks         : 15
+| id             | title                    | domain | url                                         | created_date         | size   | chunks |
+|----------------|--------------------------|--------|---------------------------------------------|----------------------|--------|--------|
+| doc_001        | política_vacaciones.pdf  | RRHH   | https://intranet.capgemini.com/hr/vacation-policy.pdf | 2025-09-20 14:30:15 | 2.4 MB | 15     |
 
 Chunks asociados:
-Chunk 0: id=chunk_001_01
-Este documento establece las políticas de vacaciones para todos los empleados de Capgemini...
-
-Chunk 1: id=chunk_001_02
-Las solicitudes de vacaciones deben realizarse con al menos 15 días de anticipación...
++-----------+-------------------+----------------------------------------------------+
+| Chunk #   | id                | text                                               |
++===========+===================+====================================================+
+| 0         | chunk_001_01      | Este documento establece las políticas...          |
+| 1         | chunk_001_02      | Las solicitudes de vacaciones deben...             |
++-----------+-------------------+----------------------------------------------------+
 ```
 
 ### 3. Eliminar Documentos (`db delete`)
@@ -273,35 +319,28 @@ python main.py db delete --source-path "/documents/manual.pdf"
 
 **⚠️ Importante**: Este comando elimina el documento y TODOS sus chunks asociados permanentemente.
 
-### 4. Estadísticas Generales (`db stats`)
+### 4. Estadísticas Generales (`db count`)
 ```powershell
-python main.py db stats
+python main.py db count
 ```
 
 **Salida típica:**
 ```
-📊 Estadísticas de la Base Vectorial
-=====================================
-Total documentos: 127
-Total chunks: 2,847
-Dominios disponibles: RRHH (45), IT (38), Procesos (32), Calidad (12)
-Último procesamiento: 2025-09-23 10:15:32
-Tamaño base de datos: 245.7 MB
-Estado: Saludable ✅
+Total de documentos únicos: 127
+Total de fragmentos (chunks): 2,847
 ```
-
----
 
 ## Configuracion avanzada
 
 ### Archivo de Configuración (`crawler_config.yaml`)
+
 ```yaml
 # Dominios permitidos para crawling
 allowed_domains:
-  - "capgemini.com"
-  - "cca.capgemini.com" 
-  - "intranet.capgemini.com"
-  - "training.capgemini.com"
+  - "onboarding"
+  - "training"
+  - "cca"
+  - "sdo"
 
 # Configuración de procesamiento
 processing:
@@ -485,7 +524,7 @@ python main.py crawl --url "URL" --dominio "DOMINIO" --manual "URL1,URL2,URL3"
 1. **Monitoreo regular**:
    ```powershell
    # Revisar estadísticas semanalmente
-   python main.py db stats
+   python main.py db count
    
    # Listar documentos recientes
    python main.py db list --show-chunks
@@ -497,7 +536,7 @@ python main.py crawl --url "URL" --dominio "DOMINIO" --manual "URL1,URL2,URL3"
    python main.py db delete --url "URL_OBSOLETA"
    
    # Verificar detalles antes eliminar
-   python main.py db info --id "DOCUMENT_ID"
+   python main.py db show --id "DOCUMENT_ID"
    ```
 
 ### ❌ **Evitar estos errores comunes**
@@ -563,3 +602,43 @@ for ($i = 0; $i -lt $dominios.Length; $i++) {
 ```powershell
 # cleanup_monthly.ps1
 Write-Host "Obteniendo estadísticas antes de limpieza:"
+python main.py db count
+
+Write-Host "Eliminando documentos obsoletos..."
+# Ejemplo: eliminar documentos de un dominio específico
+python main.py db delete --filter dominio:obsoleto.com
+
+Write-Host "Compactando base de datos..."
+python main.py db optimize
+
+Write-Host "Estadísticas después de limpieza:"
+python main.py db count
+```
+
+---
+
+## Soporte y contacto
+
+Para obtener soporte técnico y contactar al equipo de MeriBot:
+
+- **Email**: soporte@meribot.com
+- **Teléfono**: +34 91 123 45 67
+- **Horario**: Lunes a Viernes, 9:00 - 18:00 CET
+
+---
+
+## Proximas funcionalidades roadmap
+
+- **Nuevos comandos de administración**: `backup`, `restore`, `migrate`
+- **Integración con sistemas de tickets**: Crear y gestionar tickets desde la CLI
+- **Mejoras en el rendimiento del crawling**: Nuevos algoritmos y optimizaciones
+- **Soporte para nuevos formatos de documentos**: `.pptx`, `.csv`, `.json`
+- **Funciones avanzadas de análisis de datos**: Estadísticas y reportes detallados
+
+---
+
+## Conclusion
+
+La herramienta `meri-cli` es esencial para la administración eficiente del sistema MeriBot. Su dominio en tareas de crawling, gestión de bases de datos y monitoreo la convierte en una aliada estratégica para administradores y desarrolladores. Siguiendo este manual, se espera que los usuarios puedan aprovechar al máximo todas las capacidades de `meri-cli`, asegurando un rendimiento óptimo y una integración fluida con el ecosistema MeriBot.
+
+---
