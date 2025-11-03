@@ -245,8 +245,8 @@ python main.py db --help    # Ver ayuda de comandos DB
 
 # Subcomandos principales:
 python main.py db list      # Listar documentos
-python main.py db delete    # Eliminar documentos
 python main.py db show      # Información detallada
+python main.py db delete    # Eliminar documentos
 python main.py db count     # Estadísticas generales
 ```
 
@@ -265,13 +265,10 @@ python main.py db list --show-chunks
 python main.py db list --filter dominio:IT --show-chunks
 
 # Filtrar por nombre de documento
-python main.py db list --filter nombre:manual_onboarding.html
+python main.py db list --filter title:manual_onboarding.html
 
 # Filtrar por fecha de ingreso
 python main.py db list --filter fecha:2025-09-21
-
-# Filtrar por varios criterios
-python main.py db list --filter "dominio:RRHH,nombre:política_vacaciones.pdf"
 ```
 
 **Salida típica:**
