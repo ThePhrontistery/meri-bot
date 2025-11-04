@@ -231,7 +231,7 @@ def parse_xlsx(path: str, url: str = None) -> Dict[str, Any]:
         combined_text = "\n".join(text)
         combined_text = normalize_text(combined_text) if combined_text else ""
         metadata = {
-            "title": None,
+            "title": os.path.basename(path),
             "author": None,
             "date": None,
             "version": None,
@@ -318,8 +318,12 @@ def parse_pdf(path: str, url: str = None) -> Dict[str, Any]:
         # Normalizar el texto extraído para limpiar espacios y caracteres de control
         text = normalize_text(text) if text else ""
         metadata = doc.metadata
+        # Si el título es "Presentación de PowerPoint", usar el nombre de archivo
+        title = metadata.get("title")
+        if title and title.strip().lower() == "presentación de powerpoint":
+            title = os.path.basename(path)
         meta = {
-            "title": metadata.get("title"),
+            "title": title,
             "author": metadata.get("author"),
             "date": metadata.get("creationDate"),
             "version": metadata.get("version", None),
