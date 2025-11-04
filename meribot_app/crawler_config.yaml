@@ -9,11 +9,12 @@ SENSITIVE_KEYS:
 seeds:
   - ""
 allowed_domains:
-  - "cca.capgemini.com"
-  - "onboarding"
-  - "training"
   - "cca"
-  - "sdo"
+  - "carrera profesional"
+  - "engagement manager"
+  - "formación"
+  - "replicon"
+  - "rrhh"
 user_agent: "MeriBot/1.0"
 delay: 1.0 # segundos entre peticiones
 output_dir: "./data/scraped"
