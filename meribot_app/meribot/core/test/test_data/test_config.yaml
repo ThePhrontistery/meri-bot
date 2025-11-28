@@ -1,0 +1,14 @@
+# Configuración de testing para crawler
+testing:
+  enabled: true
+  timeout: 10
+  max_retries: 2
+  
+urls:
+  test:
+    - "http://localhost:8001/test"
+    
+crawler:
+  user_agent: "MeriBot-Test/1.0"
+  delay: 0.1
+  max_depth: 1

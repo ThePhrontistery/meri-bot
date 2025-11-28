@@ -49,7 +49,7 @@ SCRAPER_DELAY=1.0  # segundos entre peticiones
 
 # Configuración de ChromaDB
 CHROMA_PATH=./chroma_data
-EMBEDDING_MODEL=all-MiniLM-L6-v2
+EMBEDDING_MODEL=text-embedding-3-large
 ```
 
 ## Tareas Programadas
@@ -77,7 +77,7 @@ Los errores se registran en `logs/crawler.log` con diferentes niveles de severid
 - BeautifulSoup4
 - Requests
 - ChromaDB
-- Sentence-Transformers
+- Azure OpenAI Embeddings
 - Python-dotenv
 
 ## Notas de Implementación

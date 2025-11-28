@@ -1,0 +1,31 @@
+# Gestión de Listas de Tareas
+Guía para gestionar listas de tareas en archivos markdown para hacer seguimiento del progreso en la finalización de un PRD  
+
+## Implementación de Tareas  
+- **Una sub‑tarea a la vez:** **NO** comiences la siguiente sub‑tarea hasta que preguntes al usuario y este diga "sí" o "y"  
+- **Protocolo de finalización:**  
+  1. Cuando termines una **sub‑tarea**, márcala inmediatamente como completada cambiando `[ ]` por `[x]`.  
+  2. Si **todas** las sub‑tareas bajo una tarea principal están ahora `[x]`, sigue esta secuencia:  
+     - **Primero**: Ejecuta toda las pruebas unitarias. 
+     - Valida con el usuario.
+  3. Una vez que todas las sub‑tareas estén marcadas como completadas y los cambios hayan sido confirmados, marca la **tarea principal** como completada.  
+- Detente después de cada sub‑tarea y espera la aprobación del usuario.  
+
+## Mantenimiento de la Lista de Tareas  
+1. **Actualiza la lista de tareas mientras trabajas:**  
+   - Marca tareas y sub‑tareas como completadas (`[x]`) según el protocolo anterior.  
+   - Agrega nuevas tareas conforme surjan.  
+2. **Mantén la sección "Archivos Relevantes":**  
+   - Lista cada archivo creado o modificado.  
+   - Da a cada archivo una descripción de una línea sobre su propósito.  
+
+## Instrucciones para la IA  
+Al trabajar con listas de tareas, la IA debe:  
+1. Actualizar regularmente el archivo de lista de tareas después de finalizar cualquier trabajo significativo.  
+2. Seguir el protocolo de finalización:  
+   - Marcar cada **sub‑tarea** finalizada como `[x]`.  
+   - Marcar la **tarea principal** como `[x]` una vez que **todas** sus sub‑tareas estén `[x]`.  
+3. Agregar tareas nuevas que se descubran.  
+4. Mantener la sección "Archivos Relevantes" precisa y actualizada.  
+5. Antes de comenzar a trabajar, verificar cuál es la siguiente sub‑tarea.  
+6. Después de implementar una sub‑tarea, actualizar el archivo y luego pausar para obtener aprobación

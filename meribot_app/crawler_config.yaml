@@ -1,0 +1,67 @@
+SENSITIVE_KEYS:
+  - password
+  - api_key
+  - token
+  - secret
+# Ejemplo de configuración para el Crawler de Meri-bot
+# Puedes copiar este archivo como crawler_config.yaml en el directorio del módulo crawler
+
+seeds:
+  - ""
+allowed_domains:
+  - "cca"
+  - "carrera profesional"
+  - "engagement manager"
+  - "formación"
+  - "replicon"
+  - "rrhh"
+user_agent: "MeriBot/1.0"
+delay: 1.0 # segundos entre peticiones
+output_dir: "./data/scraped"
+log_level: "INFO"
+chroma_path: "./chroma_data"
+embedding_model: "all-MiniLM-L6-v2"
+max_depth: 4
+file_types:
+  - "html"
+  - "pdf"
+  - "docx"
+  - "xlsx"
+
+# Configuración para soporte de SPAs (Single Page Applications)
+spa_support: true          # Habilitar detección automática de SPAs
+selenium_timeout: 15       # Timeout en segundos para cargar páginas con Selenium
+headless: true            # Ejecutar navegador en modo headless (sin interfaz gráfica)
+selenium_delay: 3         # Tiempo de espera adicional para contenido dinámico (segundos)
+
+# Configuración de autenticación automática
+auto_login:
+  enabled: true           # Habilitar login automático
+  # login_url se establece automáticamente igual a la URL del crawl cuando se proporcionan credenciales
+  # Por ejemplo: crawl --url "https://sway.cloud.microsoft/my" --> login_url será "https://sway.cloud.microsoft/my"
+  username_field: "input[name='username'], input[type='email'], #username, #email"  # Selectores CSS para campo de usuario
+  password_field: "input[name='password'], input[type='password'], #password"       # Selectores CSS para campo de contraseña
+  submit_button: "button[type='submit'], input[type='submit'], .login-btn, button:contains('Acceder'), button:contains('Login')"  # Selectores para botón de envío
+  success_indicators: [".dashboard", ".home", "nav", ".menu"]  # Elementos que indican login exitoso
+  # Credenciales (usar variables de entorno por seguridad)
+  username: "${MERIBOT_USERNAME}"  # Variable de entorno MERIBOT_USERNAME
+  password: "${MERIBOT_PASSWORD}"  # Variable de entorno MERIBOT_PASSWORD
+max_message_length: 4000
+max_conversation_id_length: 100
+max_domains_count: 5
+dangerous_patterns:
+  - "ignore previous"
+  - "ignore all previous"
+  - "forget previous"
+  - "system:"
+  - "assistant:"
+  - "user:"
+  - "### instruction"
+  - "### system"
+  - "jailbreak"
+  - "pretend you are"
+  - "act as if"
+  - "role:"
+  - "<|system|>"
+  - "<|assistant|>"
+  - "<|user|>"

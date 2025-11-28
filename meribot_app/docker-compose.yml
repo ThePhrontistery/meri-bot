@@ -1,35 +1,59 @@
+# =====================================================
+# Docker Compose para MeriBot - Desarrollo
+# Configuración simplificada con ChromaDB local integrado
+# =====================================================
+
 version: '3.8'
 
 services:
-  api:
-    build: .
-    ports:
-      - "8000:8000"
-    volumes:
-      - .:/app
-    environment:
-      - ENV=development
-    depends_on:
-      - chromadb
-    command: uvicorn meribot.api.app:app --host 0.0.0.0 --port 8000 --reload
-
-  chromadb:
-    image: chromadb/chroma:latest
-    ports:
-      - "8001:8000"
-    volumes:
-      - chroma_data:/chroma/chroma
-
-  web:
+  # =====================================================
+  # Servicio Principal de MeriBot
+  # Incluye API FastAPI + Frontend + ChromaDB local
+  # =====================================================
+  meribot:
     build: 
       context: .
-      dockerfile: Dockerfile.web
+      target: production
+    container_name: meribot-api
     ports:
-      - "8080:80"
+      - "8000:8000"      # API y Widget
     volumes:
-      - ./web/static:/usr/share/nginx/html/static
-    depends_on:
-      - api
+      # Código para desarrollo (hot-reload)
+      - .:/app
+      # Datos persistentes
+      - meribot_logs:/app/logs
+      - meribot_chroma:/app/chroma_data  
+      - meribot_scraped:/app/data/scraped
+    environment:
+      - ENV=development
+      - HOST=0.0.0.0
+      - PORT=8000
+      # Variables de entorno adicionales (crear .env)
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+    command: uvicorn meribot.core.api.app:app --host 0.0.0.0 --port 8000 --reload
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/chatbot/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
 
+# =====================================================
+# Volúmenes Persistentes
+# =====================================================
 volumes:
-  chroma_data:
+  meribot_logs:
+    driver: local
+  meribot_chroma:
+    driver: local
+  meribot_scraped:
+    driver: local
+
+# =====================================================
+# Redes (opcional para futuras extensiones)
+# =====================================================
+networks:
+  default:
+    name: meribot-network

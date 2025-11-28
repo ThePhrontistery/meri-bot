@@ -44,20 +44,40 @@ Servidor Web CCA – Intranet C&CA
 - Utiliza un simple python -m http.server (es suficiente para hacer pruebas locales).
 - Asegura la integración con la red interna y autenticación corporativa.
 
-## 🔹 Capa de Lógica de la Aplicación (Contenedor)
+## 🔹 Capa de Lógica de la Aplicación (FastAPI Core)
 ============================================================
-Contenedor Docker
- |── Servicio FastAPI
- │    └── Endpoint: /chatbot/query
- │    └── Recibe peticiones del Widget
- └── Lógica LangChain
-      └── Procesa la consulta
-      └── Accede a herramientas (retrieval, chains, agents)
-      └── Consulta la base vectorial si es necesario
+```
+meribot/core/
+├── api/
+│   ├── app.py                    # Aplicación FastAPI principal
+│   └── endpoints/                # Endpoints organizados por módulos
+├── chatengine.py                 # Motor de conversación principal
+├── conversation/                 # Gestión de diálogos y contexto
+├── llm/                         # Integración con modelos de lenguaje
+└── templates/                   # Plantillas de respuesta
+```
 
-- FastAPI gestiona las peticiones y respuestas.
-- LangChain permite el uso de LLMs y recuperación semántica.
-- Docker facilita el despliegue y escalabilidad.
+### 🔌 Endpoints de la API
+- **POST** `/chatbot/query` - Procesa consultas del usuario
+  - Recibe: `question`, `conversation_id` (opcional), `domains` (opcional)
+  - Devuelve: `response`, `conversation_id`, `intent`, `confidence`, `citations`
+- **GET** `/chatbot/health` - Verificación de estado del servicio
+- **GET** `/chatbot/allowed_domains` - Lista de dominios permitidos para scraping
+- **GET** `/` - Página principal del widget
+- **GET** `/widget` - Interfaz del widget chatbot
+
+### 🧠 Motor de Conversación (ChatEngine)
+- **Procesamiento de Mensajes**: Análisis de intención y contexto
+- **Gestión RAG**: Retrieval-Augmented Generation con ChromaDB
+- **Integración LLM**: Conexión con modelos de OpenAI/Azure
+- **Manejo de Contexto**: Persistencia de conversaciones
+- **Validación**: Control de calidad de respuestas
+
+### 🔧 Configuración y Middlewares
+- **CORS**: Configurado para integración con intranets
+- **Archivos Estáticos**: Servicio de CSS, JS e imágenes del widget
+- **Gestión Errores**: Manejo robusto de excepciones
+- **Logging**: Registro detallado para debugging y monitoreo
 
 ## 🔹 Capa de Recopilación de Datos
 ============================================================
@@ -100,14 +120,45 @@ Herramienta meri-cli (CLI)
 - Permite control total sin afectar el flujo conversacional.
 
  
-## 🔄 Flujo General
+## 🔄 Flujo de Procesamiento de Consultas
 ============================================================
-1. Usuario → Widget → Servidor Web
-2. Servidor Web → FastAPI → LangChain
-3. LangChain → ChromaDB → Recupera información
-4. LangChain → Respuesta → FastAPI → Widget → Usuario
-5. Scraper Host → Extrae datos → Embeddings → ChromaDB
-6. meri-cli → Administración - Administra scraping y base vectorial
+
+### 📱 Flujo Principal de Usuario
+```
+Usuario → Widget JavaScript → POST /chatbot/query → ChatEngine → Respuesta
+```
+
+1. **Usuario** escribe pregunta en el widget embebido
+2. **Widget** envía petición HTTP POST a `/chatbot/query`
+3. **FastAPI** recibe y valida la petición (`QueryRequest`)
+4. **ChatEngine** procesa el mensaje:
+   - Analiza la intención de la consulta
+   - Busca información relevante en ChromaDB (RAG)
+   - Genera respuesta usando LLM si es necesario
+   - Aplica validaciones de calidad
+5. **API** devuelve respuesta estructurada con metadatos
+6. **Widget** muestra la respuesta al usuario
+
+### 🕷️ Flujo de Recopilación de Datos
+```
+Scheduler → Crawler → Scraping → Procesamiento → ChromaDB
+```
+
+1. **Scheduler** ejecuta tareas de scraping programadas
+2. **Crawler** extrae contenido de sitios web permitidos
+3. **Procesamiento** limpia y estructura los datos
+4. **Embeddings** genera vectores semánticos
+5. **ChromaDB** almacena documentos y vectores para búsqueda
+
+### ⚙️ Flujo de Administración
+```
+meri-cli → Comandos → Gestión Sistema → Logs/Reportes
+```
+
+1. **Administrador** ejecuta comandos CLI
+2. **meri-cli** procesa comandos administrativos
+3. **Sistema** ejecuta operaciones de mantenimiento
+4. **Logs** registran actividades y resultados
 
 ## ✅ Recomendaciones
 ============================================================
